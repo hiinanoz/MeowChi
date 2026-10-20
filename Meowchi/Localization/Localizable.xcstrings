@@ -1,0 +1,348 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "action.feed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feed"
+          }
+        }
+      }
+    },
+    "action.sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep"
+          }
+        }
+      }
+    },
+    "action.wake": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wake up"
+          }
+        }
+      }
+    },
+    "cat.defaultName": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mochi"
+          }
+        }
+      }
+    },
+    "common.ok": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        }
+      }
+    },
+    "food.chicken.name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chicken"
+          }
+        }
+      }
+    },
+    "food.dry.name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dry Food"
+          }
+        }
+      }
+    },
+    "food.fish.name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fish"
+          }
+        }
+      }
+    },
+    "food.treat.name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Treat"
+          }
+        }
+      }
+    },
+    "food.wet.name": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wet Food"
+          }
+        }
+      }
+    },
+    "hud.coins %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld coin"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld coins"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "hud.level %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lv. %lld"
+          }
+        }
+      }
+    },
+    "mood.bored": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bored"
+          }
+        }
+      }
+    },
+    "mood.excited": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Excited"
+          }
+        }
+      }
+    },
+    "mood.happy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Happy"
+          }
+        }
+      }
+    },
+    "mood.hungry": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hungry"
+          }
+        }
+      }
+    },
+    "mood.neutral": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calm"
+          }
+        }
+      }
+    },
+    "mood.sad": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sad"
+          }
+        }
+      }
+    },
+    "mood.sleepy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleepy"
+          }
+        }
+      }
+    },
+    "notice.busy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your cat is busy right now."
+          }
+        }
+      }
+    },
+    "notice.levelUp": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Level up!"
+          }
+        }
+      }
+    },
+    "notice.noFood": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You're out of food."
+          }
+        }
+      }
+    },
+    "notice.sleeping": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shh… your cat is sleeping."
+          }
+        }
+      }
+    },
+    "save.error.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your previous save was damaged. It has been kept aside safely and a new game was started."
+          }
+        }
+      }
+    },
+    "save.error.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save couldn't be loaded"
+          }
+        }
+      }
+    },
+    "stat.cleanliness": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cleanliness"
+          }
+        }
+      }
+    },
+    "stat.energy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Energy"
+          }
+        }
+      }
+    },
+    "stat.happiness": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Happiness"
+          }
+        }
+      }
+    },
+    "stat.health": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health"
+          }
+        }
+      }
+    },
+    "stat.hunger": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fullness"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

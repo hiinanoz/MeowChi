@@ -1,0 +1,675 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+		013E63CE299CB0718C321E95 = {
+			isa = PBXGroup;
+			children = (
+				D010DAD361CA90D9CD1AA883,
+				25DBA27B5B8CEA516A43EA4D,
+			);
+			path = MeowchiTests;
+			sourceTree = "<group>";
+		};
+		0206D15721B4D143CC79B8B3 = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		068E21CFF51574B12466E74C = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = SpriteLibrary.swift;
+			sourceTree = "<group>";
+		};
+		08723DE70035A45CE7E33CC1 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		0D4719800460A9872D190D36 = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0DCE3E0E16B5D4CBF192D043 = {
+			isa = PBXBuildFile;
+			fileRef = 45FEF11BEFC41C0C92ED67BC;
+		};
+		10E503C5A938234DB3E6EB61 = {
+			isa = PBXBuildFile;
+			fileRef = 8223185FBB211437BF477E7E;
+		};
+		1138E6ED37D44C732DE6F5A8 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = RoomScene.swift;
+			sourceTree = "<group>";
+		};
+		11AF12A87622A613DAE4C415 = {
+			isa = PBXGroup;
+			children = (
+				85A7D8E49FCB0865855CFC23,
+				33CC715B739D548CF4E217F1,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		1F0052988AD48929DD91A0D5 = {
+			isa = PBXBuildFile;
+			fileRef = C1F94725A8C0A27827E1BA6A;
+		};
+		2254342BECCEAFBD04538E0A = {
+			isa = PBXTargetDependency;
+			target = 9E46948988D0C4FE6032242F;
+			targetProxy = 431387EB7262E1CFC79B125E;
+		};
+		238367DBEBE1F6AA71AAD920 = {
+			isa = PBXBuildFile;
+			fileRef = 1138E6ED37D44C732DE6F5A8;
+		};
+		25DBA27B5B8CEA516A43EA4D = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = GameStoreTests.swift;
+			sourceTree = "<group>";
+		};
+		2AC8BA37DAC32D5437812408 = {
+			isa = PBXGroup;
+			children = (
+				51D9F8DAAB7A533C98DAB9EB,
+				AA7268D20DD1E55046E528BE,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2B096DF5F468EAE4EE410656 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.uyelikposya.meowchi.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Meowchi.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Meowchi";
+			};
+			name = Release;
+		};
+		2C6864DC2BB1F1659BF47980 = {
+			isa = PBXGroup;
+			children = (
+				F0C63590472112A349A7F246,
+			);
+			path = Localization;
+			sourceTree = "<group>";
+		};
+		2E35686EB3B47598BFEB24A2 = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A051EDC31C0E6E26FBF972FD,
+				A8203821B161CC9FDFED62E6,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		31402007750C9E62EFE4F6C8 = {
+			isa = PBXBuildFile;
+			fileRef = 33CC715B739D548CF4E217F1;
+		};
+		33CC715B739D548CF4E217F1 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = HUDView.swift;
+			sourceTree = "<group>";
+		};
+		3F06E74F624047097A43F1ED = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = CatStats.swift;
+			sourceTree = "<group>";
+		};
+		431387EB7262E1CFC79B125E = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46F86FAA6BBF9AC94A7E4595;
+			proxyType = 1;
+			remoteGlobalIDString = 9E46948988D0C4FE6032242F;
+			remoteInfo = Meowchi;
+		};
+		45FEF11BEFC41C0C92ED67BC = {
+			isa = PBXFileReference;
+			lastKnownFileType = folder.assetcatalog;
+			path = Assets.xcassets;
+			sourceTree = "<group>";
+		};
+		46F86FAA6BBF9AC94A7E4595 = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1520;
+				LastUpgradeCheck = 1520;
+				TargetAttributes = {
+					9E46948988D0C4FE6032242F = {
+						CreatedOnToolsVersion = 15.2;
+					};
+					E5B141960220753784353F25 = {
+						CreatedOnToolsVersion = 15.2;
+						TestTargetID = 9E46948988D0C4FE6032242F;
+					};
+				};
+			};
+			buildConfigurationList = B61A476A5531CC175278BDCF;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				tr,
+				es,
+				de,
+				ja,
+				ko,
+				fr,
+			);
+			mainGroup = 8A2934BF8E67675297A3835F;
+			productRefGroup = 2AC8BA37DAC32D5437812408;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9E46948988D0C4FE6032242F,
+				E5B141960220753784353F25,
+			);
+		};
+		47A4E3D3714E1DC0C79E965D = {
+			isa = PBXGroup;
+			children = (
+				11AF12A87622A613DAE4C415,
+				4B1BB0FAAE349C6B2F641F3E,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		4B1BB0FAAE349C6B2F641F3E = {
+			isa = PBXGroup;
+			children = (
+				4F1F491039760DF3DC099379,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		4D5B1C97095A6DCC0A47FBE8 = {
+			isa = PBXBuildFile;
+			fileRef = 7B3171749DEA097B2D9242BA;
+		};
+		4E8A86A63DBE537BF7CD74EC = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A71FA2572889AFD8D65FDDCF,
+				2B096DF5F468EAE4EE410656,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4F1F491039760DF3DC099379 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = PixelTheme.swift;
+			sourceTree = "<group>";
+		};
+		51D9F8DAAB7A533C98DAB9EB = {
+			isa = PBXFileReference;
+			explicitFileType = wrapper.application;
+			includeInIndex = 0;
+			path = Meowchi.app;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		54C6F49BDA0C9C63E4CB70E5 = {
+			isa = PBXBuildFile;
+			fileRef = 8C0C3EDB15F7F65C5CEE783C;
+		};
+		5519CE22010C9D7F54B41EBC = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2F429E3B45EF701C8384B42,
+				0DCE3E0E16B5D4CBF192D043,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		580544F59D745C748B7384E1 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = MeowchiApp.swift;
+			sourceTree = "<group>";
+		};
+		5922E0E638FF7D387C4AC71C = {
+			isa = PBXGroup;
+			children = (
+				8C0C3EDB15F7F65C5CEE783C,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		5DE577FFAB824FEF616568CF = {
+			isa = PBXGroup;
+			children = (
+				45FEF11BEFC41C0C92ED67BC,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		612B66A4D810A05F8E5A6A3C = {
+			isa = PBXGroup;
+			children = (
+				3F06E74F624047097A43F1ED,
+				C69C64B1AC9D66D3E1F613F2,
+				68549A064F85EDA1EC86D408,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		68549A064F85EDA1EC86D408 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = ItemCatalog.swift;
+			sourceTree = "<group>";
+		};
+		6D1C2FC7A9F1ED297ABC4D6F = {
+			isa = PBXGroup;
+			children = (
+				9296D7564BCB5E19556C7808,
+				DAE215AAC8568CFABE38AC45,
+				9A3FD2639F3FE963123F8B60,
+				A785C618E41568D8867C57F5,
+			);
+			path = Game;
+			sourceTree = "<group>";
+		};
+		6D1FC892FE0E344A997F4BA3 = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		772F9DDC1B2C2F1F7B100B44 = {
+			isa = PBXBuildFile;
+			fileRef = 4F1F491039760DF3DC099379;
+		};
+		7B3171749DEA097B2D9242BA = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = CatSimulator.swift;
+			sourceTree = "<group>";
+		};
+		7BA86DA25DD34116FA3F401E = {
+			isa = PBXBuildFile;
+			fileRef = 068E21CFF51574B12466E74C;
+		};
+		80DB6ACE13380ADC3D86D6C5 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		8223185FBB211437BF477E7E = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = CatNode.swift;
+			sourceTree = "<group>";
+		};
+		833F538B010A1D12991F68E0 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF0118815CD93CCC9D1F0143,
+				F1F61AEE0A5E7140083F2E32,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85A7D8E49FCB0865855CFC23 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = HomeView.swift;
+			sourceTree = "<group>";
+		};
+		85B4269635614BD0C8CA6978 = {
+			isa = PBXBuildFile;
+			fileRef = 3F06E74F624047097A43F1ED;
+		};
+		8A2934BF8E67675297A3835F = {
+			isa = PBXGroup;
+			children = (
+				D80A94CBB67D01225CEC93BF,
+				013E63CE299CB0718C321E95,
+				2AC8BA37DAC32D5437812408,
+			);
+			sourceTree = "<group>";
+		};
+		8C0C3EDB15F7F65C5CEE783C = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = Balance.swift;
+			sourceTree = "<group>";
+		};
+		8FF958351626617C7DFD67A0 = {
+			isa = PBXBuildFile;
+			fileRef = DAE215AAC8568CFABE38AC45;
+		};
+		9296D7564BCB5E19556C7808 = {
+			isa = PBXGroup;
+			children = (
+				8223185FBB211437BF477E7E,
+			);
+			path = Cat;
+			sourceTree = "<group>";
+		};
+		9A3FD2639F3FE963123F8B60 = {
+			isa = PBXGroup;
+			children = (
+				1138E6ED37D44C732DE6F5A8,
+				068E21CFF51574B12466E74C,
+			);
+			path = Scenes;
+			sourceTree = "<group>";
+		};
+		9BF8CA865509CCDB7D16519C = {
+			isa = PBXBuildFile;
+			fileRef = 580544F59D745C748B7384E1;
+		};
+		9E46948988D0C4FE6032242F = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 833F538B010A1D12991F68E0;
+			buildPhases = (
+				F7EEE878C388C21EDF872EA6,
+				0206D15721B4D143CC79B8B3,
+				5519CE22010C9D7F54B41EBC,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Meowchi;
+			productName = Meowchi;
+			productReference = 51D9F8DAAB7A533C98DAB9EB;
+			productType = "com.apple.product-type.application";
+		};
+		A051EDC31C0E6E26FBF972FD = {
+			isa = PBXBuildFile;
+			fileRef = D010DAD361CA90D9CD1AA883;
+		};
+		A2F429E3B45EF701C8384B42 = {
+			isa = PBXBuildFile;
+			fileRef = F0C63590472112A349A7F246;
+		};
+		A71FA2572889AFD8D65FDDCF = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.uyelikposya.meowchi.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Meowchi.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Meowchi";
+			};
+			name = Debug;
+		};
+		A785C618E41568D8867C57F5 = {
+			isa = PBXGroup;
+			children = (
+				7B3171749DEA097B2D9242BA,
+			);
+			path = Simulation;
+			sourceTree = "<group>";
+		};
+		A8203821B161CC9FDFED62E6 = {
+			isa = PBXBuildFile;
+			fileRef = 25DBA27B5B8CEA516A43EA4D;
+		};
+		AA7268D20DD1E55046E528BE = {
+			isa = PBXFileReference;
+			explicitFileType = wrapper.cfbundle;
+			includeInIndex = 0;
+			path = MeowchiTests.xctest;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B61A476A5531CC175278BDCF = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				80DB6ACE13380ADC3D86D6C5,
+				08723DE70035A45CE7E33CC1,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BF0118815CD93CCC9D1F0143 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				MARKETING_VERSION = 0.1.0;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Meowchi;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.simulation-games";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.uyelikposya.meowchi;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		C1F94725A8C0A27827E1BA6A = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = SaveStore.swift;
+			sourceTree = "<group>";
+		};
+		C69C64B1AC9D66D3E1F613F2 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = GameState.swift;
+			sourceTree = "<group>";
+		};
+		CE5A16000962214626D4EC4C = {
+			isa = PBXBuildFile;
+			fileRef = C69C64B1AC9D66D3E1F613F2;
+		};
+		D010DAD361CA90D9CD1AA883 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = CatSimulatorTests.swift;
+			sourceTree = "<group>";
+		};
+		D6C4B81BC28233E2FF4E74C3 = {
+			isa = PBXBuildFile;
+			fileRef = 85A7D8E49FCB0865855CFC23;
+		};
+		D7EE625C8CD283337AA0E050 = {
+			isa = PBXBuildFile;
+			fileRef = 68549A064F85EDA1EC86D408;
+		};
+		D80A94CBB67D01225CEC93BF = {
+			isa = PBXGroup;
+			children = (
+				FD48FF84FBAC52D587DABA7D,
+				5922E0E638FF7D387C4AC71C,
+				47A4E3D3714E1DC0C79E965D,
+				6D1C2FC7A9F1ED297ABC4D6F,
+				2C6864DC2BB1F1659BF47980,
+				612B66A4D810A05F8E5A6A3C,
+				5DE577FFAB824FEF616568CF,
+				EEA32C2F6750C06B6FA131AD,
+			);
+			path = Meowchi;
+			sourceTree = "<group>";
+		};
+		DAE215AAC8568CFABE38AC45 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = GameStore.swift;
+			sourceTree = "<group>";
+		};
+		E5B141960220753784353F25 = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4E8A86A63DBE537BF7CD74EC;
+			buildPhases = (
+				2E35686EB3B47598BFEB24A2,
+				6D1FC892FE0E344A997F4BA3,
+				0D4719800460A9872D190D36,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2254342BECCEAFBD04538E0A,
+			);
+			name = MeowchiTests;
+			productName = MeowchiTests;
+			productReference = AA7268D20DD1E55046E528BE;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		ED3163498D0A3A0B7D741E45 = {
+			isa = PBXGroup;
+			children = (
+				C1F94725A8C0A27827E1BA6A,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		EEA32C2F6750C06B6FA131AD = {
+			isa = PBXGroup;
+			children = (
+				ED3163498D0A3A0B7D741E45,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		F0C63590472112A349A7F246 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text.json.xcstrings;
+			path = Localizable.xcstrings;
+			sourceTree = "<group>";
+		};
+		F1F61AEE0A5E7140083F2E32 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				MARKETING_VERSION = 0.1.0;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Meowchi;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.simulation-games";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.uyelikposya.meowchi;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		F7EEE878C388C21EDF872EA6 = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9BF8CA865509CCDB7D16519C,
+				54C6F49BDA0C9C63E4CB70E5,
+				D6C4B81BC28233E2FF4E74C3,
+				31402007750C9E62EFE4F6C8,
+				772F9DDC1B2C2F1F7B100B44,
+				10E503C5A938234DB3E6EB61,
+				8FF958351626617C7DFD67A0,
+				238367DBEBE1F6AA71AAD920,
+				7BA86DA25DD34116FA3F401E,
+				4D5B1C97095A6DCC0A47FBE8,
+				85B4269635614BD0C8CA6978,
+				CE5A16000962214626D4EC4C,
+				D7EE625C8CD283337AA0E050,
+				1F0052988AD48929DD91A0D5,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FD48FF84FBAC52D587DABA7D = {
+			isa = PBXGroup;
+			children = (
+				580544F59D745C748B7384E1,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+	};
+	rootObject = 46F86FAA6BBF9AC94A7E4595;
+}

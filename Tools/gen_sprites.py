@@ -1,0 +1,316 @@
+#!/usr/bin/env python3
+"""Generates TEMPORARY placeholder pixel-art sprites into the asset catalog.
+
+These are NOT production artwork. Final sprites must follow docs/ASSETS.md and
+keep the same asset names so they can be swapped without code changes.
+Pure standard library (no Pillow). Run: python3 Tools/gen_sprites.py
+"""
+import json, pathlib, struct, zlib
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+ASSETS = ROOT / "Meowchi/Resources/Assets.xcassets"
+
+K = (59, 38, 40, 255)      # outline
+O = (242, 153, 74, 255)    # orange fur
+D = (214, 111, 44, 255)    # stripes
+W = (255, 247, 235, 255)   # white fur
+P = (245, 160, 170, 255)   # pink
+E = (40, 28, 30, 255)      # eyes
+H = (255, 255, 255, 255)   # highlight
+
+
+class Canvas:
+    def __init__(self, w, h):
+        self.w, self.h = w, h
+        self.p = [[None] * w for _ in range(h)]
+
+    def set(self, x, y, c):
+        if 0 <= x < self.w and 0 <= y < self.h:
+            self.p[y][x] = c
+
+    def rect(self, x, y, w, h, c):
+        for yy in range(y, y + h):
+            for xx in range(x, x + w):
+                self.set(xx, yy, c)
+
+    def ellipse(self, cx, cy, rx, ry, c):
+        for y in range(self.h):
+            for x in range(self.w):
+                if ((x + .5 - cx) / rx) ** 2 + ((y + .5 - cy) / ry) ** 2 <= 1:
+                    self.set(x, y, c)
+
+    def tri(self, a, b, c, col):
+        def side(p, q, r):
+            return (p[0] - r[0]) * (q[1] - r[1]) - (q[0] - r[0]) * (p[1] - r[1])
+        for y in range(self.h):
+            for x in range(self.w):
+                pt = (x + .5, y + .5)
+                d1, d2, d3 = side(pt, a, b), side(pt, b, c), side(pt, c, a)
+                if not ((d1 < 0 or d2 < 0 or d3 < 0) and (d1 > 0 or d2 > 0 or d3 > 0)):
+                    self.set(x, y, col)
+
+    def outline(self, c=K):
+        src = [row[:] for row in self.p]
+        for y in range(self.h):
+            for x in range(self.w):
+                if src[y][x] is None and any(
+                    0 <= x + dx < self.w and 0 <= y + dy < self.h and src[y + dy][x + dx] is not None
+                    for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                    self.p[y][x] = c
+
+    def stamp(self, rows, palette, ox=0, oy=0):
+        for y, row in enumerate(rows):
+            for x, ch in enumerate(row):
+                if ch in palette:
+                    self.set(ox + x, oy + y, palette[ch])
+
+
+def write_png(path, canvas, scale=1, background=None):
+    w, h = canvas.w * scale, canvas.h * scale
+    opaque = background is not None
+    raw = bytearray()
+    for y in range(h):
+        raw.append(0)
+        for x in range(w):
+            c = canvas.p[y // scale][x // scale] or background or (0, 0, 0, 0)
+            raw.extend(c[:3] if opaque else c)
+    def chunk(t, d):
+        return struct.pack(">I", len(d)) + t + d + struct.pack(">I", zlib.crc32(t + d) & 0xFFFFFFFF)
+    ihdr = struct.pack(">IIBBBBB", w, h, 8, 2 if opaque else 6, 0, 0, 0)
+    path.write_bytes(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", ihdr) + chunk(b"IDAT", zlib.compress(bytes(raw), 9)) + chunk(b"IEND", b""))
+
+
+INFO = {"info": {"author": "xcode", "version": 1}}
+
+
+def save_image(folder, name, canvas):
+    d = ASSETS / folder / f"{name}.imageset"
+    d.mkdir(parents=True, exist_ok=True)
+    write_png(d / f"{name}.png", canvas)
+    (d / "Contents.json").write_text(json.dumps(
+        {"images": [{"filename": f"{name}.png", "idiom": "universal", "scale": "1x"}], **INFO}, indent=2))
+
+
+# ---------- Cat (32x32, feet at bottom center) ----------
+
+def cat_sit(eyes="open", mouth="smile", tail=0, breath=0, head_dy=0, lift=(0, 0)):
+    c = Canvas(32, 32)
+    tails = [[(22, 25), (24, 24), (25, 22), (26, 20), (26, 18)],
+             [(22, 25), (24, 25), (26, 24), (27, 22), (28, 20)]]
+    pts = tails[tail]
+    for x, y in pts:
+        c.rect(x, y, 2, 2, O)
+    c.rect(pts[-1][0], pts[-1][1], 2, 2, W)
+    c.ellipse(16, 24, 7, 6 + breath * .5, O)
+    c.ellipse(16, 25, 4, 4.5, W)
+    c.ellipse(12.5, 29 - lift[0], 2.5, 1.6, W)
+    c.ellipse(19.5, 29 - lift[1], 2.5, 1.6, W)
+    hy = 12 + head_dy
+    c.tri((6, hy - 9), (6.5, hy - 1), (13.5, hy - 5), O)
+    c.tri((26, hy - 9), (25.5, hy - 1), (18.5, hy - 5), O)
+    c.ellipse(16, hy, 9.5, 7.5, O)
+    c.tri((7.5, hy - 7), (8, hy - 2.5), (11.5, hy - 4.5), P)
+    c.tri((24.5, hy - 7), (24, hy - 2.5), (20.5, hy - 4.5), P)
+    for x, y, w, h in ((12, hy - 6, 1, 2), (15, hy - 7, 2, 2), (19, hy - 6, 1, 2), (7, hy, 2, 1), (23, hy, 2, 1)):
+        c.rect(x, y, w, h, D)
+    c.ellipse(16, hy + 3.5, 4.5, 2.6, W)
+    for ex in (11, 19):
+        if eyes == "open":
+            c.rect(ex, hy - 1, 2, 3, E); c.set(ex, hy - 1, H)
+        elif eyes == "closed":
+            c.rect(ex - 1, hy + 1, 4, 1, E)
+        elif eyes == "happy":
+            for dx, dy in ((-1, 1), (0, 0), (1, 0), (2, 1)):
+                c.set(ex + dx, hy + dy, E)
+        elif eyes == "sad":
+            c.rect(ex, hy, 2, 2, E); c.set(ex, hy, H)
+            c.set(ex - 1 if ex < 16 else ex + 2, hy - 2, E)
+            c.set(ex if ex < 16 else ex + 1, hy - 2, E)
+    c.rect(9, hy + 2, 2, 1, P); c.rect(21, hy + 2, 2, 1, P)
+    c.rect(15, hy + 2, 2, 1, P)
+    if mouth == "smile":
+        for x, y in ((14, hy + 3), (15, hy + 4), (16, hy + 4), (17, hy + 3)):
+            c.set(x, y, E)
+    elif mouth == "open":
+        c.rect(15, hy + 4, 2, 2, P); c.set(14, hy + 4, E); c.set(17, hy + 4, E)
+    elif mouth == "flat":
+        c.rect(15, hy + 4, 2, 1, E)
+    c.outline()
+    return c
+
+
+def cat_sleep(breath=0):
+    c = Canvas(32, 32)
+    c.rect(9, 28, 16, 2, O); c.rect(7, 28, 2, 2, W)
+    c.ellipse(17, 25, 11, 5.5 + breath * .5, O)
+    for x in (17, 21, 25):
+        c.rect(x, 20 + (1 if x == 25 else 0), 1, 2, D)
+    hy = 22
+    c.tri((4, hy - 8), (4.5, hy - 1), (10.5, hy - 4), O)
+    c.tri((17, hy - 8), (16.5, hy - 1), (10.5, hy - 4), O)
+    c.ellipse(10.5, hy, 7.5, 6, O)
+    c.tri((5.5, hy - 6), (6, hy - 2.5), (9, hy - 4), P)
+    c.ellipse(10.5, hy + 3, 4, 2.2, W)
+    c.rect(6, hy + 1, 3, 1, E); c.rect(12, hy + 1, 3, 1, E)
+    c.rect(10, hy + 2, 1, 1, P)
+    c.outline()
+    return c
+
+
+# ---------- Room objects ----------
+
+def bowl(fill):
+    c = Canvas(16, 9)
+    c.ellipse(8, 5.5, 7, 3.2, (230, 92, 92, 255))
+    c.ellipse(8, 3.6, 5.5, 1.6, {"empty": (150, 50, 60, 255), "food": (150, 95, 50, 255),
+                                 "water": (110, 180, 230, 255)}[fill])
+    if fill == "food":
+        for x in (5, 8, 11):
+            c.set(x, 2, (190, 130, 70, 255))
+    c.rect(3, 6, 10, 1, (200, 70, 80, 255))
+    c.outline()
+    return c
+
+
+def bed():
+    c = Canvas(36, 14)
+    c.ellipse(18, 8.5, 17, 5, (214, 86, 120, 255))
+    c.ellipse(18, 7.5, 12.5, 3, (247, 170, 190, 255))
+    c.outline()
+    return c
+
+
+def scratching_post():
+    c = Canvas(16, 36)
+    c.rect(1, 30, 14, 4, (170, 112, 72, 255))
+    c.rect(6, 6, 4, 24, (222, 190, 140, 255))
+    for y in range(8, 30, 3):
+        c.rect(6, y, 4, 1, (190, 150, 100, 255))
+    c.rect(2, 2, 12, 4, (170, 120, 200, 255))
+    c.outline()
+    return c
+
+
+def yarn():
+    c = Canvas(12, 10)
+    c.ellipse(5, 5, 4.5, 4.5, (232, 80, 110, 255))
+    for x, y in ((3, 3), (4, 4), (5, 5), (6, 6), (6, 2), (7, 3)):
+        c.set(x, y, (180, 50, 80, 255))
+    c.rect(9, 8, 2, 1, (232, 80, 110, 255))
+    c.outline()
+    return c
+
+
+def plant():
+    c = Canvas(16, 24)
+    g1, g2 = (110, 180, 100, 255), (80, 150, 80, 255)
+    c.ellipse(8, 8, 5, 6, g1); c.ellipse(4, 11, 3.5, 3, g2); c.ellipse(12, 11, 3.5, 3, g2)
+    c.rect(4, 15, 8, 7, (200, 110, 70, 255)); c.rect(3, 15, 10, 2, (220, 130, 85, 255))
+    c.outline()
+    return c
+
+
+HEART = [".HH.HH.", "HPPHPPH", "HPPPPPH", ".HPPPH.", "..HPH..", "...H..."]
+ZED = ["KKKKK", "...K.", "..K..", ".K...", "KKKKK"]
+
+
+def small(rows, pal):
+    c = Canvas(len(rows[0]), len(rows))
+    c.stamp(rows, pal)
+    return c
+
+
+ICONS = {
+    "icon_hunger": ["..KKK....", ".KOOOK.KK", "KOEOOOKOK", "KOOOOOOOK", ".KOOOK.KK", "..KKK...."],
+    "icon_energy": ["....KKK", "...KYK.", "..KYK..", ".KYYYK.", "..KYK..", ".KYK...", "KYK....", "KK....."],
+    "icon_happiness": [".KK.KK.", "KPPKPPK", "KPPPPPK", ".KPPPK.", "..KPK..", "...K..."],
+    "icon_cleanliness": ["...K...", "..KBK..", ".KBBBK.", "KBBHBBK", "KBBBBBK", ".KBBBK.", "..KKK.."],
+    "icon_health": ["..KKK..", "..KRK..", "KKKRKKK", "KRRRRRK", "KKKRKKK", "..KRK..", "..KKK.."],
+    "icon_coin": [".KKKK.", "KYYYYK", "KYKYYK", "KYKYYK", "KYYYYK", ".KKKK."],
+    "icon_xp": ["...K...", "..KYK..", "KKYYYKK", ".KYYYK.", ".KYKYK.", "KK...KK"],
+}
+ICON_PAL = {"K": K, "O": (120, 170, 220, 255), "E": E, "Y": (250, 205, 70, 255), "P": (240, 90, 120, 255),
+            "B": (110, 180, 230, 255), "H": H, "R": (230, 70, 70, 255)}
+
+
+# ---------- Room background 180x200 ----------
+
+ROOM_PAD_X, ROOM_PAD_Y = 20, 80  # extra art around the 180x200 core; keep in sync with RoomScene.artPadding
+
+
+def room():
+    """Core room is 180x200; padding extends wall and floor for taller/wider screens."""
+    full = Canvas(180 + 2 * ROOM_PAD_X, 200 + 2 * ROOM_PAD_Y)
+    floor_top = ROOM_PAD_Y + 120
+    for y in range(full.h):
+        for x in range(full.w):
+            if y < floor_top:
+                full.set(x, y, (244, 212, 184, 255) if ((x - ROOM_PAD_X) // 6) % 2 else (250, 226, 200, 255))
+            else:
+                seam = (x + ((y - floor_top) // 10) * 23) % 46 == 0
+                full.set(x, y, (176, 112, 70, 255) if (y - floor_top) % 10 == 0 or seam else (205, 140, 92, 255))
+    full.rect(0, floor_top - 8, full.w, 8, (196, 140, 100, 255)); full.rect(0, floor_top - 8, full.w, 1, (150, 100, 70, 255))
+    c = Canvas(180, 200)
+    # window
+    c.rect(58, 20, 64, 64, K); c.rect(60, 22, 60, 60, (255, 250, 240, 255))
+    c.rect(63, 25, 54, 54, (150, 210, 240, 255))
+    for x, y, w in ((70, 34, 12), (68, 36, 16), (95, 50, 10), (93, 52, 14)):
+        c.rect(x, y, w, 2, H)
+    c.rect(89, 25, 2, 54, (255, 250, 240, 255)); c.rect(63, 51, 54, 2, (255, 250, 240, 255))
+    c.rect(54, 84, 72, 4, (196, 140, 100, 255)); c.rect(54, 88, 72, 1, K)
+    for cx in (50, 122):
+        c.rect(cx, 16, 8, 74, (247, 170, 190, 255)); c.rect(cx + 2, 16, 1, 74, (230, 140, 165, 255))
+    c.rect(46, 14, 88, 3, (150, 100, 70, 255))
+    # picture frame
+    c.rect(142, 38, 24, 20, K); c.rect(144, 40, 20, 16, (255, 236, 170, 255))
+    c.ellipse(154, 49, 5, 4, (242, 153, 74, 255))
+    # rug
+    c.ellipse(90, 165, 54, 23, (230, 160, 140, 255))
+    c.ellipse(90, 165, 50, 20, (240, 190, 160, 255))
+    c.ellipse(90, 165, 38, 14, (245, 205, 175, 255))
+    for y in range(200):
+        for x in range(180):
+            if c.p[y][x]:
+                full.set(x + ROOM_PAD_X, y + ROOM_PAD_Y, c.p[y][x])
+    return full
+
+
+def main():
+    ASSETS.mkdir(parents=True, exist_ok=True)
+    (ASSETS / "Contents.json").write_text(json.dumps(INFO, indent=2))
+    for folder in ("Sprites", "Icons"):
+        (ASSETS / folder).mkdir(parents=True, exist_ok=True)
+        (ASSETS / folder / "Contents.json").write_text(json.dumps(INFO, indent=2))
+    frames = {
+        "cat_idle_0": cat_sit(tail=0), "cat_idle_1": cat_sit(tail=1, breath=1),
+        "cat_blink": cat_sit(eyes="closed", tail=0),
+        "cat_walk_0": cat_sit(tail=0, lift=(2, 0)), "cat_walk_1": cat_sit(tail=1, lift=(0, 2)),
+        "cat_happy_0": cat_sit(eyes="happy", mouth="open", tail=1),
+        "cat_happy_1": cat_sit(eyes="happy", mouth="smile", tail=0, breath=1),
+        "cat_sad": cat_sit(eyes="sad", mouth="flat", tail=0),
+        "cat_eat_0": cat_sit(eyes="closed", mouth="open", head_dy=3), "cat_eat_1": cat_sit(eyes="closed", mouth="smile", head_dy=4),
+        "cat_sleep_0": cat_sleep(0), "cat_sleep_1": cat_sleep(1),
+        "room_background": room(), "bowl_empty": bowl("empty"), "bowl_food": bowl("food"),
+        "bowl_water": bowl("water"), "bed_basic": bed(), "scratching_post": scratching_post(),
+        "toy_yarn": yarn(), "plant_basic": plant(),
+        "fx_heart": small(HEART, {"H": K, "P": (240, 90, 120, 255)}), "fx_zzz": small(ZED, {"K": (90, 110, 200, 255)}),
+    }
+    for name, canvas in frames.items():
+        save_image("Sprites", name, canvas)
+    for name, rows in ICONS.items():
+        width = max(len(r) for r in rows)
+        save_image("Icons", name, small([r.ljust(width, ".") for r in rows], ICON_PAL))
+    # App icon (opaque, placeholder)
+    icon = ASSETS / "AppIcon.appiconset"; icon.mkdir(parents=True, exist_ok=True)
+    write_png(icon / "icon.png", cat_sit(eyes="happy", mouth="open", tail=1), scale=32,
+              background=(255, 214, 170, 255))  # 1024px
+    (icon / "Contents.json").write_text(json.dumps({"images": [{"filename": "icon.png", "idiom": "universal",
+                                                    "platform": "ios", "size": "1024x1024"}], **INFO}, indent=2))
+    accent = ASSETS / "AccentColor.colorset"; accent.mkdir(parents=True, exist_ok=True)
+    (accent / "Contents.json").write_text(json.dumps({"colors": [{"idiom": "universal", "color": {
+        "color-space": "srgb", "components": {"red": "0.949", "green": "0.600", "blue": "0.290", "alpha": "1.000"}}}],
+        **INFO}, indent=2))
+
+
+if __name__ == "__main__":
+    main()

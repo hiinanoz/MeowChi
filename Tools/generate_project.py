@@ -9,7 +9,7 @@ import hashlib, pathlib, re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 APP, TESTS = "Meowchi", "MeowchiTests"
-BUNDLE_ID = "com.uyelikposya.meowchi"
+BUNDLE_ID = "com.meowchi.game"
 DEPLOYMENT_TARGET = "17.0"
 DEVICE_FAMILY = "1"  # 1 = iPhone. Use "1,2" when iPad support lands.
 MARKETING_VERSION, BUILD = "0.1.0", "1"

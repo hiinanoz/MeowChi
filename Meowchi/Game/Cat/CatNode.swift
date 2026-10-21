@@ -6,11 +6,11 @@ enum CatAnimation: Equatable {
 }
 
 /// The cat character: a container node that moves (possibly sub-pixel) plus a sprite child
-/// that the scene snaps to whole pixels every frame. All frames are 32x32 with feet at the bottom center,
+/// that the scene snaps to whole pixels every frame. All frames are 64x64 with feet at the bottom center,
 /// so switching animations never shifts the character.
 final class CatNode: SKNode {
-    static let frameSize = CGSize(width: 32, height: 32)
-    static let walkSpeed: CGFloat = 30 // logical pixels per second
+    static let frameSize = CGSize(width: 64, height: 64)
+    static let walkSpeed: CGFloat = 60 // logical pixels per second
 
     let sprite = SKSpriteNode(texture: SpriteLibrary.texture("cat_idle_0"), size: CatNode.frameSize)
     private(set) var animation: CatAnimation?
@@ -28,7 +28,7 @@ final class CatNode: SKNode {
 
     /// Hit area in the parent's coordinate space, slightly generous for small fingers.
     var hitFrame: CGRect {
-        CGRect(x: position.x - 14, y: position.y, width: 28, height: 28)
+        CGRect(x: position.x - 28, y: position.y, width: 56, height: 56)
     }
 
     func play(_ next: CatAnimation, force: Bool = false) {

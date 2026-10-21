@@ -29,7 +29,12 @@ struct Balance {
     var autoWakeEnergy = 100.0
 
     // MARK: Interactions
-    var petHappiness = 4.0
+    /// Stroking is the "real" petting; a quick tap gives a smaller boost.
+    var petHappiness = 5.0
+    var tapHappiness = 2.0
+    /// Drag distance (room pixels) over the cat that counts as one stroke.
+    var strokeDistance = 80.0
+    var maxNameLength = 16
     var petCooldownSeconds = 1.5
     var maxRewardedPetsPerHour = 12
     var petXP = 1

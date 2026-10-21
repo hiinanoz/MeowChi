@@ -106,6 +106,50 @@ final class GameStoreTests: XCTestCase {
         XCTAssertTrue(slots.contains { $0.hasPrefix("quarantine.") })
     }
 
+    func testStrokeGivesMoreHappinessThanTap() {
+        var balance = Balance.standard
+        balance.startingStats.happiness = 50
+        let tapStore = makeStore(balance: balance)
+        tapStore.pet(.tap)
+        let strokeStore = makeStore(balance: balance)
+        strokeStore.pet(.stroke)
+        XCTAssertEqual(tapStore.state.cat.stats.happiness, 50 + balance.tapHappiness, accuracy: 0.001)
+        XCTAssertEqual(strokeStore.state.cat.stats.happiness, 50 + balance.petHappiness, accuracy: 0.001)
+    }
+
+    func testOnboardingNamesCatAndStartsTutorial() {
+        let store = makeStore()
+        XCTAssertTrue(store.needsOnboarding)
+        store.completeOnboarding(name: "  Pamuk Prenses Çok Uzun İsim  ")
+        XCTAssertFalse(store.needsOnboarding)
+        XCTAssertEqual(store.state.cat.name, "Pamuk Prenses Ço")
+        XCTAssertEqual(store.tutorialStep, .feed)
+        store.feed("food.dry")
+        XCTAssertEqual(store.tutorialStep, .pet)
+        store.pet(.stroke)
+        XCTAssertEqual(store.tutorialStep, .done)
+    }
+
+    func testBlankNameKeepsDefault() {
+        XCTAssertNil(CatState.sanitizedName("   \n", maxLength: 16))
+        let store = makeStore()
+        let original = store.state.cat.name
+        store.completeOnboarding(name: "   ")
+        XCTAssertEqual(store.state.cat.name, original)
+    }
+
+    func testOlderSaveWithoutNewFieldsStillLoads() throws {
+        var state = GameState.newGame(now: clock.now, balance: .standard)
+        state.onboardedAt = nil
+        let data = try SaveCodec.encode(state)
+        var json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        var inner = try XCTUnwrap(json["state"] as? [String: Any])
+        inner.removeValue(forKey: "onboardedAt")
+        json["state"] = inner
+        let legacy = try JSONSerialization.data(withJSONObject: json)
+        XCTAssertEqual(try SaveCodec.decode(legacy).coins, state.coins)
+    }
+
     func testCodecRejectsFutureVersions() throws {
         let data = Data(#"{"version": 99, "state": {}}"#.utf8)
         XCTAssertThrowsError(try SaveCodec.decode(data)) { XCTAssertEqual($0 as? SaveStoreError, .unsupportedVersion(99)) }

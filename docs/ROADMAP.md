@@ -25,7 +25,7 @@ RoomScene (SpriteKit)  ──calls──▶ store.pet() / reads store.mood
   (`.ok`, `.busy`, `.outOfStock`…). State changes and the save happen **before** the animation,
   so an interrupted animation can never use up an item twice.
 - **CatSimulator** (`Game/Simulation/`): pure, deterministic, elapsed-time simulation. No timers.
-- **RoomScene / CatNode** (`Game/`): rendering only. Fixed 180×200 logical room, whole-number scale,
+- **RoomScene / CatNode** (`Game/`): rendering only. Fixed 360×400 logical room (1 art px = 1 pt), whole-number scale,
   nearest-neighbor filtering, the sprite snaps to whole pixels every frame.
 - **Persistence**: SwiftData `SaveRecord` holding a versioned JSON envelope (`SaveCodec`), plus the
   previous good payload as a backup. Unreadable saves are quarantined and the player is told. Progress is never silently reset.
@@ -47,7 +47,7 @@ Applied in 15-minute steps from `lastSimulatedAt` to now:
 | # | Phase | Deliverable | Status |
 |---|---|---|---|
 | 1 | Foundation + first playable room | Compiling app, models, SwiftData save, simulation, room scene, cat state machine, HUD, feed/sleep/pet, 15 unit tests | ✅ this branch |
-| 2 | Playable cat polish | Stroke vs tap petting, more idle variety, walking sprites seen from the side, day/night by clock, onboarding (name your cat) | next |
+| 2 | Playable cat polish | 2x art resolution (64px cat), stroke vs tap petting + haptics, day/night by local clock, onboarding (name your cat) + in-room hints | ✅ code; side-view walk and extra idle variety wait for final art |
 | 3 | Care system | Food picker, bath scene, brushing (drag), litter box, vet + health, daily tasks base | |
 | 4 | Gameplay expansion | Mini-game framework + Laser Chase, results screen, coins, shop, inventory UI, daily tasks | |
 | 5 | Content & customization | Decoration slots + room editor, garden walk, more food/toys, extra cat looks | |

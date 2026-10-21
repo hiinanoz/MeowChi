@@ -17,46 +17,67 @@ W = (255, 247, 235, 255)   # white fur
 P = (245, 160, 170, 255)   # pink
 E = (40, 28, 30, 255)      # eyes
 H = (255, 255, 255, 255)   # highlight
+OS = (222, 120, 52, 255)   # orange shade
+OL = (251, 188, 115, 255)  # orange light
+WS = (236, 220, 204, 255)  # white shade
+
+
+# Art is authored on a logical grid and rasterized SCALE times finer, so outlines and
+# highlights come out 1 native pixel thick (64x64 cat from a 32-unit layout).
+SCALE = 2
 
 
 class Canvas:
-    def __init__(self, w, h):
-        self.w, self.h = w, h
-        self.p = [[None] * w for _ in range(h)]
+    def __init__(self, w, h, s=SCALE):
+        self.w, self.h, self.s = w, h, s          # logical size
+        self.W, self.H = w * s, h * s             # native (PNG) size
+        self.p = [[None] * self.W for _ in range(self.H)]
+
+    def pset(self, X, Y, c):
+        if 0 <= X < self.W and 0 <= Y < self.H:
+            self.p[Y][X] = c
 
     def set(self, x, y, c):
-        if 0 <= x < self.w and 0 <= y < self.h:
-            self.p[y][x] = c
+        for dy in range(self.s):
+            for dx in range(self.s):
+                self.pset(int(x * self.s) + dx, int(y * self.s) + dy, c)
 
     def rect(self, x, y, w, h, c):
-        for yy in range(y, y + h):
-            for xx in range(x, x + w):
-                self.set(xx, yy, c)
+        for Y in range(int(y * self.s), int((y + h) * self.s)):
+            for X in range(int(x * self.s), int((x + w) * self.s)):
+                self.pset(X, Y, c)
 
     def ellipse(self, cx, cy, rx, ry, c):
-        for y in range(self.h):
-            for x in range(self.w):
-                if ((x + .5 - cx) / rx) ** 2 + ((y + .5 - cy) / ry) ** 2 <= 1:
-                    self.set(x, y, c)
+        for Y in range(self.H):
+            for X in range(self.W):
+                if (((X + .5) / self.s - cx) / rx) ** 2 + (((Y + .5) / self.s - cy) / ry) ** 2 <= 1:
+                    self.p[Y][X] = c
+
+    def shaded_ellipse(self, cx, cy, rx, ry, base, shade, light=None):
+        """Base fill with a 1px shade band on the lower right and an optional top-left highlight."""
+        self.ellipse(cx, cy, rx, ry, shade)
+        self.ellipse(cx - .4, cy - .5, rx - .3, ry - .4, base)
+        if light:
+            self.ellipse(cx - rx * .35, cy - ry * .45, rx * .35, ry * .25, light)
 
     def tri(self, a, b, c, col):
         def side(p, q, r):
             return (p[0] - r[0]) * (q[1] - r[1]) - (q[0] - r[0]) * (p[1] - r[1])
-        for y in range(self.h):
-            for x in range(self.w):
-                pt = (x + .5, y + .5)
+        for Y in range(self.H):
+            for X in range(self.W):
+                pt = ((X + .5) / self.s, (Y + .5) / self.s)
                 d1, d2, d3 = side(pt, a, b), side(pt, b, c), side(pt, c, a)
                 if not ((d1 < 0 or d2 < 0 or d3 < 0) and (d1 > 0 or d2 > 0 or d3 > 0)):
-                    self.set(x, y, col)
+                    self.p[Y][X] = col
 
     def outline(self, c=K):
         src = [row[:] for row in self.p]
-        for y in range(self.h):
-            for x in range(self.w):
-                if src[y][x] is None and any(
-                    0 <= x + dx < self.w and 0 <= y + dy < self.h and src[y + dy][x + dx] is not None
+        for Y in range(self.H):
+            for X in range(self.W):
+                if src[Y][X] is None and any(
+                    0 <= X + dx < self.W and 0 <= Y + dy < self.H and src[Y + dy][X + dx] is not None
                     for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
-                    self.p[y][x] = c
+                    self.p[Y][X] = c
 
     def stamp(self, rows, palette, ox=0, oy=0):
         for y, row in enumerate(rows):
@@ -66,7 +87,7 @@ class Canvas:
 
 
 def write_png(path, canvas, scale=1, background=None):
-    w, h = canvas.w * scale, canvas.h * scale
+    w, h = canvas.W * scale, canvas.H * scale
     opaque = background is not None
     raw = bytearray()
     for y in range(h):
@@ -101,14 +122,14 @@ def cat_sit(eyes="open", mouth="smile", tail=0, breath=0, head_dy=0, lift=(0, 0)
     for x, y in pts:
         c.rect(x, y, 2, 2, O)
     c.rect(pts[-1][0], pts[-1][1], 2, 2, W)
-    c.ellipse(16, 24, 7, 6 + breath * .5, O)
-    c.ellipse(16, 25, 4, 4.5, W)
-    c.ellipse(12.5, 29 - lift[0], 2.5, 1.6, W)
-    c.ellipse(19.5, 29 - lift[1], 2.5, 1.6, W)
+    c.shaded_ellipse(16, 24, 7, 6 + breath * .5, O, OS)
+    c.shaded_ellipse(16, 25, 4, 4.5, W, WS)
+    c.shaded_ellipse(12.5, 29 - lift[0], 2.5, 1.6, W, WS)
+    c.shaded_ellipse(19.5, 29 - lift[1], 2.5, 1.6, W, WS)
     hy = 12 + head_dy
     c.tri((6, hy - 9), (6.5, hy - 1), (13.5, hy - 5), O)
     c.tri((26, hy - 9), (25.5, hy - 1), (18.5, hy - 5), O)
-    c.ellipse(16, hy, 9.5, 7.5, O)
+    c.shaded_ellipse(16, hy, 9.5, 7.5, O, OS, OL)
     c.tri((7.5, hy - 7), (8, hy - 2.5), (11.5, hy - 4.5), P)
     c.tri((24.5, hy - 7), (24, hy - 2.5), (20.5, hy - 4.5), P)
     for x, y, w, h in ((12, hy - 6, 1, 2), (15, hy - 7, 2, 2), (19, hy - 6, 1, 2), (7, hy, 2, 1), (23, hy, 2, 1)):
@@ -116,7 +137,7 @@ def cat_sit(eyes="open", mouth="smile", tail=0, breath=0, head_dy=0, lift=(0, 0)
     c.ellipse(16, hy + 3.5, 4.5, 2.6, W)
     for ex in (11, 19):
         if eyes == "open":
-            c.rect(ex, hy - 1, 2, 3, E); c.set(ex, hy - 1, H)
+            c.rect(ex, hy - 1, 2, 3, E); c.rect(ex, hy - 1, 1, 1, H); c.pset(ex * SCALE + 2, hy * SCALE + 3, H)
         elif eyes == "closed":
             c.rect(ex - 1, hy + 1, 4, 1, E)
         elif eyes == "happy":
@@ -142,13 +163,13 @@ def cat_sit(eyes="open", mouth="smile", tail=0, breath=0, head_dy=0, lift=(0, 0)
 def cat_sleep(breath=0):
     c = Canvas(32, 32)
     c.rect(9, 28, 16, 2, O); c.rect(7, 28, 2, 2, W)
-    c.ellipse(17, 25, 11, 5.5 + breath * .5, O)
+    c.shaded_ellipse(17, 25, 11, 5.5 + breath * .5, O, OS, OL)
     for x in (17, 21, 25):
         c.rect(x, 20 + (1 if x == 25 else 0), 1, 2, D)
     hy = 22
     c.tri((4, hy - 8), (4.5, hy - 1), (10.5, hy - 4), O)
     c.tri((17, hy - 8), (16.5, hy - 1), (10.5, hy - 4), O)
-    c.ellipse(10.5, hy, 7.5, 6, O)
+    c.shaded_ellipse(10.5, hy, 7.5, 6, O, OS, OL)
     c.tri((5.5, hy - 6), (6, hy - 2.5), (9, hy - 4), P)
     c.ellipse(10.5, hy + 3, 4, 2.2, W)
     c.rect(6, hy + 1, 3, 1, E); c.rect(12, hy + 1, 3, 1, E)
@@ -268,10 +289,10 @@ def room():
     c.ellipse(90, 165, 54, 23, (230, 160, 140, 255))
     c.ellipse(90, 165, 50, 20, (240, 190, 160, 255))
     c.ellipse(90, 165, 38, 14, (245, 205, 175, 255))
-    for y in range(200):
-        for x in range(180):
-            if c.p[y][x]:
-                full.set(x + ROOM_PAD_X, y + ROOM_PAD_Y, c.p[y][x])
+    for Y in range(c.H):
+        for X in range(c.W):
+            if c.p[Y][X]:
+                full.pset(X + ROOM_PAD_X * SCALE, Y + ROOM_PAD_Y * SCALE, c.p[Y][X])
     return full
 
 
@@ -302,7 +323,7 @@ def main():
         save_image("Icons", name, small([r.ljust(width, ".") for r in rows], ICON_PAL))
     # App icon (opaque, placeholder)
     icon = ASSETS / "AppIcon.appiconset"; icon.mkdir(parents=True, exist_ok=True)
-    write_png(icon / "icon.png", cat_sit(eyes="happy", mouth="open", tail=1), scale=32,
+    write_png(icon / "icon.png", cat_sit(eyes="happy", mouth="open", tail=1), scale=1024 // (32 * SCALE),
               background=(255, 214, 170, 255))  # 1024px
     (icon / "Contents.json").write_text(json.dumps({"images": [{"filename": "icon.png", "idiom": "universal",
                                                     "platform": "ios", "size": "1024x1024"}], **INFO}, indent=2))

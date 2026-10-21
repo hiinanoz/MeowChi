@@ -16,6 +16,7 @@ struct HomeView: View {
                 .clipShape(PixelBorder(step: 4))
                 .overlay(PixelBorder(step: 4).stroke(PixelPalette.ink, lineWidth: 2))
                 .overlay(alignment: .top) { noticeBanner }
+                .overlay(alignment: .bottom) { TutorialBanner() }
             ActionBar(onFeed: feed, onToggleSleep: toggleSleep)
         }
         .padding(.horizontal, 12)

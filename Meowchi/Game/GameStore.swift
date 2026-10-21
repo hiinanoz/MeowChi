@@ -22,6 +22,7 @@ final class GameStore {
     var loadIssue: SaveStoreError?
     /// Increments on every level up so views can react.
     private(set) var levelUpCount = 0
+    var tutorialStep: TutorialStep?
 
     let balance: Balance
     private let saveStore: SaveStore
@@ -82,12 +83,13 @@ final class GameStore {
         state.cat.stats[.happiness] += item.happiness
         busyUntil = now.addingTimeInterval(balance.feedDurationSeconds)
         grantXP(item.xp)
+        if tutorialStep == .feed { tutorialStep = .pet }
         save()
         return .ok
     }
 
     @discardableResult
-    func pet() -> ActionResult {
+    func pet(_ kind: PetKind = .tap) -> ActionResult {
         let now = clock()
         CatSimulator.advance(&state, to: now, balance: balance)
         guard !state.cat.isSleeping else { return .sleeping }
@@ -104,8 +106,9 @@ final class GameStore {
         }
         petLog.rewardedCount += 1
         state.petLog = petLog
-        state.cat.stats[.happiness] += balance.petHappiness
+        state.cat.stats[.happiness] += kind == .stroke ? balance.petHappiness : balance.tapHappiness
         grantXP(balance.petXP)
+        if tutorialStep == .pet { tutorialStep = .done }
         save()
         return .ok
     }
@@ -119,6 +122,17 @@ final class GameStore {
         state.cat.isSleeping = sleeping
         save()
         return .ok
+    }
+
+    // MARK: Onboarding
+
+    var needsOnboarding: Bool { state.onboardedAt == nil }
+
+    func completeOnboarding(name: String) {
+        state.cat.name = CatState.sanitizedName(name, maxLength: balance.maxNameLength) ?? state.cat.name
+        state.onboardedAt = clock()
+        tutorialStep = .feed
+        save()
     }
 
     func quantity(of itemID: String) -> Int { state.inventory[itemID] ?? 0 }

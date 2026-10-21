@@ -56,6 +56,17 @@
         }
       }
     },
+    "common.skip": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        }
+      }
+    },
     "food.chicken.name": {
       "extractionState": "manual",
       "localizations": {
@@ -266,6 +277,72 @@
         }
       }
     },
+    "onboarding.name.button": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adopt"
+          }
+        }
+      }
+    },
+    "onboarding.name.placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kitten's name"
+          }
+        }
+      }
+    },
+    "onboarding.name.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What will you call your kitten?"
+          }
+        }
+      }
+    },
+    "onboarding.welcome.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A tiny kitten is looking for a cozy home. Will you take care of it?"
+          }
+        }
+      }
+    },
+    "onboarding.welcome.button": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meet your kitten"
+          }
+        }
+      }
+    },
+    "onboarding.welcome.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Welcome to Meowchi!"
+          }
+        }
+      }
+    },
     "save.error.message": {
       "extractionState": "manual",
       "localizations": {
@@ -339,6 +416,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fullness"
+          }
+        }
+      }
+    },
+    "tutorial.done": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All set! Come back anytime."
+          }
+        }
+      }
+    },
+    "tutorial.feed %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap Feed to give %@ a snack."
+          }
+        }
+      }
+    },
+    "tutorial.pet %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Now stroke %@ with your finger."
           }
         }
       }

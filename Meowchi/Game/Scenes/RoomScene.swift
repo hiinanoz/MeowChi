@@ -1,26 +1,27 @@
 import SpriteKit
+import UIKit
 
 /// The cat's home. Art is authored at a fixed logical resolution (`roomSize`) and scaled
 /// by a whole-number factor so every art pixel maps to an integer number of screen points.
 final class RoomScene: SKScene {
-    static let roomSize = CGSize(width: 180, height: 200)
+    static let roomSize = CGSize(width: 360, height: 400)
     /// Area that must always be visible; it sets the whole-number scale. Edges outside it may be cropped on narrow phones.
-    static let safeVisibleSize = CGSize(width: 160, height: 200)
+    static let safeVisibleSize = CGSize(width: 320, height: 400)
     /// Extra background art around the core room (see Tools/gen_sprites.py ROOM_PAD_X/Y).
-    static let artPadding = CGSize(width: 20, height: 80)
+    static let artPadding = CGSize(width: 40, height: 160)
     /// Walkable floor area in room coordinates (origin bottom-left).
-    static let walkArea = CGRect(x: 30, y: 8, width: 120, height: 52)
+    static let walkArea = CGRect(x: 60, y: 16, width: 240, height: 104)
 
     private enum Spot {
-        static let catStart = CGPoint(x: 90, y: 28)
-        static let foodBowl = CGPoint(x: 44, y: 44)
-        static let waterBowl = CGPoint(x: 26, y: 46)
-        static let eat = CGPoint(x: 60, y: 42)
-        static let bed = CGPoint(x: 136, y: 16)
-        static let sleep = CGPoint(x: 136, y: 18)
-        static let scratchingPost = CGPoint(x: 160, y: 62)
-        static let plant = CGPoint(x: 20, y: 64)
-        static let yarn = CGPoint(x: 104, y: 22)
+        static let catStart = CGPoint(x: 180, y: 56)
+        static let foodBowl = CGPoint(x: 88, y: 88)
+        static let waterBowl = CGPoint(x: 52, y: 92)
+        static let eat = CGPoint(x: 120, y: 84)
+        static let bed = CGPoint(x: 272, y: 32)
+        static let sleep = CGPoint(x: 272, y: 36)
+        static let scratchingPost = CGPoint(x: 320, y: 124)
+        static let plant = CGPoint(x: 40, y: 128)
+        static let yarn = CGPoint(x: 208, y: 44)
     }
 
     weak var store: GameStore?
@@ -32,6 +33,13 @@ final class RoomScene: SKScene {
     private var isBuilt = false
     private var lastUpdate: TimeInterval = 0
     private var nextDecisionAt: TimeInterval = 0
+    private var nextLightingCheck: TimeInterval = 0
+    /// Touch tracking for tap vs. stroke petting.
+    private var touchStartedOnCat = false
+    private var strokeTravel: CGFloat = 0
+    private var didStroke = false
+    private var lastTouchPoint: CGPoint = .zero
+    private let haptics = UIImpactFeedbackGenerator(style: .soft)
 
     override init(size: CGSize) {
         super.init(size: size)
@@ -71,6 +79,7 @@ final class RoomScene: SKScene {
 
         layoutWorld()
         if store?.state.cat.isSleeping == true { setSleeping(true, animated: false) }
+        refreshLighting(animated: false)
     }
 
     override func didChangeSize(_ oldSize: CGSize) {
@@ -98,6 +107,10 @@ final class RoomScene: SKScene {
 
     override func update(_ currentTime: TimeInterval) {
         lastUpdate = currentTime
+        if currentTime >= nextLightingCheck {
+            nextLightingCheck = currentTime + 30
+            refreshLighting(animated: true)
+        }
         guard let store, !cat.isScripted, !store.state.cat.isSleeping,
               cat.action(forKey: "move") == nil, currentTime >= nextDecisionAt else { return }
         decideNextBehavior(mood: store.mood)
@@ -134,32 +147,61 @@ final class RoomScene: SKScene {
     // MARK: Touch
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        lastTouchPoint = touch.location(in: world)
+        touchStartedOnCat = cat.hitFrame.contains(lastTouchPoint)
+        strokeTravel = 0
+        didStroke = false
+        if touchStartedOnCat { haptics.prepare() }
+    }
+
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard touchStartedOnCat, let touch = touches.first, let store else { return }
+        let point = touch.location(in: world)
+        defer { lastTouchPoint = point }
+        // Only movement over the cat counts as stroking.
+        guard cat.hitFrame.insetBy(dx: -16, dy: -16).contains(point) else { return }
+        strokeTravel += hypot(point.x - lastTouchPoint.x, point.y - lastTouchPoint.y)
+        if strokeTravel >= CGFloat(store.balance.strokeDistance) {
+            strokeTravel = 0
+            didStroke = true
+            handlePet(store.pet(.stroke), stroke: true)
+        }
+    }
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first, let store else { return }
         let point = touch.location(in: world)
-        if cat.hitFrame.contains(point) {
-            handlePet(store.pet())
-        } else if !cat.isScripted, !store.state.cat.isSleeping, Self.walkArea.insetBy(dx: -12, dy: -8).contains(point) {
+        if touchStartedOnCat {
+            if !didStroke { handlePet(store.pet(.tap), stroke: false) }
+        } else if !cat.isScripted, !store.state.cat.isSleeping, Self.walkArea.insetBy(dx: -24, dy: -16).contains(point) {
             let target = CGPoint(x: min(max(point.x, Self.walkArea.minX), Self.walkArea.maxX).rounded(),
                                  y: min(max(point.y, Self.walkArea.minY), Self.walkArea.maxY).rounded())
             cat.walk(to: target)
             nextDecisionAt = lastUpdate + 4
         }
+        touchStartedOnCat = false
     }
 
-    private func handlePet(_ result: ActionResult) {
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        touchStartedOnCat = false
+    }
+
+    private func handlePet(_ result: ActionResult, stroke: Bool) {
         switch result {
         case .ok:
+            if stroke { haptics.impactOccurred(intensity: 0.6) }
             guard !cat.isScripted else { spawnHearts(); return }
             cat.stopMoving()
-            cat.react(.happy, duration: 1.4)
-            spawnHearts()
+            cat.react(.happy, duration: stroke ? 2 : 1)
+            if stroke { spawnHearts() } else { spawnEffect("fx_heart", offsetY: 56) }
             nextDecisionAt = lastUpdate + 3
         case .noReward:
             guard !cat.isScripted else { return }
             cat.stopMoving()
             cat.react(.happy, duration: 0.6)
         case .sleeping:
-            spawnEffect("fx_zzz", offsetY: 18)
+            spawnEffect("fx_zzz", offsetY: 36)
         case .busy, .outOfStock, .unknownItem:
             break
         }
@@ -191,20 +233,30 @@ final class RoomScene: SKScene {
         cancelScript()
         if sleeping {
             cat.isScripted = true
-            nightOverlay.run(.fadeAlpha(to: 0.4, duration: animated ? 1.2 : 0))
+            refreshLighting(animated: animated, sleeping: true)
             let lieDown = { [weak self] in
                 guard let self else { return }
                 self.cat.play(.sleep)
-                self.run(.repeatForever(.sequence([.run { [weak self] in self?.spawnEffect("fx_zzz", offsetY: 20) },
+                self.run(.repeatForever(.sequence([.run { [weak self] in self?.spawnEffect("fx_zzz", offsetY: 40) },
                                                    .wait(forDuration: 1.6)])), withKey: "script")
             }
             if animated { cat.walk(to: Spot.sleep, completion: lieDown) } else { cat.position = Spot.sleep; lieDown() }
         } else {
-            nightOverlay.run(.fadeAlpha(to: 0, duration: animated ? 0.8 : 0))
+            refreshLighting(animated: animated, sleeping: false)
             cat.isScripted = false
             cat.react(.happy, duration: 0.8)
             nextDecisionAt = lastUpdate + 1.5
         }
+    }
+
+    /// Room light follows the local clock; a sleeping cat dims it further.
+    private func refreshLighting(animated: Bool, sleeping: Bool? = nil) {
+        let isSleeping = sleeping ?? store?.state.cat.isSleeping ?? false
+        let ambient = DayCycle.darkness(for: DayCycle.phase(at: Date()))
+        let target = CGFloat(isSleeping ? max(ambient, DayCycle.sleepingDarkness) : ambient)
+        guard abs(nightOverlay.alpha - target) > 0.01 else { return }
+        nightOverlay.removeAction(forKey: "light")
+        nightOverlay.run(.fadeAlpha(to: target, duration: animated ? 1.2 : 0), withKey: "light")
     }
 
     private func cancelScript() {
@@ -219,16 +271,16 @@ final class RoomScene: SKScene {
     private func spawnHearts() {
         for i in 0..<3 {
             run(.wait(forDuration: Double(i) * 0.18)) { [weak self] in
-                self?.spawnEffect("fx_heart", offsetY: 28, dx: CGFloat([-6, 2, 8][i]))
+                self?.spawnEffect("fx_heart", offsetY: 56, dx: CGFloat([-12, 4, 16][i]))
             }
         }
     }
 
-    private func spawnEffect(_ name: String, offsetY: CGFloat, dx: CGFloat = 4) {
+    private func spawnEffect(_ name: String, offsetY: CGFloat, dx: CGFloat = 8) {
         let node = SKSpriteNode(texture: SpriteLibrary.texture(name))
         node.position = CGPoint(x: cat.position.x.rounded() + dx, y: cat.position.y.rounded() + offsetY)
         node.zPosition = 2100
         world.addChild(node)
-        node.run(.sequence([.group([.moveBy(x: 0, y: 12, duration: 1), .fadeOut(withDuration: 1)]), .removeFromParent()]))
+        node.run(.sequence([.group([.moveBy(x: 0, y: 24, duration: 1), .fadeOut(withDuration: 1)]), .removeFromParent()]))
     }
 }

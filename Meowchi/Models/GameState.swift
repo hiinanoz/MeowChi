@@ -14,6 +14,8 @@ struct GameState: Codable, Equatable {
     var lastSimulatedAt: Date
     var petLog: PetLog
     var settings: GameSettings
+    /// nil until the player has named their kitten. Optional so older saves decode unchanged.
+    var onboardedAt: Date?
 
     static func newGame(now: Date, balance: Balance) -> GameState {
         GameState(
@@ -35,6 +37,21 @@ struct CatState: Codable, Equatable {
     var stats: CatStats
     var isSleeping = false
     var adoptedAt: Date
+
+    /// Trims whitespace, limits length; returns nil if nothing usable is left.
+    static func sanitizedName(_ raw: String, maxLength: Int) -> String? {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : String(trimmed.prefix(maxLength))
+    }
+}
+
+enum PetKind {
+    case tap, stroke
+}
+
+/// In-room tutorial hints shown right after onboarding. Not persisted: they are optional help.
+enum TutorialStep {
+    case feed, pet, done
 }
 
 enum Personality: String, Codable, CaseIterable {

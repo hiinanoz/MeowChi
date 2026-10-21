@@ -64,3 +64,23 @@ final class CatSimulatorTests: XCTestCase {
         XCTAssertEqual(CatSimulator.mood(for: cat), .sleepy)
     }
 }
+
+final class DayCycleTests: XCTestCase {
+    private func date(hour: Int) -> Date {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Europe/Istanbul")!
+        return calendar.date(from: DateComponents(year: 2026, month: 10, day: 21, hour: hour))!
+    }
+
+    func testPhasesFollowLocalHour() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Europe/Istanbul")!
+        XCTAssertEqual(DayCycle.phase(at: date(hour: 3), calendar: calendar), .night)
+        XCTAssertEqual(DayCycle.phase(at: date(hour: 6), calendar: calendar), .dawn)
+        XCTAssertEqual(DayCycle.phase(at: date(hour: 12), calendar: calendar), .day)
+        XCTAssertEqual(DayCycle.phase(at: date(hour: 20), calendar: calendar), .evening)
+        XCTAssertEqual(DayCycle.phase(at: date(hour: 23), calendar: calendar), .night)
+        XCTAssertGreaterThan(DayCycle.darkness(for: .night), DayCycle.darkness(for: .evening))
+        XCTAssertEqual(DayCycle.darkness(for: .day), 0)
+    }
+}

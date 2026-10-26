@@ -2,8 +2,8 @@ import SwiftUI
 
 /// The complete persisted game state. Plain value type so it is trivially testable.
 ///
-/// Versioning rule: adding a field requires either an optional type or a default
-/// handled in `SaveCodec.migrate`; bump `GameState.schemaVersion` for breaking changes.
+/// Versioning rule: a new field gets a default in `init(from:)` (decodeIfPresent), so older saves
+/// keep loading. Bump `GameState.schemaVersion` only for breaking changes.
 struct GameState: Codable, Equatable {
     static let schemaVersion = 1
 
@@ -12,10 +12,11 @@ struct GameState: Codable, Equatable {
     var coins: Int
     var inventory: [String: Int]
     var lastSimulatedAt: Date
-    var petLog: PetLog
+    var petLog: RewardLog
     var settings: GameSettings
     /// nil until the player has named their kitten. Optional so older saves decode unchanged.
     var onboardedAt: Date?
+    var care = CareState()
 
     static func newGame(now: Date, balance: Balance) -> GameState {
         GameState(
@@ -24,7 +25,7 @@ struct GameState: Codable, Equatable {
             coins: balance.startingCoins,
             inventory: balance.startingInventory,
             lastSimulatedAt: now,
-            petLog: PetLog(windowStart: now),
+            petLog: RewardLog(windowStart: now),
             settings: GameSettings()
         )
     }
@@ -63,11 +64,55 @@ struct Progression: Codable, Equatable {
     var xp = 0
 }
 
-/// Tracks rewarded petting to limit reward farming.
-struct PetLog: Codable, Equatable {
+extension GameState {
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        cat = try c.decode(CatState.self, forKey: .cat)
+        progression = try c.decode(Progression.self, forKey: .progression)
+        coins = try c.decode(Int.self, forKey: .coins)
+        inventory = try c.decode([String: Int].self, forKey: .inventory)
+        lastSimulatedAt = try c.decode(Date.self, forKey: .lastSimulatedAt)
+        petLog = try c.decode(RewardLog.self, forKey: .petLog)
+        settings = try c.decode(GameSettings.self, forKey: .settings)
+        // Added after schema v1 shipped internally: default when missing.
+        onboardedAt = try c.decodeIfPresent(Date.self, forKey: .onboardedAt)
+        care = try c.decodeIfPresent(CareState.self, forKey: .care) ?? CareState()
+    }
+}
+
+/// Cleaning and vet bookkeeping.
+struct CareState: Codable, Equatable {
+    /// 0 = fresh, 100 = full. Fills over time; above the dirty threshold it lowers cleanliness.
+    var litter = 0.0
+    var lastBathAt: Date?
+    var lastVetAt: Date?
+    var brushLog = RewardLog(windowStart: .distantPast)
+}
+
+/// Rate-limits a repeatable reward (petting, brushing) to stop farming.
+struct RewardLog: Codable, Equatable {
     var windowStart: Date
     var rewardedCount = 0
-    var lastPetAt: Date?
+    var lastAt: Date?
+
+    private enum CodingKeys: String, CodingKey {
+        case windowStart, rewardedCount
+        case lastAt = "lastPetAt" // original key from schema v1
+    }
+
+    /// Records an attempt; true if it earns a reward (cooldown passed and hourly cap not reached).
+    /// Clock changes backwards reset the window instead of blocking rewards.
+    mutating func consume(at now: Date, cooldown: TimeInterval, maxPerHour: Int) -> Bool {
+        if now.timeIntervalSince(windowStart) >= 3600 || now < windowStart {
+            windowStart = now
+            rewardedCount = 0
+        }
+        let cooledDown = lastAt.map { now.timeIntervalSince($0) >= cooldown || now < $0 } ?? true
+        lastAt = now
+        guard cooledDown, rewardedCount < maxPerHour else { return false }
+        rewardedCount += 1
+        return true
+    }
 }
 
 struct GameSettings: Codable, Equatable {

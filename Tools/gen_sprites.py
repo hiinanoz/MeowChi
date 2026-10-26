@@ -231,6 +231,31 @@ def plant():
     return c
 
 
+def tub():
+    c = Canvas(34, 16)
+    c.shaded_ellipse(17, 5, 15, 3.5, (240, 250, 255, 255), (200, 220, 235, 255))
+    c.rect(3, 5, 28, 8, (235, 245, 252, 255)); c.rect(3, 11, 28, 2, (200, 220, 235, 255))
+    for x in (5, 27):
+        c.rect(x, 13, 2, 2, (200, 170, 90, 255))
+    for x, y, r in ((8, 3, 2.5), (13, 2, 3), (19, 2.5, 2.5), (25, 3, 2.2)):
+        c.ellipse(x, y, r, r * .8, (255, 255, 255, 255))
+    c.outline()
+    return c
+
+
+def litter(dirty):
+    c = Canvas(24, 12)
+    c.rect(1, 3, 22, 8, (120, 170, 200, 255)); c.rect(1, 9, 22, 2, (90, 140, 175, 255))
+    c.rect(3, 3, 18, 2, (235, 220, 180, 255))
+    if dirty:
+        for x in (6, 11, 16):
+            c.rect(x, 2, 2, 2, (150, 110, 70, 255))
+    c.outline()
+    return c
+
+
+BUBBLE = [".KK.", "KHBK", "KBBK", ".KK."]
+SPARKLE = ["..Y..", "..Y..", "YYHYY", "..Y..", "..Y.."]
 HEART = [".HH.HH.", "HPPHPPH", "HPPPPPH", ".HPPPH.", "..HPH..", "...H..."]
 ZED = ["KKKKK", "...K.", "..K..", ".K...", "KKKKK"]
 
@@ -247,10 +272,17 @@ ICONS = {
     "icon_happiness": [".KK.KK.", "KPPKPPK", "KPPPPPK", ".KPPPK.", "..KPK..", "...K..."],
     "icon_cleanliness": ["...K...", "..KBK..", ".KBBBK.", "KBBHBBK", "KBBBBBK", ".KBBBK.", "..KKK.."],
     "icon_health": ["..KKK..", "..KRK..", "KKKRKKK", "KRRRRRK", "KKKRKKK", "..KRK..", "..KKK.."],
+    "icon_clean": ["..KK..KK", ".KHBKKHK", ".KBBKKBK", "KKKKKKK.", "KSSSSSK.", "KSSSSSK.", ".KKKKK.."],
+    "icon_brush": ["....KKK", "...KWWK", "..KWWK.", ".KBBK..", "KBBK...", "KBK....", "KK....."],
+    "icon_food_dry": [".KKKKK.", "KTTTTTK", "KTETETK", "KTTTTTK", ".KTTTK.", "..KKK.."],
+    "icon_food_wet": [".KKKKK.", "KSSSSSK", "KRRRRRK", "KRSRSRK", "KRRRRRK", ".KKKKK."],
+    "icon_food_fish": ["..KKK....", ".KOOOK.KK", "KOEOOOKOK", "KOOOOOOOK", ".KOOOK.KK", "..KKK...."],
+    "icon_food_chicken": ["..KKKK.", ".KTTTTK", "KTTTTTK", "KTTTTK.", ".KTTK..", "..KWWK.", "...KWWK", "....KK."],
+    "icon_food_treat": ["...K...", "..KPK..", ".KPPPK.", "KPPYPPK", ".KPPPK.", "..KPK..", "...K..."],
     "icon_coin": [".KKKK.", "KYYYYK", "KYKYYK", "KYKYYK", "KYYYYK", ".KKKK."],
     "icon_xp": ["...K...", "..KYK..", "KKYYYKK", ".KYYYK.", ".KYKYK.", "KK...KK"],
 }
-ICON_PAL = {"K": K, "O": (120, 170, 220, 255), "E": E, "Y": (250, 205, 70, 255), "P": (240, 90, 120, 255),
+ICON_PAL = {"K": K, "O": (120, 170, 220, 255), "E": E, "S": (190, 200, 210, 255), "W": W, "T": (196, 134, 72, 255), "Y": (250, 205, 70, 255), "P": (240, 90, 120, 255),
             "B": (110, 180, 230, 255), "H": H, "R": (230, 70, 70, 255)}
 
 
@@ -314,6 +346,9 @@ def main():
         "room_background": room(), "bowl_empty": bowl("empty"), "bowl_food": bowl("food"),
         "bowl_water": bowl("water"), "bed_basic": bed(), "scratching_post": scratching_post(),
         "toy_yarn": yarn(), "plant_basic": plant(),
+        "bath_tub": tub(), "litter_clean": litter(False), "litter_dirty": litter(True),
+        "fx_bubble": small(BUBBLE, {"K": (120, 170, 210, 255), "H": H, "B": (200, 235, 255, 255)}),
+        "fx_sparkle": small(SPARKLE, {"Y": (250, 220, 90, 255), "H": H}),
         "fx_heart": small(HEART, {"H": K, "P": (240, 90, 120, 255)}), "fx_zzz": small(ZED, {"K": (90, 110, 200, 255)}),
     }
     for name, canvas in frames.items():

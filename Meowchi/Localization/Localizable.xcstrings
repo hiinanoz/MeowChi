@@ -1,6 +1,17 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "action.clean": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clean"
+          }
+        }
+      }
+    },
     "action.feed": {
       "extractionState": "manual",
       "localizations": {
@@ -8,6 +19,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Feed"
+          }
+        }
+      }
+    },
+    "action.health": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health"
           }
         }
       }
@@ -34,6 +56,28 @@
         }
       }
     },
+    "brush.done": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        }
+      }
+    },
+    "brush.hint %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroke %@ to brush."
+          }
+        }
+      }
+    },
     "cat.defaultName": {
       "extractionState": "manual",
       "localizations": {
@@ -41,6 +85,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mochi"
+          }
+        }
+      }
+    },
+    "clean.bath": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bath"
+          }
+        }
+      }
+    },
+    "clean.brush": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brush"
+          }
+        }
+      }
+    },
+    "clean.litter": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Litter box"
           }
         }
       }
@@ -100,6 +177,17 @@
         }
       }
     },
+    "food.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Food"
+          }
+        }
+      }
+    },
     "food.treat.name": {
       "extractionState": "manual",
       "localizations": {
@@ -118,6 +206,83 @@
           "stringUnit": {
             "state": "translated",
             "value": "Wet Food"
+          }
+        }
+      }
+    },
+    "health.tip.cleanliness": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A bath or a brush would feel nice."
+          }
+        }
+      }
+    },
+    "health.tip.energy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Some sleep would do wonders."
+          }
+        }
+      }
+    },
+    "health.tip.good": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Healthy and happy. Keep it up!"
+          }
+        }
+      }
+    },
+    "health.tip.happiness": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Some petting would cheer them up."
+          }
+        }
+      }
+    },
+    "health.tip.hunger": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A good meal would help a lot."
+          }
+        }
+      }
+    },
+    "health.vet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visit the vet"
+          }
+        }
+      }
+    },
+    "health.vet.hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Free check-up, available every few hours."
           }
         }
       }
@@ -233,6 +398,17 @@
         }
       }
     },
+    "notice.alreadyClean": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Already squeaky clean!"
+          }
+        }
+      }
+    },
     "notice.busy": {
       "extractionState": "manual",
       "localizations": {
@@ -244,6 +420,17 @@
         }
       }
     },
+    "notice.healthy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Healthy as can be!"
+          }
+        }
+      }
+    },
     "notice.levelUp": {
       "extractionState": "manual",
       "localizations": {
@@ -251,6 +438,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Level up!"
+          }
+        }
+      }
+    },
+    "notice.litterClean": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The litter box is already fresh."
           }
         }
       }
@@ -273,6 +471,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Shh… your cat is sleeping."
+          }
+        }
+      }
+    },
+    "notice.tooSoon": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not yet. Try again a bit later."
           }
         }
       }

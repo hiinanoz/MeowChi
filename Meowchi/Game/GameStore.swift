@@ -11,6 +11,8 @@ enum ActionResult: Equatable {
     case sleeping
     case outOfStock
     case unknownItem
+    /// On cooldown (bath, vet), try again later.
+    case tooSoon
 }
 
 /// Single source of truth for game state. All mutations go through here so they are validated and saved.
@@ -93,24 +95,88 @@ final class GameStore {
         let now = clock()
         CatSimulator.advance(&state, to: now, balance: balance)
         guard !state.cat.isSleeping else { return .sleeping }
-        var petLog = state.petLog
-        if now.timeIntervalSince(petLog.windowStart) >= 3600 || now < petLog.windowStart {
-            petLog.windowStart = now
-            petLog.rewardedCount = 0
-        }
-        let cooledDown = petLog.lastPetAt.map { now.timeIntervalSince($0) >= balance.petCooldownSeconds || now < $0 } ?? true
-        petLog.lastPetAt = now
-        guard cooledDown, petLog.rewardedCount < balance.maxRewardedPetsPerHour else {
-            state.petLog = petLog
-            return .noReward
-        }
-        petLog.rewardedCount += 1
-        state.petLog = petLog
+        guard state.petLog.consume(at: now, cooldown: balance.petCooldownSeconds,
+                                   maxPerHour: balance.maxRewardedPetsPerHour) else { return .noReward }
         state.cat.stats[.happiness] += kind == .stroke ? balance.petHappiness : balance.tapHappiness
         grantXP(balance.petXP)
         if tutorialStep == .pet { tutorialStep = .done }
         save()
         return .ok
+    }
+
+    // MARK: Care
+
+    @discardableResult
+    func bathe() -> ActionResult {
+        let now = clock()
+        if let result = careGuard(now) { return result }
+        guard !isOnCooldown(state.care.lastBathAt, hours: balance.bathCooldownHours, now: now) else { return .tooSoon }
+        guard state.cat.stats.cleanliness < balance.alreadyCleanThreshold else { return .noReward }
+        state.cat.stats[.cleanliness] += balance.bathCleanliness
+        state.cat.stats[.happiness] += balance.bathHappiness
+        state.cat.stats[.energy] += balance.bathEnergy
+        state.care.lastBathAt = now
+        busyUntil = now.addingTimeInterval(balance.bathDurationSeconds)
+        grantXP(balance.bathXP)
+        save()
+        return .ok
+    }
+
+    /// One brush stroke. Rate-limited like petting.
+    @discardableResult
+    func brush() -> ActionResult {
+        let now = clock()
+        if let result = careGuard(now) { return result }
+        guard state.care.brushLog.consume(at: now, cooldown: balance.brushCooldownSeconds,
+                                          maxPerHour: balance.maxRewardedBrushesPerHour) else { return .noReward }
+        state.cat.stats[.cleanliness] += balance.brushCleanliness
+        state.cat.stats[.happiness] += balance.brushHappiness
+        grantXP(balance.brushXP)
+        save()
+        return .ok
+    }
+
+    /// Works while the cat sleeps: you clean the box, not the cat.
+    @discardableResult
+    func cleanLitter() -> ActionResult {
+        CatSimulator.advance(&state, to: clock(), balance: balance)
+        guard state.care.litter >= 1 else { return .noReward }
+        let wasDirty = state.care.litter >= balance.litterDirtyThreshold
+        state.care.litter = 0
+        if wasDirty { state.cat.stats[.happiness] += balance.litterCleanHappiness }
+        grantXP(wasDirty ? balance.litterCleanXP : 1)
+        save()
+        return .ok
+    }
+
+    @discardableResult
+    func visitVet() -> ActionResult {
+        let now = clock()
+        if let result = careGuard(now) { return result }
+        guard !isOnCooldown(state.care.lastVetAt, hours: balance.vetCooldownHours, now: now) else { return .tooSoon }
+        guard state.cat.stats.health < balance.alreadyHealthyThreshold else { return .noReward }
+        state.cat.stats[.health] += balance.vetHealth
+        state.cat.stats[.happiness] += balance.vetHappiness
+        state.care.lastVetAt = now
+        grantXP(balance.vetXP)
+        save()
+        return .ok
+    }
+
+    var isLitterDirty: Bool { state.care.litter >= balance.litterDirtyThreshold }
+
+    /// Shared preconditions for actions that involve the cat.
+    private func careGuard(_ now: Date) -> ActionResult? {
+        CatSimulator.advance(&state, to: now, balance: balance)
+        if state.cat.isSleeping { return .sleeping }
+        if now < busyUntil { return .busy }
+        return nil
+    }
+
+    /// A timestamp in the future (clock moved back) never blocks the player.
+    private func isOnCooldown(_ last: Date?, hours: Double, now: Date) -> Bool {
+        guard let last, last <= now else { return false }
+        return now.timeIntervalSince(last) < hours * 3600
     }
 
     @discardableResult

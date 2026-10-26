@@ -8,6 +8,7 @@
 		013E63CE299CB0718C321E95 = {
 			isa = PBXGroup;
 			children = (
+				C38CF4ADFAC5DB20A94BC4F2,
 				D010DAD361CA90D9CD1AA883,
 				25DBA27B5B8CEA516A43EA4D,
 			);
@@ -74,6 +75,7 @@
 		11AF12A87622A613DAE4C415 = {
 			isa = PBXGroup;
 			children = (
+				D02609E90699AACEBBFC5278,
 				85A7D8E49FCB0865855CFC23,
 				33CC715B739D548CF4E217F1,
 			);
@@ -143,6 +145,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6DB3951D48AB7FF11B563618,
 				A051EDC31C0E6E26FBF972FD,
 				A8203821B161CC9FDFED62E6,
 			);
@@ -339,6 +342,10 @@
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6DB3951D48AB7FF11B563618 = {
+			isa = PBXBuildFile;
+			fileRef = C38CF4ADFAC5DB20A94BC4F2;
 		};
 		772F9DDC1B2C2F1F7B100B44 = {
 			isa = PBXBuildFile;
@@ -549,6 +556,12 @@
 			path = SaveStore.swift;
 			sourceTree = "<group>";
 		};
+		C38CF4ADFAC5DB20A94BC4F2 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = CareTests.swift;
+			sourceTree = "<group>";
+		};
 		C69C64B1AC9D66D3E1F613F2 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
@@ -564,6 +577,16 @@
 			lastKnownFileType = sourcecode.swift;
 			path = CatSimulatorTests.swift;
 			sourceTree = "<group>";
+		};
+		D02609E90699AACEBBFC5278 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = CarePanels.swift;
+			sourceTree = "<group>";
+		};
+		D55CDEF545172B9A0F09A3F2 = {
+			isa = PBXBuildFile;
+			fileRef = D02609E90699AACEBBFC5278;
 		};
 		D6C4B81BC28233E2FF4E74C3 = {
 			isa = PBXBuildFile;
@@ -672,6 +695,7 @@
 				9BF8CA865509CCDB7D16519C,
 				54C6F49BDA0C9C63E4CB70E5,
 				3CD5F876D3396D6125FF6250,
+				D55CDEF545172B9A0F09A3F2,
 				D6C4B81BC28233E2FF4E74C3,
 				31402007750C9E62EFE4F6C8,
 				F36E3D0720E665059BFE0599,

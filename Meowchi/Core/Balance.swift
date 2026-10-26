@@ -41,6 +41,34 @@ struct Balance {
     /// Covers walking to the bowl plus eating; blocks overlapping actions.
     var feedDurationSeconds = 7.0
 
+    // MARK: Cleaning
+    var litterFillPerHour = 5.0
+    var litterDirtyThreshold = 60.0
+    var dirtyLitterCleanlinessPenaltyPerHour = 2.0
+    var litterCleanHappiness = 3.0
+    var litterCleanXP = 3
+    var bathCleanliness = 45.0
+    /// Cats aren't big fans of baths.
+    var bathHappiness = -4.0
+    var bathEnergy = -5.0
+    var bathXP = 5
+    var bathCooldownHours = 3.0
+    /// A bath is pointless (no reward) above this cleanliness.
+    var alreadyCleanThreshold = 95.0
+    var brushCleanliness = 4.0
+    var brushHappiness = 2.0
+    var brushCooldownSeconds = 1.0
+    var maxRewardedBrushesPerHour = 10
+    var brushXP = 1
+    var bathDurationSeconds = 6.0
+
+    // MARK: Health
+    var vetHealth = 35.0
+    var vetHappiness = -2.0
+    var vetXP = 2
+    var vetCooldownHours = 6.0
+    var alreadyHealthyThreshold = 95.0
+
     // MARK: Progression & economy
     var baseXPPerLevel = 50
     var xpGrowthPerLevel = 25

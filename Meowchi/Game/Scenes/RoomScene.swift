@@ -22,13 +22,18 @@ final class RoomScene: SKScene {
         static let scratchingPost = CGPoint(x: 320, y: 124)
         static let plant = CGPoint(x: 40, y: 128)
         static let yarn = CGPoint(x: 208, y: 44)
+        static let litter = CGPoint(x: 330, y: 36)
+        static let bath = CGPoint(x: 180, y: 64)
     }
 
     weak var store: GameStore?
+    /// While true, strokes over the cat brush it instead of petting.
+    var isBrushing = false
 
     private let world = SKNode()
     private let cat = CatNode()
     private let foodBowl = SKSpriteNode(texture: SpriteLibrary.texture("bowl_empty"))
+    private let litterBox = SKSpriteNode(texture: SpriteLibrary.texture("litter_clean"))
     private let nightOverlay = SKSpriteNode(color: SKColor(red: 0.08, green: 0.07, blue: 0.25, alpha: 1), size: RoomScene.roomSize)
     private var isBuilt = false
     private var lastUpdate: TimeInterval = 0
@@ -65,6 +70,8 @@ final class RoomScene: SKScene {
         place(SKSpriteNode(texture: SpriteLibrary.texture("scratching_post")), at: Spot.scratchingPost)
         place(SKSpriteNode(texture: SpriteLibrary.texture("plant_basic")), at: Spot.plant)
         place(SKSpriteNode(texture: SpriteLibrary.texture("toy_yarn")), at: Spot.yarn)
+        place(litterBox, at: Spot.litter)
+        refreshLitter()
 
         cat.position = Spot.catStart
         world.addChild(cat)
@@ -165,7 +172,7 @@ final class RoomScene: SKScene {
         if strokeTravel >= CGFloat(store.balance.strokeDistance) {
             strokeTravel = 0
             didStroke = true
-            handlePet(store.pet(.stroke), stroke: true)
+            if isBrushing { handleBrush(store.brush()) } else { handlePet(store.pet(.stroke), stroke: true) }
         }
     }
 
@@ -173,7 +180,7 @@ final class RoomScene: SKScene {
         guard let touch = touches.first, let store else { return }
         let point = touch.location(in: world)
         if touchStartedOnCat {
-            if !didStroke { handlePet(store.pet(.tap), stroke: false) }
+            if !didStroke && !isBrushing { handlePet(store.pet(.tap), stroke: false) }
         } else if !cat.isScripted, !store.state.cat.isSleeping, Self.walkArea.insetBy(dx: -24, dy: -16).contains(point) {
             let target = CGPoint(x: min(max(point.x, Self.walkArea.minX), Self.walkArea.maxX).rounded(),
                                  y: min(max(point.y, Self.walkArea.minY), Self.walkArea.maxY).rounded())
@@ -202,12 +209,71 @@ final class RoomScene: SKScene {
             cat.react(.happy, duration: 0.6)
         case .sleeping:
             spawnEffect("fx_zzz", offsetY: 36)
-        case .busy, .outOfStock, .unknownItem:
+        case .busy, .outOfStock, .unknownItem, .tooSoon:
+            break
+        }
+    }
+
+    private func handleBrush(_ result: ActionResult) {
+        switch result {
+        case .ok:
+            haptics.impactOccurred(intensity: 0.4)
+            cat.stopMoving()
+            cat.react(.happy, duration: 1.2)
+            spawnEffect("fx_sparkle", offsetY: 40, dx: .random(in: -16...16))
+            nextDecisionAt = lastUpdate + 3
+        case .noReward:
+            cat.react(.happy, duration: 0.6)
+        default:
             break
         }
     }
 
     // MARK: Scripted sequences
+
+    /// Runs after `GameStore.bathe` succeeded: walk to the tub spot, splash, sparkle.
+    func playBath() {
+        cancelScript()
+        cat.isScripted = true
+        cat.walk(to: Spot.bath) { [weak self] in
+            guard let self else { return }
+            let tub = SKSpriteNode(texture: SpriteLibrary.texture("bath_tub"))
+            tub.anchorPoint = CGPoint(x: 0.5, y: 0)
+            tub.position = CGPoint(x: Spot.bath.x, y: Spot.bath.y - 6)
+            tub.zPosition = self.depth(for: Spot.bath.y) + 1 // in front of the cat
+            tub.name = "tub"
+            self.world.addChild(tub)
+            self.cat.play(.happy)
+            let bubbles = SKAction.repeat(.sequence([.run { [weak self] in
+                self?.spawnEffect("fx_bubble", offsetY: .random(in: 24...48), dx: .random(in: -24...24))
+            }, .wait(forDuration: 0.25)]), count: 14)
+            self.run(.sequence([bubbles, .run { [weak self] in
+                guard let self else { return }
+                tub.removeFromParent()
+                self.cat.isScripted = false
+                self.cat.react(.happy, duration: 1)
+                for i in 0..<3 { self.spawnEffect("fx_sparkle", offsetY: 30 + CGFloat(i) * 8, dx: CGFloat([-14, 0, 14][i])) }
+                self.nextDecisionAt = self.lastUpdate + 2
+            }]), withKey: "script")
+        }
+    }
+
+    func playVet() {
+        cat.stopMoving()
+        cat.react(.happy, duration: 1.5)
+        spawnHearts()
+        nextDecisionAt = lastUpdate + 3
+    }
+
+    func refreshLitter(sparkle: Bool = false) {
+        litterBox.texture = SpriteLibrary.texture(store?.isLitterDirty == true ? "litter_dirty" : "litter_clean")
+        guard sparkle else { return }
+        let node = SKSpriteNode(texture: SpriteLibrary.texture("fx_sparkle"))
+        node.position = CGPoint(x: Spot.litter.x, y: Spot.litter.y + 28)
+        node.zPosition = 2100
+        world.addChild(node)
+        node.run(.sequence([.group([.moveBy(x: 0, y: 16, duration: 0.8), .fadeOut(withDuration: 0.8)]), .removeFromParent()]))
+    }
 
     /// Runs after `GameStore.feed` succeeded. Stats are already applied, so cancelling this is harmless.
     func playFeeding() {
@@ -261,6 +327,7 @@ final class RoomScene: SKScene {
 
     private func cancelScript() {
         removeAction(forKey: "script")
+        world.childNode(withName: "tub")?.removeFromParent()
         cat.stopMoving()
         foodBowl.texture = SpriteLibrary.texture("bowl_empty")
         cat.isScripted = false

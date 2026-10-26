@@ -14,15 +14,17 @@ enum CatSimulator {
         var remaining = min(elapsed, balance.maxSimulatedHours * 3600)
         while remaining > 0 {
             let step = min(remaining, balance.simulationStepSeconds)
-            applyStep(&state.cat, hours: step / 3600, balance: balance)
+            applyStep(&state.cat, care: &state.care, hours: step / 3600, balance: balance)
             remaining -= step
         }
         state.lastSimulatedAt = now
     }
 
-    static func applyStep(_ cat: inout CatState, hours h: Double, balance b: Balance) {
+    static func applyStep(_ cat: inout CatState, care: inout CareState, hours h: Double, balance b: Balance) {
         var s = cat.stats
         let floor = b.decayFloor
+        care.litter = min(100, care.litter + b.litterFillPerHour * h)
+        let litterPenalty = care.litter >= b.litterDirtyThreshold ? b.dirtyLitterCleanlinessPenaltyPerHour : 0
         if cat.isSleeping {
             s.energy += b.energyRestorePerHourSleeping * h
             s.hunger = decay(s.hunger, by: b.hungerDecayPerHourSleeping * h, floor: floor)
@@ -30,7 +32,7 @@ enum CatSimulator {
             s.energy = decay(s.energy, by: b.energyDecayPerHour * h, floor: floor)
             s.hunger = decay(s.hunger, by: b.hungerDecayPerHour * h, floor: floor)
         }
-        s.cleanliness = decay(s.cleanliness, by: b.cleanlinessDecayPerHour * h, floor: floor)
+        s.cleanliness = decay(s.cleanliness, by: (b.cleanlinessDecayPerHour + litterPenalty) * h, floor: floor)
 
         let neglected = min(s.hunger, s.cleanliness, s.energy) < b.neglectThreshold
         let happinessLoss = b.happinessDecayPerHour + (neglected ? b.happinessNeglectPenaltyPerHour : 0)

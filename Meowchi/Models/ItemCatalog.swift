@@ -8,6 +8,7 @@ struct FoodItem: Identifiable, Equatable {
     let xp: Int
 
     var nameKey: LocalizedStringKey { LocalizedStringKey(id + ".name") }
+    var iconName: String { "icon_" + id.replacingOccurrences(of: ".", with: "_") }
 }
 
 /// Static item definitions. Balancing values for items live here, next to their IDs.

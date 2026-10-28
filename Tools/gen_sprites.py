@@ -255,6 +255,7 @@ def litter(dirty):
 
 
 BUBBLE = [".KK.", "KHBK", "KBBK", ".KK."]
+LASER = [".RR.", "RHHR", "RHHR", ".RR."]
 SPARKLE = ["..Y..", "..Y..", "YYHYY", "..Y..", "..Y.."]
 HEART = [".HH.HH.", "HPPHPPH", "HPPPPPH", ".HPPPH.", "..HPH..", "...H..."]
 ZED = ["KKKKK", "...K.", "..K..", ".K...", "KKKKK"]
@@ -279,6 +280,9 @@ ICONS = {
     "icon_food_fish": ["..KKK....", ".KOOOK.KK", "KOEOOOKOK", "KOOOOOOOK", ".KOOOK.KK", "..KKK...."],
     "icon_food_chicken": ["..KKKK.", ".KTTTTK", "KTTTTTK", "KTTTTK.", ".KTTK..", "..KWWK.", "...KWWK", "....KK."],
     "icon_food_treat": ["...K...", "..KPK..", ".KPPPK.", "KPPYPPK", ".KPPPK.", "..KPK..", "...K..."],
+    "icon_play": ["...KK..", "..KPPK.", ".KPKPPK", "KPPKPPK", "KPPPKPK", ".KPPPK.", "..KKK.K"],
+    "icon_shop": ["..KKK..", ".K...K.", "KKKKKKK", "KYYYYYK", "KYKYKYK", "KYYYYYK", "KKKKKKK"],
+    "icon_tasks": ["KKKKKK.", "KWWWWK.", "KWKKWK.", "KWWWWKK", "KWKKWKY", "KWWWWKK", "KKKKKK."],
     "icon_coin": [".KKKK.", "KYYYYK", "KYKYYK", "KYKYYK", "KYYYYK", ".KKKK."],
     "icon_xp": ["...K...", "..KYK..", "KKYYYKK", ".KYYYK.", ".KYKYK.", "KK...KK"],
 }
@@ -348,6 +352,7 @@ def main():
         "toy_yarn": yarn(), "plant_basic": plant(),
         "bath_tub": tub(), "litter_clean": litter(False), "litter_dirty": litter(True),
         "fx_bubble": small(BUBBLE, {"K": (120, 170, 210, 255), "H": H, "B": (200, 235, 255, 255)}),
+        "fx_laser": small(LASER, {"R": (240, 50, 60, 255), "H": (255, 200, 200, 255)}),
         "fx_sparkle": small(SPARKLE, {"Y": (250, 220, 90, 255), "H": H}),
         "fx_heart": small(HEART, {"H": K, "P": (240, 90, 120, 255)}), "fx_zzz": small(ZED, {"K": (90, 110, 200, 255)}),
     }

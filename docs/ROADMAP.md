@@ -49,7 +49,7 @@ Applied in 15-minute steps from `lastSimulatedAt` to now:
 | 1 | Foundation + first playable room | Compiling app, models, SwiftData save, simulation, room scene, cat state machine, HUD, feed/sleep/pet, 15 unit tests | ✅ this branch |
 | 2 | Playable cat polish | 2x art resolution (64px cat), stroke vs tap petting + haptics, day/night by local clock, onboarding (name your cat) + in-room hints | ✅ code; side-view walk and extra idle variety wait for final art |
 | 3 | Care system | Food picker, bath (in-room tub), brushing (drag in brush mode), litter box that fills over time, free vet check-up with cooldown, health tips | ✅ code |
-| 4 | Gameplay expansion | Mini-game framework + Laser Chase, results screen, coins, shop, inventory UI, daily tasks | |
+| 4 | Gameplay expansion | Mini-game framework + Laser Chase (45 s, energy paid up front, capped and plausibility-checked rewards, results screen), food shop with atomic purchases, 4 daily tasks from a pool of 7 + all-done bonus, timezone/clock-safe reset | ✅ code |
 | 5 | Content & customization | Decoration slots + room editor, garden walk, more food/toys, extra cat looks | |
 | 6 | Polish & release | 6 extra languages, audio manager + SFX/music, settings, accessibility, notifications (opt-in), icon, App Store metadata | |
 | 7 | iPad (+ landscape) | Adaptive HUD and side panels, iPad simulator QA | |

@@ -11,10 +11,13 @@ struct HomeView: View {
 
     @State private var panel: CarePanel?
     @State private var isBrushing = false
+    @State private var showShop = false
+    @State private var showTasks = false
+    @State private var activeGame: MiniGameKind?
 
     var body: some View {
         VStack(spacing: 8) {
-            HUDView()
+            HUDView(onShop: { panel = nil; showShop = true }, onTasks: { panel = nil; showTasks = true })
             SpriteView(scene: scene, preferredFramesPerSecond: 60, options: [.ignoresSiblingOrder])
                 .clipShape(PixelBorder(step: 4))
                 .overlay(PixelBorder(step: 4).stroke(PixelPalette.ink, lineWidth: 2))
@@ -26,13 +29,30 @@ struct HomeView: View {
                     }
                     .animation(.easeOut(duration: 0.2), value: panel)
                 }
-            ActionBar(panel: $panel, onToggleSleep: toggleSleep)
+            ActionBar(panel: $panel, onPlay: play, onToggleSleep: toggleSleep)
         }
+        .sheet(isPresented: $showShop) { ShopView().environment(store) }
+        .sheet(isPresented: $showTasks) { TasksView().environment(store) }
+        .fullScreenCover(item: $activeGame) { MiniGameView(kind: $0).environment(store) }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .background(PixelPalette.frame.ignoresSafeArea())
         .onAppear {
             scene.store = store
+            #if DEBUG
+            // Screenshot/QA helper: `-openScreen shop|tasks|laser|food|clean|health`.
+            if let i = CommandLine.arguments.firstIndex(of: "-openScreen"), i + 1 < CommandLine.arguments.count {
+                switch CommandLine.arguments[i + 1] {
+                case "shop": showShop = true
+                case "tasks": showTasks = true
+                case "laser": activeGame = .laserChase
+                case "food": panel = .food
+                case "clean": panel = .clean
+                case "health": panel = .health
+                default: break
+                }
+            }
+            #endif
         }
         .onChange(of: store.state.cat.isSleeping) { _, sleeping in
             if sleeping { setBrushing(false) }
@@ -110,6 +130,8 @@ struct HomeView: View {
         case .sleeping: show("notice.sleeping")
         case .outOfStock: show("notice.noFood")
         case .tooSoon: show("notice.tooSoon")
+        case .insufficientCoins: show("notice.noCoins")
+        case .tooTired: show("notice.tooTired")
         case .noReward: if let noReward { show(noReward) }
         case .unknownItem: break
         }
@@ -118,6 +140,13 @@ struct HomeView: View {
     private func setBrushing(_ on: Bool) {
         isBrushing = on
         scene.isBrushing = on
+    }
+
+    private func play() {
+        panel = nil
+        setBrushing(false)
+        if store.state.cat.isSleeping { return show("notice.sleeping") }
+        activeGame = .laserChase
     }
 
     private func toggleSleep() {
@@ -137,14 +166,18 @@ struct HomeView: View {
 private struct ActionBar: View {
     @Environment(GameStore.self) private var store
     @Binding var panel: CarePanel?
+    let onPlay: @MainActor () -> Void
     let onToggleSleep: @MainActor () -> Void
 
     var body: some View {
         let sleeping = store.state.cat.isSleeping
-        HStack(spacing: 8) {
+        HStack(spacing: 6) {
             ActionButton(icon: "icon_hunger", title: "action.feed", selected: panel == .food) { toggle(.food) }
                 .disabled(sleeping)
             ActionButton(icon: "icon_clean", title: "action.clean", selected: panel == .clean) { toggle(.clean) }
+            ActionButton(icon: "icon_play", title: "action.play", selected: false,
+                         fill: Color(red: 0.98, green: 0.70, blue: 0.78)) { onPlay() }
+                .disabled(sleeping)
             ActionButton(icon: "icon_energy", title: sleeping ? "action.wake" : "action.sleep", selected: false,
                          fill: Color(red: 0.62, green: 0.74, blue: 0.98)) { onToggleSleep() }
             ActionButton(icon: "icon_health", title: "action.health", selected: panel == .health) { toggle(.health) }

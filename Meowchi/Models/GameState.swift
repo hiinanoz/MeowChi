@@ -17,6 +17,7 @@ struct GameState: Codable, Equatable {
     /// nil until the player has named their kitten. Optional so older saves decode unchanged.
     var onboardedAt: Date?
     var care = CareState()
+    var daily = DailyTasks()
 
     static func newGame(now: Date, balance: Balance) -> GameState {
         GameState(
@@ -77,6 +78,7 @@ extension GameState {
         // Added after schema v1 shipped internally: default when missing.
         onboardedAt = try c.decodeIfPresent(Date.self, forKey: .onboardedAt)
         care = try c.decodeIfPresent(CareState.self, forKey: .care) ?? CareState()
+        daily = try c.decodeIfPresent(DailyTasks.self, forKey: .daily) ?? DailyTasks()
     }
 }
 

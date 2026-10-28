@@ -13,6 +13,9 @@ enum ActionResult: Equatable {
     case unknownItem
     /// On cooldown (bath, vet), try again later.
     case tooSoon
+    case insufficientCoins
+    /// Not enough energy for a mini-game.
+    case tooTired
 }
 
 /// Single source of truth for game state. All mutations go through here so they are validated and saved.
@@ -29,13 +32,19 @@ final class GameStore {
     let balance: Balance
     private let saveStore: SaveStore
     private let clock: () -> Date
+    /// Read on every use so a time-zone change is picked up.
+    private let calendar: () -> Calendar
+    /// The mini-game in progress. Not persisted: quitting the app forfeits the round (energy was already paid).
+    @ObservationIgnored private var activeGame: (kind: MiniGameKind, startedAt: Date)?
     @ObservationIgnored private var busyUntil = Date.distantPast
     private let log = Logger(subsystem: "Meowchi", category: "GameStore")
 
-    init(saveStore: SaveStore, balance: Balance = .standard, clock: @escaping () -> Date = Date.init) {
+    init(saveStore: SaveStore, balance: Balance = .standard, clock: @escaping () -> Date = Date.init,
+         calendar: @escaping () -> Calendar = { .current }) {
         self.saveStore = saveStore
         self.balance = balance
         self.clock = clock
+        self.calendar = calendar
         let now = clock()
         do {
             state = try saveStore.load() ?? .newGame(now: now, balance: balance)
@@ -43,7 +52,7 @@ final class GameStore {
             state = .newGame(now: now, balance: balance)
             loadIssue = error as? SaveStoreError ?? .corrupted
         }
-        CatSimulator.advance(&state, to: now, balance: balance)
+        simulate(now)
         save()
     }
 
@@ -63,8 +72,18 @@ final class GameStore {
 
     // MARK: Simulation
 
+    /// Brings needs and daily tasks up to `now`. Every action calls this first.
+    private func simulate(_ now: Date) {
+        CatSimulator.advance(&state, to: now, balance: balance)
+        let today = DailyTasks.dayKey(for: now, calendar: calendar())
+        // Only move forward: a clock set back never re-rolls or resets today's tasks.
+        if state.daily.dayKey.isEmpty || today > state.daily.dayKey {
+            state.daily = .generate(dayKey: today, count: balance.dailyTaskCount)
+        }
+    }
+
     func tick() {
-        CatSimulator.advance(&state, to: clock(), balance: balance)
+        simulate(clock())
         save()
     }
 
@@ -74,7 +93,7 @@ final class GameStore {
     func feed(_ itemID: String) -> ActionResult {
         guard let item = ItemCatalog.food(itemID) else { return .unknownItem }
         let now = clock()
-        CatSimulator.advance(&state, to: now, balance: balance)
+        simulate(now)
         guard !state.cat.isSleeping else { return .sleeping }
         guard now >= busyUntil else { return .busy }
         guard let count = state.inventory[itemID], count > 0 else { return .outOfStock }
@@ -86,6 +105,7 @@ final class GameStore {
         busyUntil = now.addingTimeInterval(balance.feedDurationSeconds)
         grantXP(item.xp)
         if tutorialStep == .feed { tutorialStep = .pet }
+        record(.fed)
         save()
         return .ok
     }
@@ -93,13 +113,14 @@ final class GameStore {
     @discardableResult
     func pet(_ kind: PetKind = .tap) -> ActionResult {
         let now = clock()
-        CatSimulator.advance(&state, to: now, balance: balance)
+        simulate(now)
         guard !state.cat.isSleeping else { return .sleeping }
         guard state.petLog.consume(at: now, cooldown: balance.petCooldownSeconds,
                                    maxPerHour: balance.maxRewardedPetsPerHour) else { return .noReward }
         state.cat.stats[.happiness] += kind == .stroke ? balance.petHappiness : balance.tapHappiness
         grantXP(balance.petXP)
         if tutorialStep == .pet { tutorialStep = .done }
+        record(.petted)
         save()
         return .ok
     }
@@ -118,6 +139,7 @@ final class GameStore {
         state.care.lastBathAt = now
         busyUntil = now.addingTimeInterval(balance.bathDurationSeconds)
         grantXP(balance.bathXP)
+        record(.bathed)
         save()
         return .ok
     }
@@ -132,6 +154,7 @@ final class GameStore {
         state.cat.stats[.cleanliness] += balance.brushCleanliness
         state.cat.stats[.happiness] += balance.brushHappiness
         grantXP(balance.brushXP)
+        record(.brushed)
         save()
         return .ok
     }
@@ -139,12 +162,13 @@ final class GameStore {
     /// Works while the cat sleeps: you clean the box, not the cat.
     @discardableResult
     func cleanLitter() -> ActionResult {
-        CatSimulator.advance(&state, to: clock(), balance: balance)
+        simulate(clock())
         guard state.care.litter >= 1 else { return .noReward }
         let wasDirty = state.care.litter >= balance.litterDirtyThreshold
         state.care.litter = 0
         if wasDirty { state.cat.stats[.happiness] += balance.litterCleanHappiness }
         grantXP(wasDirty ? balance.litterCleanXP : 1)
+        record(.litterCleaned)
         save()
         return .ok
     }
@@ -167,7 +191,7 @@ final class GameStore {
 
     /// Shared preconditions for actions that involve the cat.
     private func careGuard(_ now: Date) -> ActionResult? {
-        CatSimulator.advance(&state, to: now, balance: balance)
+        simulate(now)
         if state.cat.isSleeping { return .sleeping }
         if now < busyUntil { return .busy }
         return nil
@@ -182,7 +206,7 @@ final class GameStore {
     @discardableResult
     func setSleeping(_ sleeping: Bool) -> ActionResult {
         let now = clock()
-        CatSimulator.advance(&state, to: now, balance: balance)
+        simulate(now)
         guard now >= busyUntil else { return .busy }
         guard state.cat.isSleeping != sleeping else { return .ok }
         state.cat.isSleeping = sleeping
@@ -199,6 +223,97 @@ final class GameStore {
         state.onboardedAt = clock()
         tutorialStep = .feed
         save()
+    }
+
+    // MARK: Shop
+
+    /// Atomic purchase: validates first, then changes coins and inventory together.
+    @discardableResult
+    func buy(_ itemID: String, quantity: Int = 1) -> ActionResult {
+        guard quantity > 0, let item = ItemCatalog.food(itemID) else { return .unknownItem }
+        let cost = item.price * quantity
+        guard state.coins >= cost else { return .insufficientCoins }
+        state.coins -= cost
+        state.inventory[itemID, default: 0] += quantity
+        save()
+        return .ok
+    }
+
+    // MARK: Mini-games
+
+    func canStart(_ kind: MiniGameKind) -> Bool {
+        !state.cat.isSleeping && state.cat.stats.energy >= kind.config(balance).minimumEnergy
+    }
+
+    /// Pays the energy cost up front, so quitting and restarting can't farm rewards.
+    @discardableResult
+    func startMiniGame(_ kind: MiniGameKind) -> ActionResult {
+        let now = clock()
+        if let result = careGuard(now) { return result }
+        let config = kind.config(balance)
+        guard state.cat.stats.energy >= config.minimumEnergy else { return .tooTired }
+        state.cat.stats[.energy] -= config.energyCost
+        activeGame = (kind, now)
+        save()
+        return .ok
+    }
+
+    /// Ends the running round and pays out. Returns nil if no round was started.
+    @discardableResult
+    func finishMiniGame(points: Int) -> MiniGameReward? {
+        guard let game = activeGame else { return nil }
+        activeGame = nil
+        let now = clock()
+        simulate(now)
+        let config = game.kind.config(balance)
+        let elapsed = max(0, now.timeIntervalSince(game.startedAt))
+        let plausible = Int(elapsed / config.minSecondsPerPoint)
+        let rewarded = max(0, min(points, config.maxRewardedPoints, plausible))
+        let reward = MiniGameReward(points: max(0, points), coins: rewarded * config.coinsPerPoint, xp: rewarded * config.xpPerPoint)
+        state.cat.stats[.happiness] += config.happiness
+        state.coins += reward.coins
+        grantXP(reward.xp)
+        record(.played)
+        save()
+        return reward
+    }
+
+    func cancelMiniGame() { activeGame = nil }
+
+    // MARK: Daily tasks
+
+    func definition(for task: DailyTaskProgress) -> DailyTaskDefinition? { DailyTasks.definition(task.id) }
+
+    @discardableResult
+    func claimTask(_ id: String) -> ActionResult {
+        simulate(clock())
+        guard let index = state.daily.tasks.firstIndex(where: { $0.id == id }),
+              let definition = DailyTasks.definition(id) else { return .unknownItem }
+        let task = state.daily.tasks[index]
+        guard !task.claimed, task.progress >= definition.target else { return .noReward }
+        state.daily.tasks[index].claimed = true
+        state.coins += definition.coins
+        grantXP(definition.xp)
+        save()
+        return .ok
+    }
+
+    @discardableResult
+    func claimDailyBonus() -> ActionResult {
+        simulate(clock())
+        guard state.daily.allClaimed, !state.daily.bonusClaimed else { return .noReward }
+        state.daily.bonusClaimed = true
+        state.coins += balance.allTasksBonusCoins
+        save()
+        return .ok
+    }
+
+    private func record(_ event: TaskEvent) {
+        for i in state.daily.tasks.indices {
+            guard let definition = DailyTasks.definition(state.daily.tasks[i].id),
+                  definition.event == event, !state.daily.tasks[i].claimed else { continue }
+            state.daily.tasks[i].progress = min(definition.target, state.daily.tasks[i].progress + 1)
+        }
     }
 
     func quantity(of itemID: String) -> Int { state.inventory[itemID] ?? 0 }
@@ -222,6 +337,10 @@ final class GameStore {
     // MARK: Persistence
 
     func save() {
+        if state.cat.stats.happiness >= balance.happinessTaskThreshold,
+           state.daily.tasks.contains(where: { DailyTasks.definition($0.id)?.event == .reachedHappiness && $0.progress == 0 }) {
+            record(.reachedHappiness)
+        }
         do {
             try saveStore.save(state)
         } catch {

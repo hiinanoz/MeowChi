@@ -209,7 +209,7 @@ final class RoomScene: SKScene {
             cat.react(.happy, duration: 0.6)
         case .sleeping:
             spawnEffect("fx_zzz", offsetY: 36)
-        case .busy, .outOfStock, .unknownItem, .tooSoon:
+        case .busy, .outOfStock, .unknownItem, .tooSoon, .insufficientCoins, .tooTired:
             break
         }
     }

@@ -69,6 +69,15 @@ struct Balance {
     var vetCooldownHours = 6.0
     var alreadyHealthyThreshold = 95.0
 
+    // MARK: Mini-games
+    var laserChase = MiniGameConfig(durationSeconds: 45, energyCost: 10, minimumEnergy: 15, happiness: 12,
+                                    coinsPerPoint: 2, xpPerPoint: 1, maxRewardedPoints: 30, minSecondsPerPoint: 0.5)
+
+    // MARK: Daily tasks
+    var dailyTaskCount = 4
+    var allTasksBonusCoins = 40
+    var happinessTaskThreshold = 80.0
+
     // MARK: Progression & economy
     var baseXPPerLevel = 50
     var xpGrowthPerLevel = 25

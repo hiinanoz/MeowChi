@@ -34,6 +34,17 @@
         }
       }
     },
+    "action.play": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play"
+          }
+        }
+      }
+    },
     "action.sleep": {
       "extractionState": "manual",
       "localizations": {
@@ -122,6 +133,17 @@
         }
       }
     },
+    "common.close": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        }
+      }
+    },
     "common.ok": {
       "extractionState": "manual",
       "localizations": {
@@ -206,6 +228,83 @@
           "stringUnit": {
             "state": "translated",
             "value": "Wet Food"
+          }
+        }
+      }
+    },
+    "game.again": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play again"
+          }
+        }
+      }
+    },
+    "game.energyCost %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uses %lld energy"
+          }
+        }
+      }
+    },
+    "game.laserChase.hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drag your finger to move the laser. Each time your cat catches it, move it away again!"
+          }
+        }
+      }
+    },
+    "game.laserChase.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laser Chase"
+          }
+        }
+      }
+    },
+    "game.points %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Catches: %lld"
+          }
+        }
+      }
+    },
+    "game.results": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Well played!"
+          }
+        }
+      }
+    },
+    "game.start": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start"
           }
         }
       }
@@ -453,6 +552,17 @@
         }
       }
     },
+    "notice.noCoins": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not enough coins."
+          }
+        }
+      }
+    },
     "notice.noFood": {
       "extractionState": "manual",
       "localizations": {
@@ -482,6 +592,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Not yet. Try again a bit later."
+          }
+        }
+      }
+    },
+    "notice.tooTired": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Too tired to play. Let your cat rest first."
           }
         }
       }
@@ -574,6 +695,28 @@
         }
       }
     },
+    "shop.owned %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Owned: %lld"
+          }
+        }
+      }
+    },
+    "shop.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shop"
+          }
+        }
+      }
+    },
     "stat.cleanliness": {
       "extractionState": "manual",
       "localizations": {
@@ -625,6 +768,138 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fullness"
+          }
+        }
+      }
+    },
+    "task.bath1": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Give your cat a bath."
+          }
+        }
+      }
+    },
+    "task.brush3": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brush your cat 3 times."
+          }
+        }
+      }
+    },
+    "task.feed2": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feed your cat twice."
+          }
+        }
+      }
+    },
+    "task.happy80": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reach 80% happiness."
+          }
+        }
+      }
+    },
+    "task.litter1": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clean the litter box."
+          }
+        }
+      }
+    },
+    "task.pet3": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pet your cat 3 times."
+          }
+        }
+      }
+    },
+    "task.play1": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play one mini-game."
+          }
+        }
+      }
+    },
+    "tasks.bonus %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finish all for +%lld coins"
+          }
+        }
+      }
+    },
+    "tasks.claim": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Claim"
+          }
+        }
+      }
+    },
+    "tasks.claimed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Claimed"
+          }
+        }
+      }
+    },
+    "tasks.resetHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New tasks arrive every day at midnight."
+          }
+        }
+      }
+    },
+    "tasks.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daily tasks"
           }
         }
       }

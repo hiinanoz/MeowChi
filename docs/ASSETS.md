@@ -60,10 +60,13 @@ AI image tools don't produce real pixel grids. Each image needs these steps:
 | `toy_yarn` | 24×20 | |
 | `plant_basic` | 32×48 | |
 | `fx_heart`, `fx_zzz` | 14×12, 10×10 | |
+| `bath_tub` | 68×32 | drawn in front of the cat during a bath |
+| `litter_clean` / `litter_dirty` | 48×24 | |
+| `fx_bubble`, `fx_sparkle`, `fx_laser` | 8×8, 10×10, 8×8 | |
 
 ## UI icons (`Icons/`)
 
-`icon_hunger`, `icon_energy`, `icon_happiness`, `icon_cleanliness`, `icon_health`, `icon_coin`, `icon_xp`: about 16×16 (square preferred; the UI scales them).
+`icon_hunger`, `icon_energy`, `icon_happiness`, `icon_cleanliness`, `icon_health`, `icon_coin`, `icon_xp`, `icon_clean`, `icon_brush`, `icon_play`, `icon_shop`, `icon_tasks`, `icon_food_dry|wet|fish|chicken|treat`: about 16×16 (square preferred; the UI scales them).
 
 ## App icon
 

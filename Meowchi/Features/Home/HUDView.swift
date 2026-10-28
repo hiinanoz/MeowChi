@@ -3,6 +3,8 @@ import SwiftUI
 /// Top HUD: name, mood, level/XP, coins and the five need bars.
 struct HUDView: View {
     @Environment(GameStore.self) private var store
+    var onShop: @MainActor () -> Void = {}
+    var onTasks: @MainActor () -> Void = {}
 
     var body: some View {
         let state = store.state
@@ -27,13 +29,31 @@ struct HUDView: View {
                     .accessibilityElement(children: .combine)
                 }
                 Spacer(minLength: 0)
-                HStack(spacing: 4) {
-                    PixelIcon(name: "icon_coin", size: 16)
-                    Text(state.coins, format: .number).font(PixelFont.body(14)).monospacedDigit()
+                VStack(alignment: .trailing, spacing: 6) {
+                    Button { onShop() } label: {
+                        HStack(spacing: 4) {
+                            PixelIcon(name: "icon_coin", size: 16)
+                            Text(state.coins, format: .number).font(PixelFont.body(14)).monospacedDigit()
+                            PixelIcon(name: "icon_shop", size: 14)
+                        }
+                        .padding(.horizontal, 8).padding(.vertical, 5)
+                        .pixelPanel(PixelPalette.panelShade)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text("hud.coins \(state.coins)"))
+                    .accessibilityHint(Text("shop.title"))
+                    Button { onTasks() } label: {
+                        HStack(spacing: 4) {
+                            PixelIcon(name: "icon_tasks", size: 14)
+                            Text(verbatim: "\(state.daily.tasks.filter(\.claimed).count)/\(state.daily.tasks.count)")
+                                .font(PixelFont.body(11)).monospacedDigit()
+                        }
+                        .padding(.horizontal, 8).padding(.vertical, 4)
+                        .pixelPanel(PixelPalette.panelShade)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text("tasks.title"))
                 }
-                .padding(.horizontal, 8).padding(.vertical, 5)
-                .pixelPanel(PixelPalette.panelShade)
-                .accessibilityLabel(Text("hud.coins \(state.coins)"))
             }
             HStack(spacing: 6) {
                 ForEach(StatKind.allCases) { kind in

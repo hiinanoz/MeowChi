@@ -254,6 +254,17 @@
         }
       }
     },
+    "common.done": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        }
+      }
+    },
     "common.ok": {
       "extractionState": "manual",
       "localizations": {
@@ -1200,6 +1211,17 @@
         }
       }
     },
+    "health.tip.sick": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your cat feels unwell. A vet visit and good care will help."
+          }
+        }
+      }
+    },
     "health.vet": {
       "extractionState": "manual",
       "localizations": {
@@ -1355,6 +1377,17 @@
         }
       }
     },
+    "mood.sick": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unwell"
+          }
+        }
+      }
+    },
     "mood.sleepy": {
       "extractionState": "manual",
       "localizations": {
@@ -1406,6 +1439,72 @@
           "stringUnit": {
             "state": "translated",
             "value": "Upbeat"
+          }
+        }
+      }
+    },
+    "nails.claw %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Claw %lld"
+          }
+        }
+      }
+    },
+    "nails.done": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All neat! Your cat feels great."
+          }
+        }
+      }
+    },
+    "nails.hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap each claw to trim it. Gently!"
+          }
+        }
+      }
+    },
+    "nails.long": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Long"
+          }
+        }
+      }
+    },
+    "nails.neat": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neat"
+          }
+        }
+      }
+    },
+    "nails.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trim nails"
           }
         }
       }
@@ -1465,6 +1564,17 @@
         }
       }
     },
+    "notice.nailsNeat": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The nails are still neat."
+          }
+        }
+      }
+    },
     "notice.noCoins": {
       "extractionState": "manual",
       "localizations": {
@@ -1516,6 +1626,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Too tired to play. Let your cat rest first."
+          }
+        }
+      }
+    },
+    "notice.waterFresh": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The water is still fresh."
           }
         }
       }
@@ -1861,6 +1982,17 @@
         }
       }
     },
+    "task.water1": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change your cat's water."
+          }
+        }
+      }
+    },
     "tasks.bonus %lld": {
       "extractionState": "manual",
       "localizations": {
@@ -1945,6 +2077,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Now stroke %@ with your finger."
+          }
+        }
+      }
+    },
+    "water.change": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change water"
           }
         }
       }

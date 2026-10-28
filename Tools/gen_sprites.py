@@ -200,6 +200,59 @@ def body_sleep(breath=0):
     return c
 
 
+def body_scratch(frame):
+    """Standing on hind legs facing right, front paws on the scratching post (post is to the right)."""
+    c = Canvas(32, 32)
+    c.rect(11, 25, 2, 5, OS); c.rect(15, 25, 2, 5, O)
+    c.rect(11, 29, 2, 1, W); c.rect(15, 29, 2, 1, W)
+    c.shaded_ellipse(14, 20, 5.5, 7.5, O, OS, OL)
+    c.ellipse(15.5, 21, 3, 5, W)
+    for y in (15, 18, 21):
+        c.rect(10, y, 2, 1, D)
+    up = (0, 2)[frame]
+    for x, y in ((19, 13 + up), (20, 16 - up)):
+        c.rect(x, y, 4, 2, O); c.rect(x + 3, y, 2, 2, W)
+    hy = 9
+    c.shaded_ellipse(17, hy, 6.5, 5.5, O, OS, OL)
+    c.ellipse(19.5, hy + 2.2, 2.8, 1.8, W)
+    c.rect(19, hy, 3, 1, E)  # eyes closed with joy
+    c.rect(22, hy + 1, 1, 1, P)
+    c.rect(14, hy - 2, 2, 1, D)
+    c.outline()
+    return c
+
+
+def shifted(canvas, dx, dy):
+    out = Canvas(canvas.w, canvas.h)
+    for Y in range(canvas.H):
+        for X in range(canvas.W):
+            v = canvas.p[Y][X]
+            if v and 0 <= X + dx * SCALE < out.W and 0 <= Y + dy * SCALE < out.H:
+                out.p[Y + dy * SCALE][X + dx * SCALE] = v
+    return out
+
+
+def big_paw():
+    """Close-up paw for nail trimming (white paw, pink beans)."""
+    c = Canvas(48, 40)
+    c.shaded_ellipse(24, 28, 17, 12, W, WS)
+    for cx, cy in ((10, 12), (19, 7), (29, 7), (38, 12)):
+        c.shaded_ellipse(cx, cy, 5.5, 6, W, WS)
+        c.ellipse(cx, cy + 1, 2.8, 3, P)
+    c.ellipse(24, 29, 8, 6, P)
+    c.ellipse(22, 27, 2, 1.5, (250, 200, 210, 255))
+    c.outline()
+    return c
+
+
+def claw():
+    c = Canvas(5, 7)
+    c.tri((1, 7), (4, 7), (3, 0), (236, 236, 228, 255))
+    c.rect(2, 2, 1, 4, (210, 210, 200, 255))
+    c.outline()
+    return c
+
+
 def ears(style, family, hy):
     """Ear layer, drawn behind the body so the head covers the ear base."""
     c = Canvas(32, 32)
@@ -287,6 +340,10 @@ def cat_layers():
         out[f"cat_walk_{f}"] = body_side(f)
         for style in EAR_STYLES:
             out[f"cat_ears_{style}_walk_{f}"] = ears(style, "side", 15 - (.5 if f % 2 else 0))
+    for f in range(2):
+        out[f"cat_scratch_{f}"] = body_scratch(f)
+        for style in EAR_STYLES:
+            out[f"cat_ears_{style}_scratch_{f}"] = shifted(ears(style, "side", 9), -7, 0)
     for f in range(2):
         out[f"cat_sleep_{f}"] = body_sleep(f)
         for style in EAR_STYLES:
@@ -391,6 +448,8 @@ def litter(dirty):
 
 
 BUBBLE = [".KK.", "KHBK", "KBBK", ".KK."]
+ALERT = [".KKKKKK.", "KWWKKWWK", "KWWKKWWK", "KWWKKWWK", "KWWWWWWK", "KWWKKWWK", ".KKKKKK.", "...KK...", "..K....."]
+SICK = [".KKKKKK.", "KWWRRWWK", "KWWRRWWK", "KRRRRRRK", "KWWRRWWK", "KWWRRWWK", ".KKKKKK.", "...KK...", "..K....."]
 LASER = [".RR.", "RHHR", "RHHR", ".RR."]
 SPARKLE = ["..Y..", "..Y..", "YYHYY", "..Y..", "..Y.."]
 HEART = [".HH.HH.", "HPPHPPH", "HPPPPPH", ".HPPPH.", "..HPH..", "...H..."]
@@ -654,6 +713,8 @@ def main():
         "toy_yarn": yarn(), "plant_basic": plant(),
         "bath_tub": tub(), "litter_clean": litter(False), "litter_dirty": litter(True),
         "fx_bubble": small(BUBBLE, {"K": (120, 170, 210, 255), "H": H, "B": (200, 235, 255, 255)}),
+        "paw_big": big_paw(), "claw": claw(),
+        "fx_alert": small(ALERT, {"K": K, "W": W}), "fx_sick": small(SICK, {"K": K, "W": W, "R": (230, 70, 70, 255)}),
         "fx_laser": small(LASER, {"R": (240, 50, 60, 255), "H": (255, 200, 200, 255)}),
         "fx_sparkle": small(SPARKLE, {"Y": (250, 220, 90, 255), "H": H}),
         "fx_heart": small(HEART, {"H": K, "P": (240, 90, 120, 255)}), "fx_zzz": small(ZED, {"K": (90, 110, 200, 255)}),

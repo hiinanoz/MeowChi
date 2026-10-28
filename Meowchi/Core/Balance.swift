@@ -13,6 +13,26 @@ struct Balance {
     var happinessNeglectPenaltyPerHour = 3.0
     var neglectThreshold = 30.0
 
+    // Water bowl
+    var waterDrainPerHour = 4.0
+    var waterLowThreshold = 30.0
+    var lowWaterHappinessPenaltyPerHour = 1.5
+    var waterRefreshHappiness = 3.0
+    var waterXP = 2
+    /// Changing water that is still this fresh gives no reward.
+    var waterFreshThreshold = 90.0
+    // Nails
+    var nailGrowthDays = 3.0
+    /// Trimming is allowed (and rewarded) once nails have grown this much (0...1).
+    var nailTrimMinimumGrowth = 0.34
+    var nailTrimCleanliness = 5.0
+    var nailTrimHealth = 4.0
+    var nailTrimXP = 4
+    // Scratching post
+    var scratchHappiness = 3.0
+    var scratchCooldownMinutes = 30.0
+    var scratchChance = 0.08
+
     // MARK: Health
     var healthRecoveryPerHour = 1.0
     var healthDecayPerHour = 1.5
@@ -68,6 +88,10 @@ struct Balance {
     var vetXP = 2
     var vetCooldownHours = 6.0
     var alreadyHealthyThreshold = 95.0
+    /// Below this health the cat is "unwell" (mood, alert bubble) until the vet or good care helps.
+    var sickThreshold = 40.0
+    /// Any need below this shows an attention bubble over the cat.
+    var attentionThreshold = 25.0
 
     // MARK: Mini-games
     var laserChase = MiniGameConfig(durationSeconds: 45, energyCost: 10, minimumEnergy: 15, happiness: 12,

@@ -38,10 +38,17 @@ struct PlayPanel: View {
 struct FoodPanel: View {
     @Environment(GameStore.self) private var store
     let onPick: @MainActor (FoodItem) -> Void
+    let onWater: @MainActor () -> Void
 
     var body: some View {
         let owned = ItemCatalog.foods.filter { store.quantity(of: $0.id) > 0 }
         PanelContainer(title: "food.title") {
+            Button { onWater() } label: {
+                PanelRow(icon: "icon_cleanliness", title: "water.change",
+                         detail: Text(store.state.care.water / 100, format: .percent.precision(.fractionLength(0)))
+                            .foregroundColor(store.isWaterLow ? PixelPalette.bad : PixelPalette.ink))
+            }
+            .buttonStyle(.plain)
             if owned.isEmpty {
                 Text("notice.noFood").font(PixelFont.body(12))
             } else {
@@ -62,6 +69,7 @@ struct CleanPanel: View {
     @Environment(GameStore.self) private var store
     let onBath: @MainActor () -> Void
     let onBrush: @MainActor () -> Void
+    let onNails: @MainActor () -> Void
     let onLitter: @MainActor () -> Void
 
     var body: some View {
@@ -70,6 +78,12 @@ struct CleanPanel: View {
                 .buttonStyle(.plain)
             Button { onBrush() } label: { PanelRow(icon: "icon_brush", title: "clean.brush", detail: Text("clean.brush.detail")) }
                 .buttonStyle(.plain)
+            Button { onNails() } label: {
+                PanelRow(icon: "icon_brush", title: "nails.title",
+                         detail: Text(store.canTrimNails ? "nails.long" : "nails.neat")
+                            .foregroundColor(store.canTrimNails ? PixelPalette.bad : PixelPalette.good))
+            }
+            .buttonStyle(.plain)
             Button { onLitter() } label: {
                 PanelRow(icon: "icon_cleanliness", title: "clean.litter",
                          detail: Text(store.state.care.litter / 100, format: .percent.precision(.fractionLength(0)))
@@ -114,6 +128,7 @@ struct HealthPanel: View {
 
     /// Points the player at the lowest need, the main driver of health.
     private func tipKey(for stats: CatStats) -> LocalizedStringKey {
+        if stats.health < store.balance.sickThreshold { return "health.tip.sick" }
         let lowest = [StatKind.hunger, .cleanliness, .energy, .happiness].min { stats[$0] < stats[$1] } ?? .hunger
         return stats[lowest] >= 60 ? "health.tip.good" : LocalizedStringKey("health.tip." + lowest.rawValue)
     }

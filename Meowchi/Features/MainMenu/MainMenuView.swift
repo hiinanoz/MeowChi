@@ -31,6 +31,7 @@ struct MainMenuView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(PixelPalette.frame.ignoresSafeArea())
         .sheet(isPresented: $showSettings) { SettingsView().environment(store) }
+        .onAppear { AudioManager.shared.context = .menu }
     }
 
     private func menuButton(_ title: LocalizedStringKey, icon: String, fill: Color, action: @escaping () -> Void) -> some View {

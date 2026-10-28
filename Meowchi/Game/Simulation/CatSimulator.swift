@@ -24,6 +24,7 @@ enum CatSimulator {
         var s = cat.stats
         let floor = b.decayFloor
         care.litter = min(100, care.litter + b.litterFillPerHour * h)
+        care.water = max(0, care.water - b.waterDrainPerHour * h)
         let litterPenalty = care.litter >= b.litterDirtyThreshold ? b.dirtyLitterCleanlinessPenaltyPerHour : 0
         if cat.isSleeping {
             s.energy += b.energyRestorePerHourSleeping * h
@@ -36,6 +37,7 @@ enum CatSimulator {
 
         let neglected = min(s.hunger, s.cleanliness, s.energy) < b.neglectThreshold
         let happinessLoss = b.happinessDecayPerHour + (neglected ? b.happinessNeglectPenaltyPerHour : 0)
+            + (care.water < b.waterLowThreshold ? b.lowWaterHappinessPenaltyPerHour : 0)
         s.happiness = decay(s.happiness, by: happinessLoss * h, floor: floor)
 
         if min(s.hunger, s.cleanliness) < b.healthRiskThreshold {
@@ -55,8 +57,9 @@ enum CatSimulator {
         value <= floor ? value : max(floor, value - amount)
     }
 
-    static func mood(for cat: CatState) -> Mood {
+    static func mood(for cat: CatState, balance: Balance = .standard) -> Mood {
         let s = cat.stats
+        if !cat.isSleeping && s.health < balance.sickThreshold { return .sick }
         if cat.isSleeping || s.energy < 20 { return .sleepy }
         if s.hunger < 30 { return .hungry }
         if s.happiness < 30 { return .sad }

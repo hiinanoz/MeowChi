@@ -16,6 +16,7 @@ struct HomeView: View {
     @State private var showTasks = false
     @State private var showDecor = false
     @State private var showSettings = false
+    @State private var showNails = false
     @State private var activeGame: MiniGameKind?
     @State private var showGarden = false
 
@@ -59,14 +60,21 @@ struct HomeView: View {
         .sheet(isPresented: $showTasks) { TasksView().environment(store) }
         .sheet(isPresented: $showDecor) { DecorView().environment(store) }
         .sheet(isPresented: $showSettings) { SettingsView().environment(store) }
+        .sheet(isPresented: $showNails) { NailTrimView().environment(store) }
+        .onChange(of: store.isWaterLow) { _, _ in scene.refreshWater() }
         .onChange(of: store.state.decor) { _, _ in scene.applyDecor() }
         .onChange(of: store.state.cat.look) { _, _ in scene.applyDecor() }
-        .fullScreenCover(item: $activeGame) { MiniGameView(kind: $0).environment(store) }
-        .fullScreenCover(isPresented: $showGarden) { GardenView().environment(store) }
+        .fullScreenCover(item: $activeGame, onDismiss: { AudioManager.shared.context = .home }) {
+            MiniGameView(kind: $0).environment(store).onAppear { AudioManager.shared.context = .game }
+        }
+        .fullScreenCover(isPresented: $showGarden, onDismiss: { AudioManager.shared.context = .home }) {
+            GardenView().environment(store).onAppear { AudioManager.shared.context = .game }
+        }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .background(PixelPalette.frame.ignoresSafeArea())
         .onAppear {
+            AudioManager.shared.context = .home
             scene.store = store
             #if DEBUG
             // Screenshot/QA helper: `-openScreen shop|tasks|laser|food|clean|health`.
@@ -76,6 +84,7 @@ struct HomeView: View {
                 case "tasks": showTasks = true
                 case "decor": showDecor = true
                 case "settings": showSettings = true
+                case "nails": showNails = true
                 case "laser": activeGame = .laserChase
                 case "garden": showGarden = true
                 case "play": panel = .play
@@ -92,6 +101,7 @@ struct HomeView: View {
             scene.setSleeping(sleeping, animated: true)
         }
         .onChange(of: store.isLitterDirty) { _, _ in scene.refreshLitter() }
+        .onChange(of: store.attention) { _, _ in scene.refreshAttention() }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 store.tick()
@@ -129,12 +139,22 @@ struct HomeView: View {
     @ViewBuilder private var panelView: some View {
         switch panel {
         case .food:
-            FoodPanel { food in run(store.feed(food.id), noReward: nil) { scene.playFeeding() } }
+            FoodPanel(onPick: { food in run(store.feed(food.id), noReward: nil) { scene.playFeeding() } },
+                      onWater: { run(store.changeWater(), noReward: "notice.waterFresh") {
+                          AudioManager.shared.play(.tap)
+                          scene.refreshWater(drink: true)
+                      } })
                 .transition(.move(edge: .bottom).combined(with: .opacity))
         case .clean:
             CleanPanel(
                 onBath: { run(store.bathe(), noReward: "notice.alreadyClean") { scene.playBath() } },
                 onBrush: { panel = nil; setBrushing(true) },
+                onNails: {
+                    if store.state.cat.isSleeping { return show("notice.sleeping") }
+                    if !store.canTrimNails { return show("notice.nailsNeat") }
+                    panel = nil
+                    showNails = true
+                },
                 onLitter: { run(store.cleanLitter(), noReward: "notice.litterClean") { scene.refreshLitter(sparkle: true) } }
             )
             .transition(.move(edge: .bottom).combined(with: .opacity))

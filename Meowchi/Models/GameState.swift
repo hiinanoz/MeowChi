@@ -118,9 +118,26 @@ extension GameState {
 struct CareState: Codable, Equatable {
     /// 0 = fresh, 100 = full. Fills over time; above the dirty threshold it lowers cleanliness.
     var litter = 0.0
+    /// 100 = fresh water. Drains over time; low water makes the cat less happy.
+    var water = 100.0
     var lastBathAt: Date?
     var lastVetAt: Date?
+    var lastNailTrimAt: Date?
+    var lastScratchAt: Date?
     var brushLog = RewardLog(windowStart: .distantPast)
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        litter = try c.decodeIfPresent(Double.self, forKey: .litter) ?? 0
+        water = try c.decodeIfPresent(Double.self, forKey: .water) ?? 100
+        lastBathAt = try c.decodeIfPresent(Date.self, forKey: .lastBathAt)
+        lastVetAt = try c.decodeIfPresent(Date.self, forKey: .lastVetAt)
+        lastNailTrimAt = try c.decodeIfPresent(Date.self, forKey: .lastNailTrimAt)
+        lastScratchAt = try c.decodeIfPresent(Date.self, forKey: .lastScratchAt)
+        brushLog = try c.decodeIfPresent(RewardLog.self, forKey: .brushLog) ?? RewardLog(windowStart: .distantPast)
+    }
 }
 
 /// Rate-limits a repeatable reward (petting, brushing) to stop farming.
@@ -177,7 +194,7 @@ enum MusicTrack: String, CaseIterable, Identifiable {
 }
 
 enum Mood: String, CaseIterable {
-    case happy, neutral, sleepy, hungry, bored, sad, excited
+    case happy, neutral, sleepy, hungry, bored, sad, excited, sick
 
     var titleKey: LocalizedStringKey { LocalizedStringKey("mood." + rawValue) }
 }

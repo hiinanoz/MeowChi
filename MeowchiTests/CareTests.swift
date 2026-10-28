@@ -93,3 +93,71 @@ final class CareTests: XCTestCase {
         XCTAssertEqual(state.care, CareState())
     }
 }
+
+@MainActor
+final class CareExtrasTests: XCTestCase {
+    private final class TestClock { var now = Date(timeIntervalSince1970: 1_800_000_000) }
+    private let clock = TestClock()
+
+    private func makeStore(_ configure: (inout GameState) -> Void = { _ in }) -> GameStore {
+        var state = GameState.newGame(now: clock.now, balance: .standard)
+        configure(&state)
+        let clock = clock
+        return GameStore(saveStore: InMemorySaveStore(state: state), clock: { clock.now })
+    }
+
+    func testWaterDrainsAndLowWaterCostsHappiness() {
+        let b = Balance.standard
+        var fresh = GameState.newGame(now: clock.now, balance: b)
+        var dry = fresh
+        dry.care.water = 0
+        let later = clock.now.addingTimeInterval(3600)
+        CatSimulator.advance(&fresh, to: later, balance: b)
+        CatSimulator.advance(&dry, to: later, balance: b)
+        XCTAssertEqual(fresh.care.water, 100 - b.waterDrainPerHour, accuracy: 0.001)
+        XCTAssertEqual(fresh.cat.stats.happiness - dry.cat.stats.happiness, b.lowWaterHappinessPenaltyPerHour, accuracy: 0.001)
+    }
+
+    func testChangeWaterOnlyWhenNotFresh() {
+        let store = makeStore { $0.care.water = 95 }
+        XCTAssertEqual(store.changeWater(), .noReward)
+        let thirsty = makeStore { $0.care.water = 10 }
+        XCTAssertTrue(thirsty.isWaterLow)
+        XCTAssertEqual(thirsty.changeWater(), .ok)
+        XCTAssertEqual(thirsty.state.care.water, 100)
+    }
+
+    func testNailsGrowAndTrimOnce() {
+        let store = makeStore()
+        XCTAssertFalse(store.canTrimNails, "a new kitten's nails are neat")
+        XCTAssertEqual(store.trimNails(), .noReward)
+        clock.now = clock.now.addingTimeInterval(86400 * 2)
+        XCTAssertTrue(store.canTrimNails)
+        XCTAssertEqual(store.trimNails(), .ok)
+        XCTAssertFalse(store.canTrimNails)
+    }
+
+    func testScratchingIsRewardedWithCooldown() {
+        let store = makeStore()
+        XCTAssertEqual(store.scratchPost(), .ok)
+        XCTAssertEqual(store.scratchPost(), .noReward)
+        clock.now = clock.now.addingTimeInterval(Balance.standard.scratchCooldownMinutes * 60)
+        XCTAssertEqual(store.scratchPost(), .ok)
+    }
+
+    func testSickMoodAndAttention() {
+        let store = makeStore { $0.cat.stats.health = 30 }
+        XCTAssertEqual(store.mood, .sick)
+        XCTAssertEqual(store.attention, .unwell)
+        let hungry = makeStore { $0.cat.stats.hunger = 15 }
+        XCTAssertEqual(hungry.attention, .needsCare)
+        XCTAssertNil(makeStore().attention)
+    }
+
+    func testOldCareSaveDecodesWithDefaults() throws {
+        let care = try JSONDecoder().decode(CareState.self, from: Data(#"{"litter":42}"#.utf8))
+        XCTAssertEqual(care.litter, 42)
+        XCTAssertEqual(care.water, 100)
+        XCTAssertNil(care.lastNailTrimAt)
+    }
+}

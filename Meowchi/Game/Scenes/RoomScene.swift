@@ -17,6 +17,8 @@ final class RoomScene: SKScene {
         static let foodBowl = CGPoint(x: 88, y: 88)
         static let waterBowl = CGPoint(x: 52, y: 92)
         static let eat = CGPoint(x: 120, y: 84)
+        static let drink = CGPoint(x: 76, y: 88)
+        static let scratch = CGPoint(x: 296, y: 122)
         static let bed = CGPoint(x: 272, y: 32)
         static let sleep = CGPoint(x: 272, y: 36)
         static let scratchingPost = CGPoint(x: 320, y: 124)
@@ -32,6 +34,7 @@ final class RoomScene: SKScene {
             guard isBuilt else { return }
             applyDecor()
             refreshLitter()
+            refreshWater()
             if store?.state.cat.isSleeping == true, cat.animation != .sleep { setSleeping(true, animated: false) }
             refreshLighting(animated: false)
         }
@@ -43,7 +46,9 @@ final class RoomScene: SKScene {
     private let cat = CatNode()
     private let foodBowl = SKSpriteNode(texture: SpriteLibrary.texture("bowl_empty"))
     private let litterBox = SKSpriteNode(texture: SpriteLibrary.texture("litter_clean"))
+    private let waterBowl = SKSpriteNode(texture: SpriteLibrary.texture("bowl_water"))
     private let backdrop = RoomBackdrop()
+    private let attentionBubble = SKSpriteNode()
     /// Furniture nodes driven by decoration slots.
     private var furniture: [DecorSlot: SKSpriteNode] = [:]
     private let nightOverlay = SKSpriteNode(color: SKColor(red: 0.08, green: 0.07, blue: 0.25, alpha: 1), size: RoomScene.roomSize)
@@ -73,7 +78,7 @@ final class RoomScene: SKScene {
         world.addChild(backdrop)
 
         place(foodBowl, at: Spot.foodBowl)
-        place(SKSpriteNode(texture: SpriteLibrary.texture("bowl_water")), at: Spot.waterBowl)
+        place(waterBowl, at: Spot.waterBowl)
         for (slot, spot) in [(DecorSlot.bed, Spot.bed), (.post, Spot.scratchingPost), (.plant, Spot.plant), (.toy, Spot.yarn)] {
             let node = SKSpriteNode()
             furniture[slot] = node
@@ -81,6 +86,7 @@ final class RoomScene: SKScene {
         }
         place(litterBox, at: Spot.litter)
         refreshLitter()
+        refreshWater()
         applyDecor()
 
         cat.position = Spot.catStart
@@ -147,14 +153,18 @@ final class RoomScene: SKScene {
         case .excited: walkChance = 0.8
         case .sleepy: walkChance = 0.15
         case .sad, .hungry, .bored: walkChance = 0.3
+        case .sick: walkChance = 0.05
         case .happy, .neutral: walkChance = 0.5
         }
         cat.setTailMood(TailMood(mood))
-        if Double.random(in: 0...1) < walkChance {
+        if mood != .sleepy, mood != .sick, Double.random(in: 0...1) < store?.balance.scratchChance ?? 0 {
+            goScratch()
+        } else if Double.random(in: 0...1) < walkChance {
             cat.walk(to: randomFloorPoint())
         } else {
-            cat.play([.sad, .hungry].contains(mood) ? .sad : .idle)
+            cat.play([.sad, .hungry, .sick].contains(mood) ? .sad : .idle)
         }
+        refreshAttention()
         nextDecisionAt = lastUpdate + .random(in: 2.5...5.5)
     }
 
@@ -193,6 +203,8 @@ final class RoomScene: SKScene {
         let point = touch.location(in: world)
         if touchStartedOnCat {
             if !didStroke && !isBrushing { handlePet(store.pet(.tap), stroke: false) }
+        } else if !cat.isScripted, !store.state.cat.isSleeping, postFrame.contains(point) {
+            goScratch()
         } else if !cat.isScripted, !store.state.cat.isSleeping, Self.walkArea.insetBy(dx: -24, dy: -16).contains(point) {
             let target = CGPoint(x: min(max(point.x, Self.walkArea.minX), Self.walkArea.maxX).rounded(),
                                  y: min(max(point.y, Self.walkArea.minY), Self.walkArea.maxY).rounded())
@@ -292,6 +304,66 @@ final class RoomScene: SKScene {
             node.size = texture.size()
         }
         cat.look = store.state.cat.look
+    }
+
+    private var postFrame: CGRect { furniture[.post]?.frame.insetBy(dx: -8, dy: -8) ?? .null }
+
+    /// Walk to the post and scratch it for a few seconds. Purely cosmetic if the reward is on cooldown.
+    func goScratch() {
+        guard let store, !cat.isScripted, !store.state.cat.isSleeping else { return }
+        cat.isScripted = true
+        cat.walk(to: Spot.scratch) { [weak self] in
+            guard let self else { return }
+            self.cat.face(towardX: Spot.scratchingPost.x)
+            self.cat.play(.scratch)
+            self.cat.flashTail(.happy, duration: 2.5)
+            let rewarded = self.store?.scratchPost() == .ok
+            self.run(.sequence([.wait(forDuration: 2.5), .run { [weak self] in
+                guard let self else { return }
+                self.cat.isScripted = false
+                self.cat.play(.idle)
+                if rewarded { self.spawnHearts() }
+                self.nextDecisionAt = self.lastUpdate + 3
+            }]), withKey: "script")
+        }
+    }
+
+    /// Bowl art follows the water level; after a refresh the cat comes for a drink.
+    func refreshWater(drink: Bool = false) {
+        waterBowl.texture = SpriteLibrary.texture(store?.isWaterLow == true ? "bowl_empty" : "bowl_water")
+        guard drink, !cat.isScripted, store?.state.cat.isSleeping == false else { return }
+        cat.isScripted = true
+        cat.walk(to: Spot.drink) { [weak self] in
+            guard let self else { return }
+            self.cat.face(towardX: Spot.waterBowl.x)
+            self.cat.play(.eat)
+            self.run(.sequence([.wait(forDuration: 2), .run { [weak self] in
+                self?.cat.isScripted = false
+                self?.cat.react(.happy, duration: 1)
+            }]), withKey: "script")
+        }
+    }
+
+    /// Thought bubble over the cat: "!" for a low need, a red cross when unwell.
+    func refreshAttention() {
+        let name: String?
+        switch store?.attention {
+        case .needsCare: name = "fx_alert"
+        case .unwell: name = "fx_sick"
+        case nil: name = nil
+        }
+        if let name {
+            if attentionBubble.parent == nil {
+                attentionBubble.position = CGPoint(x: 18, y: 62)
+                attentionBubble.zPosition = 10
+                cat.addChild(attentionBubble)
+                attentionBubble.run(.repeatForever(.sequence([.moveBy(x: 0, y: 3, duration: 0.6), .moveBy(x: 0, y: -3, duration: 0.6)])))
+            }
+            attentionBubble.texture = SpriteLibrary.texture(name)
+            attentionBubble.size = attentionBubble.texture?.size() ?? .zero
+        } else {
+            attentionBubble.removeFromParent()
+        }
     }
 
     func refreshLitter(sparkle: Bool = false) {

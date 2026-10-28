@@ -4,6 +4,7 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(GameStore.self) private var store
     @Environment(\.dismiss) private var dismiss
+    @State private var previousContext = AudioManager.MusicContext.home
 
     var body: some View {
         let settings = store.state.settings
@@ -35,6 +36,12 @@ struct SettingsView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .tint(PixelPalette.accentShade)
+        .onAppear {
+            // Let the player hear their pick while choosing, then restore the screen's music.
+            previousContext = AudioManager.shared.context
+            AudioManager.shared.context = .home
+        }
+        .onDisappear { AudioManager.shared.context = previousContext }
     }
 
     private func binding<T>(_ keyPath: WritableKeyPath<GameSettings, T>) -> Binding<T> {

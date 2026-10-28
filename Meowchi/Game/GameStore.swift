@@ -72,7 +72,17 @@ final class GameStore {
         }
     }
 
-    var mood: Mood { CatSimulator.mood(for: state.cat) }
+    var mood: Mood { CatSimulator.mood(for: state.cat, balance: balance) }
+
+    /// What the cat's thought bubble shows, if anything: unwell beats a low need.
+    var attention: Attention? {
+        guard !state.cat.isSleeping else { return nil }
+        if state.cat.stats.health < balance.sickThreshold { return .unwell }
+        let low = [StatKind.hunger, .cleanliness, .energy, .happiness].contains { state.cat.stats[$0] < balance.attentionThreshold }
+        return low || isLitterDirty && state.care.litter >= 90 ? .needsCare : nil
+    }
+
+    enum Attention { case needsCare, unwell }
     var isBusy: Bool { clock() < busyUntil }
 
     // MARK: Simulation
@@ -200,6 +210,58 @@ final class GameStore {
         guard let last, last <= clock() else { return nil }
         let ready = last.addingTimeInterval(hours * 3600)
         return ready > clock() ? ready : nil
+    }
+
+    // MARK: Water, nails, scratching
+
+    var isWaterLow: Bool { state.care.water < balance.waterLowThreshold }
+
+    @discardableResult
+    func changeWater() -> ActionResult {
+        simulate(clock())
+        guard state.care.water < balance.waterFreshThreshold else { return .noReward }
+        state.care.water = 100
+        state.cat.stats[.happiness] += balance.waterRefreshHappiness
+        grantXP(balance.waterXP)
+        record(.waterChanged)
+        save()
+        return .ok
+    }
+
+    /// 0 = freshly trimmed, 1 = fully grown.
+    var nailGrowth: Double {
+        let since = state.care.lastNailTrimAt ?? state.cat.adoptedAt
+        let days = max(0, clock().timeIntervalSince(since)) / 86400
+        return min(1, days / balance.nailGrowthDays)
+    }
+
+    var canTrimNails: Bool { nailGrowth >= balance.nailTrimMinimumGrowth }
+
+    @discardableResult
+    func trimNails() -> ActionResult {
+        let now = clock()
+        if let result = careGuard(now) { return result }
+        guard canTrimNails else { return .noReward }
+        state.care.lastNailTrimAt = now
+        state.cat.stats[.cleanliness] += balance.nailTrimCleanliness
+        state.cat.stats[.health] += balance.nailTrimHealth
+        grantXP(balance.nailTrimXP)
+        record(.nailsTrimmed)
+        save()
+        return .ok
+    }
+
+    /// The cat used the scratching post on its own. Rewarded at most every `scratchCooldownMinutes`.
+    @discardableResult
+    func scratchPost() -> ActionResult {
+        let now = clock()
+        if let result = careGuard(now) { return result }
+        guard !isOnCooldown(state.care.lastScratchAt, hours: balance.scratchCooldownMinutes / 60, now: now) else { return .noReward }
+        state.care.lastScratchAt = now
+        state.cat.stats[.happiness] += balance.scratchHappiness
+        grantXP(1)
+        save()
+        return .ok
     }
 
     var isLitterDirty: Bool { state.care.litter >= balance.litterDirtyThreshold }

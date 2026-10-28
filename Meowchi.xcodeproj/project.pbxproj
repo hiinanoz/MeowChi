@@ -339,6 +339,7 @@
 		47A4E3D3714E1DC0C79E965D = {
 			isa = PBXGroup;
 			children = (
+				76A2EB9CFAAFDC91733066FE,
 				CB56D8D48D7229C13626A421,
 				B2FA4A830BFFBD21DE322421,
 				11AF12A87622A613DAE4C415,
@@ -404,6 +405,10 @@
 			lastKnownFileType = sourcecode.swift;
 			path = PixelTheme.swift;
 			sourceTree = "<group>";
+		};
+		5010629949EB1FA3E866EED3 = {
+			isa = PBXBuildFile;
+			fileRef = 8BDC1CC176DF273F185B6FA5;
 		};
 		51D9F8DAAB7A533C98DAB9EB = {
 			isa = PBXFileReference;
@@ -608,6 +613,14 @@
 			isa = PBXBuildFile;
 			fileRef = A6D23A0640FBC9812E590118;
 		};
+		76A2EB9CFAAFDC91733066FE = {
+			isa = PBXGroup;
+			children = (
+				8BDC1CC176DF273F185B6FA5,
+			);
+			path = Care;
+			sourceTree = "<group>";
+		};
 		772F9DDC1B2C2F1F7B100B44 = {
 			isa = PBXBuildFile;
 			fileRef = 4F1F491039760DF3DC099379;
@@ -715,6 +728,12 @@
 			isa = PBXFileReference;
 			lastKnownFileType = file;
 			path = sfx_purr.caf;
+			sourceTree = "<group>";
+		};
+		8BDC1CC176DF273F185B6FA5 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = NailTrimView.swift;
 			sourceTree = "<group>";
 		};
 		8C0C3EDB15F7F65C5CEE783C = {
@@ -1177,6 +1196,7 @@
 				9BF8CA865509CCDB7D16519C,
 				54C6F49BDA0C9C63E4CB70E5,
 				3CD5F876D3396D6125FF6250,
+				5010629949EB1FA3E866EED3,
 				F33BD2DB8EDB378A35E7FA20,
 				88E8B294FDA2F5CE596D23CD,
 				D55CDEF545172B9A0F09A3F2,

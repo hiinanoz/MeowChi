@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Things the player does that can advance a daily task.
 enum TaskEvent: String, Codable {
-    case fed, petted, played, litterCleaned, brushed, bathed, reachedHappiness, walked
+    case fed, petted, played, litterCleaned, brushed, bathed, reachedHappiness, walked, waterChanged, nailsTrimmed, friendVisited, watchedTV
 }
 
 struct DailyTaskDefinition: Identifiable, Equatable {
@@ -36,6 +36,7 @@ struct DailyTasks: Codable, Equatable {
         DailyTaskDefinition(id: "task.bath1", event: .bathed, target: 1, coins: 15, xp: 4),
         DailyTaskDefinition(id: "task.happy80", event: .reachedHappiness, target: 1, coins: 20, xp: 5),
         DailyTaskDefinition(id: "task.walk1", event: .walked, target: 1, coins: 20, xp: 5),
+        DailyTaskDefinition(id: "task.water1", event: .waterChanged, target: 1, coins: 10, xp: 3),
     ]
 
     static func definition(_ id: String) -> DailyTaskDefinition? { pool.first { $0.id == id } }

@@ -2,7 +2,7 @@ import SpriteKit
 
 /// Visual states of the cat. Each maps to one looping (or one-shot) sprite animation.
 enum CatAnimation: Equatable {
-    case idle, walk, happy, sad, eat, sleep
+    case idle, walk, happy, sad, eat, sleep, scratch
 }
 
 /// Tail body language, independent of the body animation.
@@ -14,7 +14,7 @@ enum TailMood: Equatable {
         case .happy, .excited: self = .happy
         case .neutral, .bored: self = .calm
         case .sleepy: self = .tired
-        case .hungry, .sad: self = .sad
+        case .hungry, .sad, .sick: self = .sad
         }
     }
 }
@@ -133,7 +133,7 @@ final class CatNode: SKNode {
             return
         }
         tailLayer.zPosition = -0.5
-        let family = animation == .walk ? "side" : "front"
+        let family = animation == .walk || animation == .scratch ? "side" : "front"
         let mood = tailFlash ?? tailMood
         let (poses, time): ([String], TimeInterval)
         switch mood {
@@ -161,6 +161,7 @@ final class CatNode: SKNode {
         case .sad: (["sad", "sad", "blink"], 0.6)
         case .eat: (["eat_0", "eat_1"], 0.22)
         case .sleep: (["sleep_0", "sleep_1"], 0.9)
+        case .scratch: (["scratch_0", "scratch_1"], 0.16)
         }
     }
 }

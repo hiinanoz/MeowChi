@@ -26,6 +26,21 @@ final class AudioManager {
     private var loadedTrack: MusicTrack?
     private var lastPlayed: [Sound: Date] = [:]
     private var settings = GameSettings()
+
+    /// Where the player is. The main menu always plays the 16-bit theme and games play the upbeat track;
+    /// at home (and while choosing in Settings) the player's own pick plays.
+    enum MusicContext { case menu, home, game }
+    var context = MusicContext.home {
+        didSet { if context != oldValue { apply(settings) } }
+    }
+
+    private var currentTrack: MusicTrack {
+        switch context {
+        case .menu: .retro16
+        case .game: .upbeat
+        case .home: MusicTrack(rawValue: settings.musicTrack) ?? .calm
+        }
+    }
     private let log = Logger(subsystem: "Meowchi", category: "Audio")
 
     private init() {
@@ -54,7 +69,7 @@ final class AudioManager {
 
     func apply(_ settings: GameSettings) {
         self.settings = settings
-        load(MusicTrack(rawValue: settings.musicTrack) ?? .calm)
+        load(currentTrack)
         music?.volume = Float(settings.musicVolume)
         for player in effects.values { player.volume = Float(settings.sfxVolume) }
         if settings.musicEnabled { resumeMusic() } else { music?.pause() }

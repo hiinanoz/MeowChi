@@ -19,6 +19,7 @@ struct GameState: Codable, Equatable {
     var care = CareState()
     var daily = DailyTasks()
     var decor = DecorState()
+    var login = LoginState()
 
     static func newGame(now: Date, balance: Balance) -> GameState {
         GameState(
@@ -111,7 +112,21 @@ extension GameState {
         care = try c.decodeIfPresent(CareState.self, forKey: .care) ?? CareState()
         daily = try c.decodeIfPresent(DailyTasks.self, forKey: .daily) ?? DailyTasks()
         decor = try c.decodeIfPresent(DecorState.self, forKey: .decor) ?? DecorState()
+        login = try c.decodeIfPresent(LoginState.self, forKey: .login) ?? LoginState()
     }
+}
+
+/// Daily check-ins. Days never reset: a missed day just means the next visit continues the 7-day cycle.
+struct LoginState: Codable, Equatable {
+    var dayKey = ""
+    var days = 0
+    var claimedDayKey = ""
+}
+
+struct LoginReward: Equatable {
+    var coins: Int
+    var item: String? = nil
+    var itemCount = 0
 }
 
 /// Cleaning and vet bookkeeping.

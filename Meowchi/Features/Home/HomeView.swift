@@ -19,6 +19,7 @@ struct HomeView: View {
     @State private var showNails = false
     @State private var showCozy = false
     @State private var chooseChannel = false
+    @State private var showLogin = false
     @State private var activeGame: MiniGameKind?
     @State private var walkLocation: WalkLocation?
     @State private var showWalkPicker = false
@@ -65,6 +66,15 @@ struct HomeView: View {
         .sheet(isPresented: $showSettings) { SettingsView().environment(store) }
         .sheet(isPresented: $showNails) { NailTrimView().environment(store) }
         .fullScreenCover(isPresented: $showCozy) { CozyView().environment(store) }
+        .sheet(isPresented: $showLogin) { LoginRewardView().environment(store) }
+        .task {
+            // Greet with the daily check-in once the room has settled (not during onboarding hints).
+            try? await Task.sleep(for: .seconds(0.8))
+            #if DEBUG
+            if CommandLine.arguments.contains("-openScreen") { return }
+            #endif
+            if store.canClaimLogin, store.tutorialStep == nil { showLogin = true }
+        }
         .confirmationDialog("tv.watch", isPresented: $chooseChannel, titleVisibility: .visible) {
             Button("tv.fish") { watch("fish") }
             Button("tv.birds") { watch("birds") }
@@ -101,6 +111,7 @@ struct HomeView: View {
                 case "decor": showDecor = true
                 case "settings": showSettings = true
                 case "nails": showNails = true
+                case "login": showLogin = true
                 case "cozy": showCozy = true
                 case "tv": DispatchQueue.main.asyncAfter(deadline: .now() + 1) { watch("fish") }
                 case "friend": DispatchQueue.main.asyncAfter(deadline: .now() + 1) { inviteFriend() }

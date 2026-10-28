@@ -117,6 +117,22 @@ final class GameplayTests: XCTestCase {
         XCTAssertEqual(store.claimDailyBonus(), .noReward)
     }
 
+    func testDailyCheckInCountsDaysAndPaysOncePerDay() {
+        let store = makeStore()
+        XCTAssertEqual(store.state.login.days, 1)
+        let coins = store.state.coins
+        XCTAssertEqual(store.claimLogin()?.coins, balance.loginRewards[0].coins)
+        XCTAssertEqual(store.state.coins, coins + balance.loginRewards[0].coins)
+        XCTAssertNil(store.claimLogin(), "once per day")
+        clock.advance(3 * 86400) // missed days don't reset the cycle
+        store.tick()
+        XCTAssertEqual(store.state.login.days, 2)
+        XCTAssertEqual(store.claimLogin()?.coins, balance.loginRewards[1].coins)
+        clock.advance(-5 * 86400) // clock set back: no new day
+        store.tick()
+        XCTAssertFalse(store.canClaimLogin)
+    }
+
     func testHappinessTaskCompletesWhenThresholdReached() {
         let store = makeStore {
             $0.cat.stats.happiness = 78

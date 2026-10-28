@@ -95,6 +95,10 @@ final class GameStore {
         if state.daily.dayKey.isEmpty || today > state.daily.dayKey {
             state.daily = .generate(dayKey: today, count: balance.dailyTaskCount)
         }
+        if today > state.login.dayKey {
+            state.login.dayKey = today
+            state.login.days += 1
+        }
     }
 
     func tick() {
@@ -499,6 +503,24 @@ final class GameStore {
         record(.walked)
         save()
         return walk
+    }
+
+    // MARK: Daily check-in
+
+    var canClaimLogin: Bool { state.login.days > 0 && state.login.claimedDayKey != state.login.dayKey }
+    /// 0...6 position of today in the 7-day reward cycle.
+    var loginCycleIndex: Int { max(0, state.login.days - 1) % balance.loginRewards.count }
+
+    @discardableResult
+    func claimLogin() -> LoginReward? {
+        simulate(clock())
+        guard canClaimLogin else { return nil }
+        let reward = balance.loginRewards[loginCycleIndex]
+        state.login.claimedDayKey = state.login.dayKey
+        state.coins += reward.coins
+        if let item = reward.item { state.inventory[item, default: 0] += reward.itemCount }
+        save()
+        return reward
     }
 
     // MARK: Daily tasks

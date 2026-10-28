@@ -119,6 +119,12 @@ struct Balance {
         .forest: WalkLocationConfig(unlockLevel: 4, coinRange: 6...14, itemChance: 0.25, itemPool: ["food.treat", "food.chicken", "food.fish"]),
     ]
 
+    // MARK: Daily check-in (7-day cycle)
+    var loginRewards: [LoginReward] = [
+        LoginReward(coins: 10), LoginReward(coins: 15), LoginReward(coins: 20), LoginReward(coins: 25),
+        LoginReward(coins: 30), LoginReward(coins: 40), LoginReward(coins: 60, item: "food.treat", itemCount: 2),
+    ]
+
     // MARK: Daily tasks
     var dailyTaskCount = 4
     var allTasksBonusCoins = 40

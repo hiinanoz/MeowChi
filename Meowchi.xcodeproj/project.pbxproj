@@ -716,6 +716,12 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		84E6FC7F6B7CBD09E3B39E44 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = LoginRewardView.swift;
+			sourceTree = "<group>";
+		};
 		853DFBD5A70AF08B5F340B32 = {
 			isa = PBXBuildFile;
 			fileRef = 025725EE5E86371684F03CA3;
@@ -778,6 +784,7 @@
 		8CA3DC30B2755FF7D1CC5478 = {
 			isa = PBXGroup;
 			children = (
+				84E6FC7F6B7CBD09E3B39E44,
 				8851A7B10DEB9D6E631A6068,
 			);
 			path = Tasks;
@@ -1127,6 +1134,10 @@
 			path = GameplayTests.swift;
 			sourceTree = "<group>";
 		};
+		EAD3E36F3E51714F22E4E748 = {
+			isa = PBXBuildFile;
+			fileRef = 84E6FC7F6B7CBD09E3B39E44;
+		};
 		ED0147BDE902BFFB78F11EF6 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
@@ -1241,6 +1252,7 @@
 				71EC139CFF6C64BFBCCF827D,
 				772F9DDC1B2C2F1F7B100B44,
 				6811F60E3E123DA7324FFE5D,
+				EAD3E36F3E51714F22E4E748,
 				4D6AEE8206C6E53667815C96,
 				10E503C5A938234DB3E6EB61,
 				3486C32D7DD36D93388BC77D,

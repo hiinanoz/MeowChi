@@ -646,9 +646,19 @@
 			path = CatSimulator.swift;
 			sourceTree = "<group>";
 		};
+		7B56D80738C8E313445721D2 = {
+			isa = PBXBuildFile;
+			fileRef = 7DC4E78F2682578A6B8BF2C1;
+		};
 		7BA86DA25DD34116FA3F401E = {
 			isa = PBXBuildFile;
 			fileRef = 068E21CFF51574B12466E74C;
+		};
+		7DC4E78F2682578A6B8BF2C1 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = WalkPickerView.swift;
+			sourceTree = "<group>";
 		};
 		7F3BB4A8A1BD2C60A91E1DDD = {
 			isa = PBXFileReference;
@@ -923,6 +933,7 @@
 			isa = PBXGroup;
 			children = (
 				5C44811EE72F89E6B6EBB883,
+				7DC4E78F2682578A6B8BF2C1,
 			);
 			path = Garden;
 			sourceTree = "<group>";
@@ -1219,6 +1230,7 @@
 				ACCD548B98951BF0FF513D86,
 				F33BD2DB8EDB378A35E7FA20,
 				88E8B294FDA2F5CE596D23CD,
+				7B56D80738C8E313445721D2,
 				D55CDEF545172B9A0F09A3F2,
 				D6C4B81BC28233E2FF4E74C3,
 				31402007750C9E62EFE4F6C8,

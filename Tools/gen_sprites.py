@@ -511,6 +511,77 @@ RUGS = {  # name: (outer, middle, inner)
 FLOOR_TOP = ROOM_PAD_Y + 120  # logical rows, in the padded canvas
 
 
+def walk_scene(kind):
+    """Park / beach / forest: same layout as garden() (ground at row 200, path rows 224-270)."""
+    import random
+    rnd = random.Random(kind)
+    c = Canvas(540, 360)
+    ground = 200
+    sky = {"park": ((150, 205, 245), (210, 235, 250)), "beach": ((120, 195, 245), (200, 235, 252)),
+           "forest": ((150, 195, 200), (205, 230, 215))}[kind]
+    for y in range(ground):
+        t = y / ground
+        c.rect(0, y, 540, 1, tuple(int(a + (b - a) * t) for a, b in zip(*sky)) + (255,))
+    for cx, cy in ((80, 50), (300, 35), (470, 60)):
+        for dx, dy, r in ((-8, 2, 7), (0, 0, 9), (9, 2, 7)):
+            c.ellipse(cx + dx, cy + dy, r * 1.3, r * .8, (255, 255, 255, 255))
+    if kind == "park":
+        for x in range(0, 540, 26):
+            h = rnd.randrange(30, 70)
+            c.rect(x, ground - h, 22, h, (190, 200, 220, 255))
+        for x in range(0, 540, 2):
+            c.rect(x, ground - 4, 2, 4, (150, 200, 120, 255))
+        for cx in range(40, 540, 110):
+            c.rect(cx - 3, ground - 36, 6, 36, (140, 95, 70, 255))
+            c.shaded_ellipse(cx, ground - 48, 24, 20, (100, 170, 95, 255), (80, 140, 75, 255), (135, 200, 120, 255))
+        grass, path, edge = (130, 195, 105, 255), (205, 205, 200, 255), (175, 175, 170, 255)
+    elif kind == "beach":
+        c.ellipse(430, 50, 16, 16, (255, 236, 160, 255))
+        c.rect(0, ground - 46, 540, 46, (80, 155, 210, 255))
+        for y in range(ground - 42, ground, 6):
+            for x in range(rnd.randrange(8), 540, 22):
+                c.rect(x, y, 8, 1, (190, 225, 250, 255))
+        grass, path, edge = (240, 220, 170, 255), (215, 190, 140, 255), (195, 170, 125, 255)
+    else:  # forest
+        for layer, col in ((0, (90, 140, 110, 255)), (1, (70, 120, 85, 255))):
+            for cx in range(-20 + layer * 30, 560, 60):
+                c.rect(cx - 4, ground - 60, 8, 60, (95, 70, 55, 255))
+                c.ellipse(cx, ground - 70 - layer * 10, 32, 44, col)
+        grass, path, edge = (90, 150, 85, 255), (160, 120, 85, 255), (130, 95, 65, 255)
+    for y in range(ground, 360):
+        for x in range(540):
+            c.set(x, y, grass if (x * 7 + y * 13) % 23 else tuple(max(0, v - 18) for v in grass[:3]) + (255,))
+    c.rect(0, ground + 24, 540, 46, path)
+    c.rect(0, ground + 24, 540, 2, edge); c.rect(0, ground + 68, 540, 2, edge)
+    for _ in range(50):
+        c.rect(rnd.randrange(540), rnd.randrange(ground + 27, ground + 66), 2, 1, edge)
+    if kind == "park":
+        c.ellipse(140, ground + 100, 50, 14, (110, 170, 220, 255)); c.ellipse(140, ground + 98, 40, 9, (150, 200, 240, 255))
+        for bx in (60, 330):
+            c.rect(bx, ground + 8, 30, 4, (160, 110, 70, 255)); c.rect(bx, ground + 2, 30, 3, (160, 110, 70, 255))
+            c.rect(bx + 2, ground + 12, 2, 6, K); c.rect(bx + 26, ground + 12, 2, 6, K)
+        for lx in (200, 470):
+            c.rect(lx, ground - 30, 2, 50, (60, 60, 70, 255)); c.rect(lx - 3, ground - 34, 8, 5, (250, 230, 150, 255))
+    elif kind == "beach":
+        for px in (70, 380):
+            for i in range(14):
+                c.rect(px + i // 3, ground + 10 - i * 4, 4, 4, (150, 110, 70, 255))
+            for dx in (-14, -7, 0, 7, 14):
+                c.ellipse(px + 6 + dx, ground - 46 + abs(dx) // 3, 9, 3, (80, 160, 90, 255))
+        c.tri((250, ground + 6), (280, ground - 14), (310, ground + 6), (240, 90, 100, 255)); c.rect(279, ground - 14, 2, 30, (240, 240, 240, 255))
+        for _ in range(40):
+            c.rect(rnd.randrange(540), rnd.randrange(ground + 74, 360), 2, 2, rnd.choice([(255, 240, 230, 255), (250, 190, 170, 255)]))
+    else:
+        for _ in range(16):
+            mx, my = rnd.randrange(540), rnd.choice([rnd.randrange(ground + 6, ground + 20), rnd.randrange(ground + 76, 350)])
+            c.rect(mx, my + 3, 2, 4, (245, 240, 230, 255)); c.ellipse(mx + 1, my + 2, 4, 2.5, (220, 70, 70, 255))
+            c.set(mx, my + 1, (255, 255, 255, 255))
+        for _ in range(30):
+            fx, fy = rnd.randrange(540), rnd.randrange(ground + 74, 360)
+            c.rect(fx, fy, 1, 5, (60, 120, 60, 255)); c.rect(fx - 2, fy + 1, 2, 1, (60, 120, 60, 255)); c.rect(fx + 1, fy + 2, 2, 1, (60, 120, 60, 255))
+    return c
+
+
 def wall(base, stripe, dot):
     """Full padded canvas; only the wall part (and baseboard) is painted."""
     c = Canvas(180 + 2 * ROOM_PAD_X, 200 + 2 * ROOM_PAD_Y)
@@ -767,6 +838,7 @@ def main():
     frames.update({f"view_{kind}": view(kind) for kind in ("sky", "sakura", "sea", "city", "fuji")})
     frames.update({name: rug(*spec) for name, spec in RUGS.items()})
     frames["garden_background"] = garden()
+    frames.update({f"{kind}_background": walk_scene(kind) for kind in ("park", "beach", "forest")})
     frames.update(cat_layers())
     for name, canvas in frames.items():
         save_image("Sprites", name, canvas)

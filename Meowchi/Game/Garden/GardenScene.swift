@@ -9,6 +9,7 @@ final class GardenScene: SKScene {
     static let path = CGRect(x: 30, y: 20, width: 1020, height: 92)
 
     weak var store: GameStore?
+    var location = WalkLocation.garden
     var look = CatLook() { didSet { cat.look = look } }
     /// Called with the reward after a successful dig, for the SwiftUI layer.
     var onFind: ((FindReward) -> Void)?
@@ -32,7 +33,7 @@ final class GardenScene: SKScene {
         guard !isBuilt else { return }
         isBuilt = true
         addChild(world)
-        let background = SKSpriteNode(texture: SpriteLibrary.texture("garden_background"))
+        let background = SKSpriteNode(texture: SpriteLibrary.texture(location.background))
         background.anchorPoint = .zero
         background.position = CGPoint(x: 0, y: -RoomScene.artPadding.height)
         background.zPosition = -1000

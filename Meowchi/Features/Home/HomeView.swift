@@ -20,7 +20,8 @@ struct HomeView: View {
     @State private var showCozy = false
     @State private var chooseChannel = false
     @State private var activeGame: MiniGameKind?
-    @State private var showGarden = false
+    @State private var walkLocation: WalkLocation?
+    @State private var showWalkPicker = false
 
     var body: some View {
         VStack(spacing: 8) {
@@ -75,8 +76,15 @@ struct HomeView: View {
         .fullScreenCover(item: $activeGame, onDismiss: { AudioManager.shared.context = .home }) {
             MiniGameView(kind: $0).environment(store).onAppear { AudioManager.shared.context = .game }
         }
-        .fullScreenCover(isPresented: $showGarden, onDismiss: { AudioManager.shared.context = .home }) {
-            GardenView().environment(store).onAppear { AudioManager.shared.context = .game }
+        .sheet(isPresented: $showWalkPicker) {
+            WalkPickerView { location in
+                showWalkPicker = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { walkLocation = location }
+            }
+            .environment(store)
+        }
+        .fullScreenCover(item: $walkLocation, onDismiss: { AudioManager.shared.context = .home }) { location in
+            GardenView(location: location).environment(store).onAppear { AudioManager.shared.context = .game }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
@@ -97,7 +105,9 @@ struct HomeView: View {
                 case "tv": DispatchQueue.main.asyncAfter(deadline: .now() + 1) { watch("fish") }
                 case "friend": DispatchQueue.main.asyncAfter(deadline: .now() + 1) { inviteFriend() }
                 case "laser": activeGame = .laserChase
-                case "garden": showGarden = true
+                case "garden": walkLocation = .garden
+                case "walks": showWalkPicker = true
+                case "beach": walkLocation = .beach
                 case "play": panel = .play
                 case "food": panel = .food
                 case "clean": panel = .clean
@@ -174,7 +184,7 @@ struct HomeView: View {
                       onTV: { chooseChannel = true },
                       onFriend: inviteFriend,
                       onLaser: { startActivity { activeGame = .laserChase } },
-                      onGarden: { startActivity { showGarden = true } })
+                      onGarden: { startActivity { showWalkPicker = true } })
                 .transition(.move(edge: .bottom).combined(with: .opacity))
         case .health:
             HealthPanel { run(store.visitVet(), noReward: "notice.healthy") { scene.playVet() } }

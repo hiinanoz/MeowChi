@@ -112,9 +112,12 @@ struct Balance {
     var walkHappiness = 8.0
     var walkXP = 3
     var walkFindCount = 5
-    var walkCoinRange = 3...8
-    var walkItemChance = 0.2
-    var walkItemPool = ["food.treat", "food.fish"]
+    var walkLocations: [WalkLocation: WalkLocationConfig] = [
+        .garden: WalkLocationConfig(unlockLevel: 1, coinRange: 3...8, itemChance: 0.2, itemPool: ["food.treat", "food.fish"]),
+        .park: WalkLocationConfig(unlockLevel: 2, coinRange: 4...10, itemChance: 0.2, itemPool: ["food.treat", "food.chicken"]),
+        .beach: WalkLocationConfig(unlockLevel: 3, coinRange: 5...12, itemChance: 0.3, itemPool: ["food.fish"]),
+        .forest: WalkLocationConfig(unlockLevel: 4, coinRange: 6...14, itemChance: 0.25, itemPool: ["food.treat", "food.chicken", "food.fish"]),
+    ]
 
     // MARK: Daily tasks
     var dailyTaskCount = 4

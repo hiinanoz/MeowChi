@@ -147,9 +147,18 @@ final class WalkTests: XCTestCase {
         XCTAssertEqual(a.finds.count, balance.walkFindCount)
         for find in a.finds {
             XCTAssertTrue((0...1).contains(find.x) && (0...1).contains(find.y))
-            if case .coins(let c) = find.reward { XCTAssertTrue(balance.walkCoinRange.contains(c)) }
-            if case .item(let id) = find.reward { XCTAssertTrue(balance.walkItemPool.contains(id)) }
+            let config = balance.walkLocations[.garden]!
+            if case .coins(let c) = find.reward { XCTAssertTrue(config.coinRange.contains(c)) }
+            if case .item(let id) = find.reward { XCTAssertTrue(config.itemPool.contains(id)) }
         }
+    }
+
+    func testLocationsUnlockByLevel() {
+        let store = makeStore()
+        XCTAssertEqual(store.startWalk(.forest), .locked)
+        XCTAssertEqual(store.startWalk(.garden), .ok)
+        XCTAssertEqual(store.activeWalk?.location, .garden)
+        for location in WalkLocation.allCases { XCTAssertNotNil(UIImage(named: location.background), location.background) }
     }
 
     func testFindsPayOnceAndWalkNeedsEnergy() {

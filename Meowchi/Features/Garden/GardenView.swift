@@ -4,6 +4,7 @@ import SwiftUI
 /// Garden walk shell: starts the walk on appear, shows finds as they're dug up, summary on the way home.
 @MainActor
 struct GardenView: View {
+    var location = WalkLocation.garden
     @Environment(GameStore.self) private var store
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
@@ -17,7 +18,7 @@ struct GardenView: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            PixelHeader(title: "game.garden.title", onBack: { goHome() }) {
+            PixelHeader(title: location.titleKey, onBack: { goHome() }) {
                 if let walk = store.activeWalk {
                     Label { Text(verbatim: "\(walk.finds.filter(\.collected).count)/\(walk.finds.count)") }
                         icon: { PixelIcon(name: "fx_sparkle", size: 14) }
@@ -77,12 +78,14 @@ struct GardenView: View {
         guard !started else { return }
         started = true
         scene.store = store
+        scene.location = location
         scene.look = store.state.cat.look
-        switch store.startWalk() {
+        switch store.startWalk(location) {
         case .ok:
             if let walk = store.activeWalk { scene.showFinds(walk) }
             phase = .walking
         case .tooTired: phase = .blocked("notice.tooTired")
+        case .locked: phase = .blocked("notice.locked")
         case .sleeping: phase = .blocked("notice.sleeping")
         default: phase = .blocked("notice.busy")
         }

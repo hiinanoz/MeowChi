@@ -453,14 +453,20 @@ final class GameStore {
     // MARK: Garden walk
 
     @discardableResult
-    func startWalk(seed: UInt64? = nil) -> ActionResult {
+    func startWalk(_ location: WalkLocation = .garden, seed: UInt64? = nil) -> ActionResult {
         let now = clock()
+        guard isUnlocked(location) else { return .locked }
         if let result = careGuard(now) { return result }
         guard state.cat.stats.energy >= balance.walkMinimumEnergy else { return .tooTired }
         state.cat.stats[.energy] -= balance.walkEnergyCost
-        activeWalk = .generate(seed: seed ?? UInt64(bitPattern: Int64(now.timeIntervalSince1970 * 1000)), balance: balance)
+        activeWalk = .generate(seed: seed ?? UInt64(bitPattern: Int64(now.timeIntervalSince1970 * 1000)), balance: balance,
+                               location: location)
         save()
         return .ok
+    }
+
+    func isUnlocked(_ location: WalkLocation) -> Bool {
+        state.progression.level >= (balance.walkLocations[location]?.unlockLevel ?? 1)
     }
 
     /// Pays out one find. Returns nil for an invalid index or a find that was already collected.

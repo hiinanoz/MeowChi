@@ -43,7 +43,7 @@ struct PlayPanel: View {
             }
             .buttonStyle(.plain)
             Button { onGarden() } label: {
-                PanelRow(icon: "fx_sparkle", title: "game.garden.title",
+                PanelRow(icon: "fx_sparkle", title: "walk.title",
                          detail: Text("game.energyCost \(Int(store.balance.walkEnergyCost))"))
             }
             .buttonStyle(.plain)

@@ -16,6 +16,9 @@ struct MeowchiApp: App {
         if let i = CommandLine.arguments.firstIndex(of: "-debugDecor"), i + 1 < CommandLine.arguments.count {
             store.debugEquip(CommandLine.arguments[i + 1].split(separator: ",").map(String.init))
         }
+        if let i = CommandLine.arguments.firstIndex(of: "-debugWear"), i + 1 < CommandLine.arguments.count {
+            store.debugWear(CommandLine.arguments[i + 1].split(separator: ",").map(String.init))
+        }
         // `-debugLook coat,ears,tail`, e.g. `-debugLook cocoa,folded,long`.
         if let i = CommandLine.arguments.firstIndex(of: "-debugLook"), i + 1 < CommandLine.arguments.count {
             let parts = CommandLine.arguments[i + 1].split(separator: ",").map(String.init)

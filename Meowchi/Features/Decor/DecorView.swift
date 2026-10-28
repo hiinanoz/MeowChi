@@ -38,6 +38,10 @@ struct DecorView: View {
                 CatCustomizer(look: Binding(get: { store.state.cat.look }, set: { store.setLook($0) }))
                     .padding(10)
                     .background(PixelBorder().fill(PixelPalette.panelShade))
+                Text("accessory.title").font(PixelFont.body(13)).frame(maxWidth: .infinity, alignment: .leading)
+                LazyVGrid(columns: columns, spacing: 8) {
+                    ForEach(Accessory.allCases) { accessoryCell($0) }
+                }
             case .slot(let slot):
                 LazyVGrid(columns: columns, spacing: 8) {
                     ForEach(DecorCatalog.items(in: slot)) { itemCell($0) }
@@ -100,6 +104,42 @@ struct DecorView: View {
         } else {
             preview(item.id, cropBottom: false)
         }
+    }
+
+    private func accessoryCell(_ item: Accessory) -> some View {
+        let owned = store.state.wardrobe.contains(item.rawValue)
+        let worn = store.state.cat.look.head == item.rawValue || store.state.cat.look.neck == item.rawValue
+        let locked = store.state.progression.level < item.unlockLevel
+        return VStack(spacing: 6) {
+            Image("cat_acc_\(item.rawValue)_idle_0").interpolation(.none).resizable()
+                .frame(width: 64, height: 64)
+                .frame(width: 64, height: 40, alignment: item.slot == .head ? .top : .center)
+                .clipped()
+            Text(item.nameKey).font(PixelFont.body(10))
+            Group {
+                if owned {
+                    Button(worn ? "accessory.remove" : "decor.use") { store.wear(item) }
+                        .buttonStyle(PixelButtonStyle(fill: worn ? PixelPalette.panel : PixelPalette.xp))
+                } else if locked {
+                    Text("decor.locked \(item.unlockLevel)").font(PixelFont.body(10)).foregroundStyle(PixelPalette.accentShade)
+                } else {
+                    Button {
+                        switch store.buyAccessory(item) {
+                        case .ok: AudioManager.shared.play(.buy); notice = nil
+                        case .insufficientCoins: notice = "notice.noCoins"
+                        default: break
+                        }
+                    } label: {
+                        HStack(spacing: 3) { PixelIcon(name: "icon_coin", size: 12); Text(item.price, format: .number) }
+                    }
+                    .buttonStyle(PixelButtonStyle(fill: PixelPalette.good))
+                    .disabled(store.state.coins < item.price)
+                }
+            }
+            .frame(height: 34)
+        }
+        .padding(8)
+        .background(PixelBorder().fill(worn ? PixelPalette.warn.opacity(0.35) : PixelPalette.panelShade))
     }
 
     /// Big wall/floor textures are cropped to a swatch; small items are shown whole.

@@ -351,7 +351,7 @@ final class GameStore {
 
     func completeOnboarding(name: String, look: CatLook = CatLook()) {
         state.cat.name = CatState.sanitizedName(name, maxLength: balance.maxNameLength) ?? state.cat.name
-        state.cat.look = look.sanitized
+        state.cat.look = CatLook(coat: look.coat, ears: look.ears, tail: look.tail).sanitized
         state.onboardedAt = clock()
         tutorialStep = .feed
         save()
@@ -409,8 +409,34 @@ final class GameStore {
 
     /// Coat, ears and tail are free to change any time. Unknown values fall back to defaults.
     func setLook(_ look: CatLook) {
-        state.cat.look = look.sanitized
+        var clean = look.sanitized
+        if let head = clean.head, !state.wardrobe.contains(head) { clean.head = nil }
+        if let neck = clean.neck, !state.wardrobe.contains(neck) { clean.neck = nil }
+        state.cat.look = clean
         save()
+    }
+
+    /// Buys an accessory and puts it on. Each accessory is bought once.
+    @discardableResult
+    func buyAccessory(_ item: Accessory) -> ActionResult {
+        guard !state.wardrobe.contains(item.rawValue) else { return .alreadyOwned }
+        guard state.progression.level >= item.unlockLevel else { return .locked }
+        guard state.coins >= item.price else { return .insufficientCoins }
+        state.coins -= item.price
+        state.wardrobe.insert(item.rawValue)
+        wear(item)
+        return .ok
+    }
+
+    /// Puts an owned accessory on, or takes it off if it is already worn.
+    func wear(_ item: Accessory) {
+        guard state.wardrobe.contains(item.rawValue) else { return }
+        var look = state.cat.look
+        switch item.slot {
+        case .head: look.head = look.head == item.rawValue ? nil : item.rawValue
+        case .neck: look.neck = look.neck == item.rawValue ? nil : item.rawValue
+        }
+        setLook(look)
     }
 
     // MARK: Mini-games
@@ -586,6 +612,14 @@ final class GameStore {
             state.decor.equipped[DecorCatalog.item(id)!.slot.rawValue] = id
         }
         save()
+    }
+
+    /// QA helper (`-debugWear bow,collar`): owns and wears accessories.
+    func debugWear(_ ids: [String]) {
+        for item in ids.compactMap(Accessory.init(rawValue:)) {
+            state.wardrobe.insert(item.rawValue)
+            if item.slot == .head ? state.cat.look.head != item.rawValue : state.cat.look.neck != item.rawValue { wear(item) }
+        }
     }
 
     func debugRefill() {

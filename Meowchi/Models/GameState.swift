@@ -20,6 +20,8 @@ struct GameState: Codable, Equatable {
     var daily = DailyTasks()
     var decor = DecorState()
     var login = LoginState()
+    /// Accessories the player owns.
+    var wardrobe: Set<String> = []
 
     static func newGame(now: Date, balance: Balance) -> GameState {
         GameState(
@@ -113,6 +115,7 @@ extension GameState {
         daily = try c.decodeIfPresent(DailyTasks.self, forKey: .daily) ?? DailyTasks()
         decor = try c.decodeIfPresent(DecorState.self, forKey: .decor) ?? DecorState()
         login = try c.decodeIfPresent(LoginState.self, forKey: .login) ?? LoginState()
+        wardrobe = try c.decodeIfPresent(Set<String>.self, forKey: .wardrobe) ?? []
     }
 }
 

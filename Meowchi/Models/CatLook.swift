@@ -5,13 +5,20 @@ struct CatLook: Codable, Equatable {
     var coat = CatCoat.ginger.rawValue
     var ears = EarStyle.pointy.rawValue
     var tail = TailLength.medium.rawValue
+    /// Equipped accessory ids (nil = none). Ownership is checked by `GameStore.setLook`.
+    var head: String? = nil
+    var neck: String? = nil
 
     var coatValue: CatCoat { CatCoat(rawValue: coat) ?? .ginger }
     var earsValue: EarStyle { EarStyle(rawValue: ears) ?? .pointy }
     var tailValue: TailLength { TailLength(rawValue: tail) ?? .medium }
 
     /// Same look with every unknown value replaced by its default.
-    var sanitized: CatLook { CatLook(coat: coatValue.rawValue, ears: earsValue.rawValue, tail: tailValue.rawValue) }
+    var sanitized: CatLook {
+        CatLook(coat: coatValue.rawValue, ears: earsValue.rawValue, tail: tailValue.rawValue,
+                head: head.flatMap { Accessory(rawValue: $0)?.slot == .head ? $0 : nil },
+                neck: neck.flatMap { Accessory(rawValue: $0)?.slot == .neck ? $0 : nil })
+    }
 }
 
 /// Coat colors. Each maps the four key fur colors of the sprites (fur, shade, light, stripes) to new ones.
@@ -37,6 +44,18 @@ enum CatCoat: String, CaseIterable, Identifiable {
         let (r, g, b) = palette[0]
         return Color(red: r / 255, green: g / 255, blue: b / 255)
     }
+}
+
+enum Accessory: String, CaseIterable, Identifiable {
+    case bow, flower, crown, collar, scarf
+
+    enum Slot { case head, neck }
+
+    var id: String { rawValue }
+    var nameKey: LocalizedStringKey { LocalizedStringKey("accessory." + rawValue) }
+    var slot: Slot { [.collar, .scarf].contains(self) ? .neck : .head }
+    var price: Int { switch self { case .bow, .flower: 60; case .collar: 80; case .scarf: 100; case .crown: 300 } }
+    var unlockLevel: Int { switch self { case .bow, .flower, .collar: 1; case .scarf: 2; case .crown: 4 } }
 }
 
 enum EarStyle: String, CaseIterable, Identifiable {

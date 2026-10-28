@@ -30,6 +30,8 @@ final class CatNode: SKNode {
     let sprite = SKSpriteNode(texture: SpriteLibrary.texture("cat_idle_0"), size: CatNode.frameSize)
     private let earsLayer = SKSpriteNode(texture: nil, size: CatNode.frameSize)
     private let tailLayer = SKSpriteNode(texture: nil, size: CatNode.frameSize)
+    private let headLayer = SKSpriteNode(texture: nil, size: CatNode.frameSize)
+    private let neckLayer = SKSpriteNode(texture: nil, size: CatNode.frameSize)
     private(set) var animation: CatAnimation?
     /// True while a scripted sequence (feeding, going to bed) owns the cat.
     var isScripted = false
@@ -45,6 +47,11 @@ final class CatNode: SKNode {
         for layer in [earsLayer, tailLayer] {
             layer.anchorPoint = CGPoint(x: 0.5, y: 0)
             layer.zPosition = -0.5 // behind the body
+            sprite.addChild(layer)
+        }
+        for (layer, z) in [(neckLayer, 0.55), (headLayer, 0.6)] { // accessories sit in front of the body
+            layer.anchorPoint = CGPoint(x: 0.5, y: 0)
+            layer.zPosition = z
             sprite.addChild(layer)
         }
         addChild(sprite)
@@ -65,6 +72,12 @@ final class CatNode: SKNode {
         let ears = look.earsValue.rawValue
         loop(sprite, frames.map { "cat_" + $0 }, time)
         loop(earsLayer, frames.map { "cat_ears_\(ears)_" + $0 }, time)
+        for (layer, id) in [(headLayer, look.head), (neckLayer, look.neck)] {
+            // Neck accessories are tucked away while the cat is curled up asleep.
+            let hidden = id == nil || (layer === neckLayer && next == .sleep)
+            layer.isHidden = hidden
+            if hidden { layer.removeAction(forKey: "anim") } else { loop(layer, frames.map { "cat_acc_\(id!)_" + $0 }, time) }
+        }
         refreshTail()
     }
 

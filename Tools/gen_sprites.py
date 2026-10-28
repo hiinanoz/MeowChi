@@ -321,6 +321,49 @@ def tail(length, family, pose):
     return c
 
 
+ACCESSORIES = ("bow", "flower", "crown", "collar", "scarf")
+NECK_ACCESSORIES = ("collar", "scarf")
+
+
+def accessory(kind, family, hx, hy):
+    """Accessory layer drawn in front of the body. (hx, hy) = head center of that frame."""
+    c = Canvas(32, 32)
+    pink, gold, red, blue = (240, 110, 150, 255), (250, 205, 70, 255), (220, 60, 70, 255), (90, 140, 220, 255)
+    side = family in ("side", "scratch")
+    if kind == "bow":
+        x, y = (hx + 2, hy - 5) if side else (hx - 4, hy - 5) if family == "sleep" else (hx + 6, hy - 6)
+        c.tri((x - 3, y - 2), (x - 3, y + 2), (x, y), pink); c.tri((x + 3, y - 2), (x + 3, y + 2), (x, y), pink)
+        c.rect(x - .5, y - 1, 1.5, 2, (200, 70, 110, 255))
+    elif kind == "flower":
+        x, y = (hx + 2, hy - 5) if side else (hx - 4, hy - 5) if family == "sleep" else (hx + 6, hy - 6)
+        for dx, dy in ((0, -1.6), (1.6, 0), (0, 1.6), (-1.6, 0)):
+            c.ellipse(x + dx, y + dy, 1.4, 1.4, (255, 255, 255, 255))
+        c.ellipse(x, y, 1.2, 1.2, gold)
+    elif kind == "crown":
+        x, y = (hx, hy - 6) if side else (hx - 0.5, hy - 6.5) if family == "sleep" else (hx, hy - 8)
+        c.rect(x - 4, y, 8, 2.5, gold)
+        for dx in (-4, -0.5, 3):
+            c.tri((x + dx, y + .5), (x + dx + 1, y - 2.5), (x + dx + 2, y + .5), gold)
+        c.set(x - .5, y + 1, red)
+    elif kind in NECK_ACCESSORIES and family != "sleep":
+        col = red if kind == "collar" else blue
+        if family == "front":
+            c.rect(hx - 5, hy + 6.5, 10, 1.5, col)
+            if kind == "collar":
+                c.ellipse(hx, hy + 9, 1.3, 1.3, gold)
+            else:
+                c.rect(hx + 1, hy + 8, 3, 4, col)
+        else:
+            nx = hx - 3 if family == "side" else hx - 2
+            c.rect(nx, hy + 3, 2, 4, col)
+            if kind == "collar":
+                c.ellipse(nx + 1.5, hy + 7, 1.2, 1.2, gold)
+            else:
+                c.rect(nx - 3, hy + 5, 3, 2, col)
+    c.outline()
+    return c
+
+
 FRONT_FRAMES = {
     "idle_0": dict(), "idle_1": dict(breath=1), "blink": dict(eyes="closed"),
     "happy_0": dict(eyes="happy", mouth="open"), "happy_1": dict(eyes="happy", breath=1),
@@ -334,18 +377,27 @@ def cat_layers():
     out = {}
     for name, kw in FRONT_FRAMES.items():
         out[f"cat_{name}"] = body_front(**kw)
+        for acc in ACCESSORIES:
+            out[f"cat_acc_{acc}_{name}"] = accessory(acc, "front", 16, 12 + kw.get("head_dy", 0))
         for style in EAR_STYLES:
             out[f"cat_ears_{style}_{name}"] = ears(style, "front", 12 + kw.get("head_dy", 0))
     for f in range(4):
         out[f"cat_walk_{f}"] = body_side(f)
+        for acc in ACCESSORIES:
+            out[f"cat_acc_{acc}_walk_{f}"] = accessory(acc, "side", 24, 15 - (.5 if f % 2 else 0))
         for style in EAR_STYLES:
             out[f"cat_ears_{style}_walk_{f}"] = ears(style, "side", 15 - (.5 if f % 2 else 0))
     for f in range(2):
         out[f"cat_scratch_{f}"] = body_scratch(f)
+        for acc in ACCESSORIES:
+            out[f"cat_acc_{acc}_scratch_{f}"] = accessory(acc, "scratch", 17, 9)
         for style in EAR_STYLES:
             out[f"cat_ears_{style}_scratch_{f}"] = shifted(ears(style, "side", 9), -7, 0)
     for f in range(2):
         out[f"cat_sleep_{f}"] = body_sleep(f)
+        for acc in ACCESSORIES:
+            if acc not in NECK_ACCESSORIES:  # neck items are hidden while curled up
+                out[f"cat_acc_{acc}_sleep_{f}"] = accessory(acc, "sleep", 10.5, 22)
         for style in EAR_STYLES:
             out[f"cat_ears_{style}_sleep_{f}"] = ears(style, "sleep", 22)
     for length, segments in TAIL_LENGTHS.items():

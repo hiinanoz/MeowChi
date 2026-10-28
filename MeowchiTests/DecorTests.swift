@@ -78,6 +78,23 @@ final class DecorTests: XCTestCase {
         for name in names { XCTAssertNotNil(UIImage(named: name), "missing asset \(name)") }
     }
 
+    func testAccessoriesBuyOnceWearAndRequireOwnership() {
+        let store = makeStore { $0.coins = 200 }
+        store.setLook(CatLook(head: "bow"))
+        XCTAssertNil(store.state.cat.look.head, "can't wear what you don't own")
+        XCTAssertEqual(store.buyAccessory(.bow), .ok)
+        XCTAssertEqual(store.state.cat.look.head, "bow")
+        XCTAssertEqual(store.buyAccessory(.bow), .alreadyOwned)
+        XCTAssertEqual(store.buyAccessory(.crown), .locked)
+        store.wear(.bow)
+        XCTAssertNil(store.state.cat.look.head, "wearing again takes it off")
+        XCTAssertNil(CatLook(head: "collar").sanitized.head, "neck item in the head slot is dropped")
+        for item in Accessory.allCases {
+            XCTAssertNotNil(UIImage(named: "cat_acc_\(item.rawValue)_idle_0"))
+            XCTAssertNotNil(UIImage(named: "cat_acc_\(item.rawValue)_walk_0"))
+        }
+    }
+
     func testSaveWithoutDecorStillLoads() throws {
         let data = try SaveCodec.encode(GameState.newGame(now: .now, balance: .standard))
         var json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])

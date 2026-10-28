@@ -176,3 +176,17 @@ final class FriendTests: XCTestCase {
         XCTAssertEqual(store.inviteFriend().0, .ok)
     }
 }
+
+@MainActor
+final class TVTests: XCTestCase {
+    func testTVNeedsATelevisionAndHasCooldown() {
+        var now = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = GameStore(saveStore: InMemorySaveStore(), clock: { now })
+        XCTAssertFalse(store.hasTV)
+        XCTAssertEqual(store.watchTV(), .unknownItem)
+        store.debugEquip(["tv_retro"])
+        XCTAssertEqual(store.watchTV(), .ok)
+        now = now.addingTimeInterval(60)
+        XCTAssertEqual(store.watchTV(), .tooSoon)
+    }
+}

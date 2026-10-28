@@ -16,6 +16,7 @@ enum CarePanel: Equatable {
 struct PlayPanel: View {
     @Environment(GameStore.self) private var store
     let onCozy: @MainActor () -> Void
+    let onTV: @MainActor () -> Void
     let onFriend: @MainActor () -> Void
     let onLaser: @MainActor () -> Void
     let onGarden: @MainActor () -> Void
@@ -30,6 +31,12 @@ struct PlayPanel: View {
                 PanelRow(icon: "icon_play", title: "friend.invite", detail: readiness(store.friendReadyAt))
             }
             .buttonStyle(.plain)
+            if store.hasTV {
+                Button { onTV() } label: {
+                    PanelRow(icon: "icon_play", title: "tv.watch", detail: readiness(store.tvReadyAt))
+                }
+                .buttonStyle(.plain)
+            }
             Button { onLaser() } label: {
                 PanelRow(icon: "icon_play", title: MiniGameKind.laserChase.titleKey,
                          detail: Text("game.energyCost \(Int(store.balance.laserChase.energyCost))"))

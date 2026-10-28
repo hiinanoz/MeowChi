@@ -87,7 +87,9 @@ struct DecorView: View {
 
     @ViewBuilder private func itemPreview(_ item: DecorItem) -> some View {
         let decor = store.state.decor
-        if let color = item.color {
+        if item.isEmpty {
+            PixelIcon(name: "icon_close", size: 24).frame(width: 64, height: 56)
+        } else if let color = item.color {
             // Color swatch shown on the currently equipped pattern.
             let pattern = item.slot == .wallColor ? decor.equipped(.wallpaper).id : decor.equipped(.floor).id
             preview(pattern, cropBottom: item.slot == .floorColor).colorMultiply(color)

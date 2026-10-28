@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Fixed placement slots in the room. Each slot shows exactly one item.
 enum DecorSlot: String, Codable, CaseIterable, Identifiable {
-    case wallpaper, wallColor, floor, floorColor, view, rug, bed, post, plant, wallArt, toy
+    case wallpaper, wallColor, floor, floorColor, view, rug, bed, post, plant, wallArt, toy, tv
 
     var id: String { rawValue }
     var titleKey: LocalizedStringKey { LocalizedStringKey("decor.slot." + rawValue) }
@@ -19,7 +19,9 @@ struct DecorItem: Identifiable, Equatable {
 
     var nameKey: LocalizedStringKey { LocalizedStringKey("decor." + id) }
     var isFree: Bool { price == 0 }
-    var hasSprite: Bool { tint == nil }
+    /// "Nothing here" items (e.g. no TV yet).
+    var isEmpty: Bool { id.hasSuffix("_none") }
+    var hasSprite: Bool { tint == nil && !isEmpty }
 
     var color: Color? {
         tint.map { Color(red: Double($0 >> 16 & 0xFF) / 255, green: Double($0 >> 8 & 0xFF) / 255, blue: Double($0 & 0xFF) / 255) }
@@ -65,6 +67,9 @@ enum DecorCatalog {
         DecorItem(id: "frame_clock", slot: .wallArt, price: 90, unlockLevel: 2),
         DecorItem(id: "toy_yarn", slot: .toy, price: 0, unlockLevel: 1),
         DecorItem(id: "toy_mouse", slot: .toy, price: 50, unlockLevel: 1),
+        DecorItem(id: "tv_none", slot: .tv, price: 0, unlockLevel: 1),
+        DecorItem(id: "tv_retro", slot: .tv, price: 250, unlockLevel: 2),
+        DecorItem(id: "tv_modern", slot: .tv, price: 400, unlockLevel: 3),
     ]
 
     static func item(_ id: String) -> DecorItem? { items.first { $0.id == id } }

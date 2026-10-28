@@ -293,6 +293,27 @@ final class GameStore {
         return (.ok, FriendCat(name: pick(names), look: look))
     }
 
+    // MARK: TV
+
+    var hasTV: Bool { !state.decor.equipped(.tv).isEmpty }
+    var tvReadyAt: Date? { readyAt(state.care.lastTVAt, hours: balance.tvCooldownHours) }
+
+    @discardableResult
+    func watchTV() -> ActionResult {
+        let now = clock()
+        guard hasTV else { return .unknownItem }
+        if let result = careGuard(now) { return result }
+        guard !isOnCooldown(state.care.lastTVAt, hours: balance.tvCooldownHours, now: now) else { return .tooSoon }
+        state.care.lastTVAt = now
+        state.cat.stats[.happiness] += balance.tvHappiness
+        state.cat.stats[.energy] += balance.tvEnergy
+        grantXP(balance.tvXP)
+        record(.watchedTV)
+        busyUntil = now.addingTimeInterval(14)
+        save()
+        return .ok
+    }
+
     var isLitterDirty: Bool { state.care.litter >= balance.litterDirtyThreshold }
 
     /// Shared preconditions for actions that involve the cat.

@@ -683,6 +683,17 @@
         }
       }
     },
+    "decor.slot.tv": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TV"
+          }
+        }
+      }
+    },
     "decor.slot.view": {
       "extractionState": "manual",
       "localizations": {
@@ -756,6 +767,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yarn Ball"
+          }
+        }
+      }
+    },
+    "decor.tv_modern": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flat TV"
+          }
+        }
+      }
+    },
+    "decor.tv_none": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No TV"
+          }
+        }
+      }
+    },
+    "decor.tv_retro": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retro TV"
           }
         }
       }
@@ -2143,6 +2187,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "Now stroke %@ with your finger."
+          }
+        }
+      }
+    },
+    "tv.birds": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bird channel"
+          }
+        }
+      }
+    },
+    "tv.fish": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fish channel"
+          }
+        }
+      }
+    },
+    "tv.watch": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Watch TV"
           }
         }
       }

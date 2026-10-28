@@ -19,6 +19,8 @@ final class RoomScene: SKScene {
         static let eat = CGPoint(x: 120, y: 84)
         static let drink = CGPoint(x: 76, y: 88)
         static let scratch = CGPoint(x: 296, y: 122)
+        static let tv = CGPoint(x: 180, y: 128)
+        static let watchTV = CGPoint(x: 180, y: 78)
         static let bed = CGPoint(x: 272, y: 32)
         static let sleep = CGPoint(x: 272, y: 36)
         static let scratchingPost = CGPoint(x: 320, y: 124)
@@ -49,6 +51,7 @@ final class RoomScene: SKScene {
     private let waterBowl = SKSpriteNode(texture: SpriteLibrary.texture("bowl_water"))
     private let backdrop = RoomBackdrop()
     private let attentionBubble = SKSpriteNode()
+    private let tvScreen = SKSpriteNode()
     private weak var friendNode: CatNode?
     /// Furniture nodes driven by decoration slots.
     private var furniture: [DecorSlot: SKSpriteNode] = [:]
@@ -80,7 +83,11 @@ final class RoomScene: SKScene {
 
         place(foodBowl, at: Spot.foodBowl)
         place(waterBowl, at: Spot.waterBowl)
-        for (slot, spot) in [(DecorSlot.bed, Spot.bed), (.post, Spot.scratchingPost), (.plant, Spot.plant), (.toy, Spot.yarn)] {
+        tvScreen.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        tvScreen.position = CGPoint(x: Spot.tv.x, y: Spot.tv.y + 44) // screen center: 22 logical px above the TV's base
+        tvScreen.zPosition = depth(for: Spot.tv.y) - 0.5
+        world.addChild(tvScreen)
+        for (slot, spot) in [(DecorSlot.bed, Spot.bed), (.post, Spot.scratchingPost), (.plant, Spot.plant), (.toy, Spot.yarn), (.tv, Spot.tv)] {
             let node = SKSpriteNode()
             furniture[slot] = node
             place(node, at: spot)
@@ -305,10 +312,15 @@ final class RoomScene: SKScene {
         let decor = store.state.decor
         backdrop.apply(decor)
         for (slot, node) in furniture {
-            let texture = SpriteLibrary.texture(decor.equipped(slot).id)
+            let item = decor.equipped(slot)
+            node.isHidden = item.isEmpty
+            guard !item.isEmpty else { continue }
+            let texture = SpriteLibrary.texture(item.id)
             node.texture = texture
             node.size = texture.size()
         }
+        tvScreen.isHidden = decor.equipped(.tv).isEmpty
+        if tvScreen.action(forKey: "channel") == nil { tvScreen.texture = SpriteLibrary.texture("tv_off"); tvScreen.size = CGSize(width: 48, height: 32) }
         cat.look = store.state.cat.look
     }
 
@@ -370,6 +382,27 @@ final class RoomScene: SKScene {
         run(.sequence([.wait(forDuration: 3.5), greet, .wait(forDuration: 2.5), chase, .wait(forDuration: 3),
                        chase, .wait(forDuration: 3), leave, .wait(forDuration: 2), done]), withKey: "script")
         friendNode = friend
+    }
+
+    /// The cat sits in front of the TV while a channel plays (~12 s).
+    func playTV(channel: String) {
+        cancelScript()
+        cat.isScripted = true
+        let frames = SpriteLibrary.textures((0..<4).map { "tv_\(channel)_\($0)" })
+        tvScreen.run(.repeatForever(.animate(with: frames, timePerFrame: 0.25)), withKey: "channel")
+        cat.walk(to: Spot.watchTV) { [weak self] in
+            guard let self else { return }
+            self.cat.play(.idle)
+            self.cat.setTailMood(.happy)
+            let cheer = SKAction.run { [weak self] in self?.cat.react(.happy, duration: 1.2); AudioManager.shared.play(.meow) }
+            self.run(.sequence([.wait(forDuration: 3), cheer, .wait(forDuration: 4), cheer, .wait(forDuration: 4), .run { [weak self] in
+                guard let self else { return }
+                self.tvScreen.removeAction(forKey: "channel")
+                self.tvScreen.texture = SpriteLibrary.texture("tv_off")
+                self.cat.isScripted = false
+                self.spawnHearts()
+            }]), withKey: "script")
+        }
     }
 
     /// Bowl art follows the water level; after a refresh the cat comes for a drink.

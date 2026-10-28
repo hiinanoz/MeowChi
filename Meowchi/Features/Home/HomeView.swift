@@ -18,6 +18,7 @@ struct HomeView: View {
     @State private var showSettings = false
     @State private var showNails = false
     @State private var showCozy = false
+    @State private var chooseChannel = false
     @State private var activeGame: MiniGameKind?
     @State private var showGarden = false
 
@@ -63,6 +64,11 @@ struct HomeView: View {
         .sheet(isPresented: $showSettings) { SettingsView().environment(store) }
         .sheet(isPresented: $showNails) { NailTrimView().environment(store) }
         .fullScreenCover(isPresented: $showCozy) { CozyView().environment(store) }
+        .confirmationDialog("tv.watch", isPresented: $chooseChannel, titleVisibility: .visible) {
+            Button("tv.fish") { watch("fish") }
+            Button("tv.birds") { watch("birds") }
+            Button("common.cancel", role: .cancel) {}
+        }
         .onChange(of: store.isWaterLow) { _, _ in scene.refreshWater() }
         .onChange(of: store.state.decor) { _, _ in scene.applyDecor() }
         .onChange(of: store.state.cat.look) { _, _ in scene.applyDecor() }
@@ -88,6 +94,8 @@ struct HomeView: View {
                 case "settings": showSettings = true
                 case "nails": showNails = true
                 case "cozy": showCozy = true
+                case "tv": DispatchQueue.main.asyncAfter(deadline: .now() + 1) { watch("fish") }
+                case "friend": DispatchQueue.main.asyncAfter(deadline: .now() + 1) { inviteFriend() }
                 case "laser": activeGame = .laserChase
                 case "garden": showGarden = true
                 case "play": panel = .play
@@ -163,6 +171,7 @@ struct HomeView: View {
             .transition(.move(edge: .bottom).combined(with: .opacity))
         case .play:
             PlayPanel(onCozy: { startActivity { showCozy = true } },
+                      onTV: { chooseChannel = true },
                       onFriend: inviteFriend,
                       onLaser: { startActivity { activeGame = .laserChase } },
                       onGarden: { startActivity { showGarden = true } })
@@ -212,6 +221,10 @@ struct HomeView: View {
     private func setBrushing(_ on: Bool) {
         isBrushing = on
         scene.isBrushing = on
+    }
+
+    private func watch(_ channel: String) {
+        run(store.watchTV(), noReward: nil) { scene.playTV(channel: channel) }
     }
 
     private func inviteFriend() {

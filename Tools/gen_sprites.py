@@ -603,6 +603,46 @@ def view(kind):
     return c
 
 
+def tv(kind):
+    """36x34 logical, anchor bottom center. Screen hole at x 6..30, y 4..20 (from top) is left empty:
+    the game draws the channel behind it."""
+    c = Canvas(36, 34)
+    if kind == "retro":
+        c.rect(6, 28, 3, 6, (120, 80, 60, 255)); c.rect(27, 28, 3, 6, (120, 80, 60, 255))
+        c.rect(2, 2, 32, 27, (190, 130, 80, 255)); c.rect(2, 26, 32, 3, (160, 105, 65, 255))
+        c.rect(31, 8, 2, 2, (240, 200, 90, 255)); c.rect(31, 12, 2, 2, (240, 200, 90, 255))
+        c.rect(14, 0, 1, 2, K); c.rect(21, 0, 1, 2, K)
+    else:
+        c.rect(15, 24, 6, 6, (90, 95, 110, 255)); c.rect(9, 30, 18, 3, (90, 95, 110, 255))
+        c.rect(4, 2, 28, 22, (60, 64, 78, 255))
+    c.rect(6, 4, 24, 16, None)
+    c.outline()  # also draws a dark bezel just inside the screen hole
+    return c
+
+
+def channel(kind, frame):
+    c = Canvas(24, 16)
+    if kind == "off":
+        c.rect(0, 0, 24, 16, (40, 44, 56, 255)); c.rect(3, 2, 6, 1, (70, 76, 92, 255))
+        return c
+    if kind == "fish":
+        c.rect(0, 0, 24, 16, (90, 160, 220, 255)); c.rect(0, 13, 24, 3, (230, 210, 150, 255))
+        c.rect(3, 9, 1, 4, (90, 170, 90, 255)); c.rect(20, 7, 1, 6, (90, 170, 90, 255))
+        for i, (y, col) in enumerate(((5, (250, 160, 60, 255)), (10, (250, 230, 90, 255)))):
+            x = (frame * 3 + i * 9) % 26 - 2 if i == 0 else 22 - (frame * 2 + 4) % 26
+            c.ellipse(x + 2, y, 2.5, 1.5, col); c.set(x - 1 if i == 0 else x + 4, y - 1, col)
+        c.set(12, 12 - frame * 3 % 12, (220, 240, 255, 255))
+    else:  # birds
+        c.rect(0, 0, 24, 16, (170, 215, 245, 255)); c.rect(0, 12, 24, 4, (140, 200, 110, 255))
+        c.ellipse(18, 3, 3, 1.5, (255, 255, 255, 255))
+        for i in range(2):
+            x = (frame * 3 + i * 11) % 28 - 3
+            y = 5 + i * 3
+            wing = -1 if (frame + i) % 2 else 1
+            c.rect(x, y, 3, 1, (70, 70, 90, 255)); c.set(x - 1, y + wing, (70, 70, 90, 255)); c.set(x + 3, y + wing, (70, 70, 90, 255))
+    return c
+
+
 def frame(kind):
     c = Canvas(24, 20)
     c.rect(0, 0, 24, 20, K); c.rect(2, 2, 20, 16, (255, 236, 170, 255) if kind != "fish" else (200, 230, 245, 255))
@@ -713,7 +753,9 @@ def main():
         "toy_yarn": yarn(), "plant_basic": plant(),
         "bath_tub": tub(), "litter_clean": litter(False), "litter_dirty": litter(True),
         "fx_bubble": small(BUBBLE, {"K": (120, 170, 210, 255), "H": H, "B": (200, 235, 255, 255)}),
-        "paw_big": big_paw(), "claw": claw(),
+        "paw_big": big_paw(), "claw": claw(), "tv_retro": tv("retro"), "tv_modern": tv("modern"),
+        "tv_off": channel("off", 0),
+        **{f"tv_{k}_{f}": channel(k, f) for k in ("fish", "birds") for f in range(4)},
         "fx_alert": small(ALERT, {"K": K, "W": W}), "fx_sick": small(SICK, {"K": K, "W": W, "R": (230, 70, 70, 255)}),
         "fx_laser": small(LASER, {"R": (240, 50, 60, 255), "H": (255, 200, 200, 255)}),
         "fx_sparkle": small(SPARKLE, {"Y": (250, 220, 90, 255), "H": H}),

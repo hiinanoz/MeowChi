@@ -8,7 +8,9 @@ string catalogs, audio and fonts are bundled as resources.
 import hashlib, pathlib, re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-APP, TESTS = "Meowchi", "MeowchiTests"
+APP, TESTS, WIDGET = "Meowchi", "MeowchiTests", "MeowchiWidget"
+# App files that the widget extension also compiles (shared data model, no game logic).
+WIDGET_SHARED_SOURCES = ["Meowchi/Services/Widget/WidgetSnapshot.swift"]
 BUNDLE_ID = "com.meowchi.game"
 DEPLOYMENT_TARGET = "17.0"
 DEVICE_FAMILY = "1"  # 1 = iPhone. Use "1,2" when iPad support lands.
@@ -95,6 +97,15 @@ APP_SETTINGS = {
     "INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad": "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight",
     "LD_RUNPATH_SEARCH_PATHS": ["$(inherited)", "@executable_path/Frameworks"],
     "PRODUCT_BUNDLE_IDENTIFIER": BUNDLE_ID, "PRODUCT_NAME": "$(TARGET_NAME)", "SWIFT_EMIT_LOC_STRINGS": "YES",
+    "CODE_SIGN_ENTITLEMENTS": f"{APP}/{APP}.entitlements",
+}
+WIDGET_SETTINGS = {
+    "CODE_SIGN_STYLE": "Automatic", "CODE_SIGN_ENTITLEMENTS": f"{WIDGET}/{WIDGET}.entitlements",
+    "CURRENT_PROJECT_VERSION": BUILD, "MARKETING_VERSION": MARKETING_VERSION,
+    "GENERATE_INFOPLIST_FILE": "YES", "INFOPLIST_FILE": f"{WIDGET}/Info.plist", "INFOPLIST_KEY_CFBundleDisplayName": "Meowchi",
+    "LD_RUNPATH_SEARCH_PATHS": ["$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks"],
+    "PRODUCT_BUNDLE_IDENTIFIER": BUNDLE_ID + ".widget", "PRODUCT_NAME": "$(TARGET_NAME)", "SKIP_INSTALL": "YES",
+    "SWIFT_EMIT_LOC_STRINGS": "YES",
 }
 TEST_SETTINGS = {
     "BUNDLE_LOADER": "$(TEST_HOST)", "CODE_SIGN_STYLE": "Automatic", "CURRENT_PROJECT_VERSION": BUILD,
@@ -107,20 +118,40 @@ TEST_SETTINGS = {
 def main():
     app_group, app_src, app_res = scan(ROOT / APP, APP)
     test_group, test_src, test_res = scan(ROOT / TESTS, TESTS)
+    widget_group, widget_src, widget_res = scan(ROOT / WIDGET, WIDGET)
+    for rel in WIDGET_SHARED_SOURCES:
+        widget_src.append(add(uid("build", WIDGET, rel), {"isa": "PBXBuildFile", "fileRef": uid("file", rel)}))
     app_product = add(uid("product", APP), {"isa": "PBXFileReference", "explicitFileType": "wrapper.application",
                                             "includeInIndex": "0", "path": f"{APP}.app", "sourceTree": "BUILT_PRODUCTS_DIR"})
     test_product = add(uid("product", TESTS), {"isa": "PBXFileReference", "explicitFileType": "wrapper.cfbundle",
                                                "includeInIndex": "0", "path": f"{TESTS}.xctest", "sourceTree": "BUILT_PRODUCTS_DIR"})
-    products = add(uid("group", "Products"), {"isa": "PBXGroup", "children": [app_product, test_product],
+    widget_product = add(uid("product", WIDGET), {"isa": "PBXFileReference", "explicitFileType": "wrapper.app-extension",
+                                                  "includeInIndex": "0", "path": f"{WIDGET}.appex", "sourceTree": "BUILT_PRODUCTS_DIR"})
+    products = add(uid("group", "Products"), {"isa": "PBXGroup", "children": [app_product, test_product, widget_product],
                                                "name": "Products", "sourceTree": "<group>"})
-    main_group = add(uid("group", "<main>"), {"isa": "PBXGroup", "children": [app_group, test_group, products],
+    main_group = add(uid("group", "<main>"), {"isa": "PBXGroup", "children": [app_group, test_group, widget_group, products],
                                                "sourceTree": "<group>"})
     project_id, app_id, test_id = uid("project"), uid("target", APP), uid("target", TESTS)
+    widget_id = uid("target", WIDGET)
+    add(widget_id, {"isa": "PBXNativeTarget", "buildConfigurationList": config_list(WIDGET, WIDGET_SETTINGS, WIDGET_SETTINGS),
+                    "buildPhases": [phase("PBXSourcesBuildPhase", WIDGET + "src", widget_src),
+                                    phase("PBXFrameworksBuildPhase", WIDGET + "fw", []),
+                                    phase("PBXResourcesBuildPhase", WIDGET + "res", widget_res)],
+                    "buildRules": [], "dependencies": [], "name": WIDGET, "productName": WIDGET,
+                    "productReference": widget_product, "productType": "com.apple.product-type.app-extension"})
+    widget_proxy = add(uid("proxy", WIDGET), {"isa": "PBXContainerItemProxy", "containerPortal": project_id, "proxyType": "1",
+                                              "remoteGlobalIDString": widget_id, "remoteInfo": WIDGET})
+    widget_dep = add(uid("dep", WIDGET), {"isa": "PBXTargetDependency", "target": widget_id, "targetProxy": widget_proxy})
+    embed_file = add(uid("embed", WIDGET), {"isa": "PBXBuildFile", "fileRef": widget_product,
+                                            "settings": {"ATTRIBUTES": ["RemoveHeadersOnCopy"]}})
+    embed = add(uid("phase", "embed-extensions"), {"isa": "PBXCopyFilesBuildPhase", "buildActionMask": "2147483647",
+                                                   "dstPath": "", "dstSubfolderSpec": "13", "files": [embed_file],
+                                                   "name": "Embed Foundation Extensions", "runOnlyForDeploymentPostprocessing": "0"})
     add(app_id, {"isa": "PBXNativeTarget", "buildConfigurationList": config_list(APP, APP_SETTINGS, APP_SETTINGS),
                  "buildPhases": [phase("PBXSourcesBuildPhase", APP + "src", app_src),
                                  phase("PBXFrameworksBuildPhase", APP + "fw", []),
-                                 phase("PBXResourcesBuildPhase", APP + "res", app_res)],
-                 "buildRules": [], "dependencies": [], "name": APP, "productName": APP,
+                                 phase("PBXResourcesBuildPhase", APP + "res", app_res), embed],
+                 "buildRules": [], "dependencies": [widget_dep], "name": APP, "productName": APP,
                  "productReference": app_product, "productType": "com.apple.product-type.application"})
     proxy = add(uid("proxy"), {"isa": "PBXContainerItemProxy", "containerPortal": project_id, "proxyType": "1",
                                "remoteGlobalIDString": app_id, "remoteInfo": APP})
@@ -135,11 +166,12 @@ def main():
                      "attributes": {"BuildIndependentTargetsInParallel": "1", "LastSwiftUpdateCheck": "1520",
                                     "LastUpgradeCheck": "1520",
                                     "TargetAttributes": {app_id: {"CreatedOnToolsVersion": "15.2"},
-                                                         test_id: {"CreatedOnToolsVersion": "15.2", "TestTargetID": app_id}}},
+                                                         test_id: {"CreatedOnToolsVersion": "15.2", "TestTargetID": app_id},
+                                                         widget_id: {"CreatedOnToolsVersion": "15.2"}}},
                      "buildConfigurationList": config_list("project", PROJECT_DEBUG, PROJECT_RELEASE),
                      "compatibilityVersion": "Xcode 14.0", "developmentRegion": "en", "hasScannedForEncodings": "0",
                      "knownRegions": REGIONS, "mainGroup": main_group, "productRefGroup": products,
-                     "projectDirPath": "", "projectRoot": "", "targets": [app_id, test_id]})
+                     "projectDirPath": "", "projectRoot": "", "targets": [app_id, test_id, widget_id]})
 
     root = {"archiveVersion": "1", "classes": {}, "objectVersion": "56",
             "objects": dict(sorted(objects.items())), "rootObject": project_id}

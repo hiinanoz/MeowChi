@@ -903,6 +903,17 @@ def main():
     for name, rows in ICONS.items():
         width = max(len(r) for r in rows)
         save_image("Icons", name, small([r.ljust(width, ".") for r in rows], ICON_PAL))
+    # The widget extension has its own small catalog with just the icons it draws.
+    widget_assets = ROOT / "MeowchiWidget/Assets.xcassets"
+    widget_assets.mkdir(parents=True, exist_ok=True)
+    (widget_assets / "Contents.json").write_text(json.dumps(INFO, indent=2))
+    for name in ("icon_hunger", "icon_energy", "icon_happiness", "icon_cleanliness", "icon_health"):
+        rows = ICONS[name]
+        width = max(len(r) for r in rows)
+        canvas = small([r.ljust(width, ".") for r in rows], ICON_PAL)
+        d = widget_assets / f"{name}.imageset"; d.mkdir(exist_ok=True)
+        write_png(d / f"{name}.png", canvas)
+        (d / "Contents.json").write_text(json.dumps({"images": [{"filename": f"{name}.png", "idiom": "universal", "scale": "1x"}], **INFO}, indent=2))
     # App icon (opaque, placeholder)
     icon = ASSETS / "AppIcon.appiconset"; icon.mkdir(parents=True, exist_ok=True)
     write_png(icon / "icon.png", cat_sit(eyes="happy", mouth="open"), scale=1024 // (32 * SCALE),

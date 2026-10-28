@@ -214,3 +214,24 @@ final class BadgeTests: XCTestCase {
         XCTAssertEqual(Set(Badge.all.map(\.id)).count, Badge.all.count)
     }
 }
+
+@MainActor
+final class WidgetTests: XCTestCase {
+    func testSnapshotForecastsHourlyAndRoundTrips() throws {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        let state = GameState.newGame(now: now, balance: .standard)
+        let snapshot = WidgetBridge.makeSnapshot(from: state, now: now, balance: .standard)
+        XCTAssertEqual(snapshot.points.count, WidgetBridge.forecastHours + 1)
+        XCTAssertLessThan(snapshot.points.last!.hunger, snapshot.points.first!.hunger, "needs drop over the forecast")
+        XCTAssertEqual(snapshot.point(at: now.addingTimeInterval(5400))?.date, now.addingTimeInterval(3600))
+        let decoded = try JSONDecoder().decode(WidgetSnapshot.self, from: JSONEncoder().encode(snapshot))
+        XCTAssertEqual(decoded, snapshot)
+    }
+
+    func testRendererRecolorsFurExactly() throws {
+        let image = try XCTUnwrap(CatImageRenderer.render(CatLook(coat: "cocoa"), scale: 1))
+        XCTAssertEqual(image.size, CGSize(width: 64, height: 64))
+        let ginger = try XCTUnwrap(CatImageRenderer.render(CatLook(), scale: 1)?.pngData())
+        XCTAssertNotEqual(image.pngData(), ginger, "a different coat changes the picture")
+    }
+}

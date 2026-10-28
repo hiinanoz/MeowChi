@@ -31,6 +31,10 @@
 			path = music_calm.caf;
 			sourceTree = "<group>";
 		};
+		0500C1190CF9170D61B3A556 = {
+			isa = PBXBuildFile;
+			fileRef = 9AD5D19080DE3307D573EE4A;
+		};
 		0620665EAAAF5B5FE9E3713F = {
 			isa = PBXBuildFile;
 			fileRef = 8D82267BFE46D33C4A4E10E7;
@@ -63,6 +67,12 @@
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
+		};
+		0C480791CE6E4D004F8224C9 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = MeowchiWidget.swift;
+			sourceTree = "<group>";
 		};
 		0D4719800460A9872D190D36 = {
 			isa = PBXResourcesBuildPhase;
@@ -142,10 +152,42 @@
 			path = Audio;
 			sourceTree = "<group>";
 		};
+		21BC8825C683F95C6762C23F = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = WidgetBridge.swift;
+			sourceTree = "<group>";
+		};
+		21F81D5195DD43189917124E = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				954BE2FCECD1A242C169ECA2,
+				67D6BD94C719058428B9C768,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2254342BECCEAFBD04538E0A = {
 			isa = PBXTargetDependency;
 			target = 9E46948988D0C4FE6032242F;
 			targetProxy = 431387EB7262E1CFC79B125E;
+		};
+		2366172B121F7603006B6562 = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DDBAED25E9C501705F6DADC5;
+			buildPhases = (
+				21F81D5195DD43189917124E,
+				5D9B15D373419AB5609695B3,
+				3251F6628CC83A5982F0E54C,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MeowchiWidget;
+			productName = MeowchiWidget;
+			productReference = BF7F217DCE052F0FECA41467;
+			productType = "com.apple.product-type.app-extension";
 		};
 		238367DBEBE1F6AA71AAD920 = {
 			isa = PBXBuildFile;
@@ -186,6 +228,7 @@
 			children = (
 				51D9F8DAAB7A533C98DAB9EB,
 				AA7268D20DD1E55046E528BE,
+				BF7F217DCE052F0FECA41467,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -233,6 +276,15 @@
 		31402007750C9E62EFE4F6C8 = {
 			isa = PBXBuildFile;
 			fileRef = 33CC715B739D548CF4E217F1;
+		};
+		3251F6628CC83A5982F0E54C = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BA80918810617DCDBE64F634,
+				0500C1190CF9170D61B3A556,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		33335241BBB7ED900474C28F = {
 			isa = PBXBuildFile;
@@ -327,6 +379,9 @@
 						CreatedOnToolsVersion = 15.2;
 						TestTargetID = 9E46948988D0C4FE6032242F;
 					};
+					2366172B121F7603006B6562 = {
+						CreatedOnToolsVersion = 15.2;
+					};
 				};
 			};
 			buildConfigurationList = B61A476A5531CC175278BDCF;
@@ -350,6 +405,7 @@
 			targets = (
 				9E46948988D0C4FE6032242F,
 				E5B141960220753784353F25,
+				2366172B121F7603006B6562,
 			);
 		};
 		47A4E3D3714E1DC0C79E965D = {
@@ -517,6 +573,13 @@
 			path = GardenView.swift;
 			sourceTree = "<group>";
 		};
+		5D9B15D373419AB5609695B3 = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5DE577FFAB824FEF616568CF = {
 			isa = PBXGroup;
 			children = (
@@ -566,6 +629,10 @@
 			path = GardenScene.swift;
 			sourceTree = "<group>";
 		};
+		67D6BD94C719058428B9C768 = {
+			isa = PBXBuildFile;
+			fileRef = 84F9D795D24ECD9BBAB17EBA;
+		};
 		6811F60E3E123DA7324FFE5D = {
 			isa = PBXBuildFile;
 			fileRef = 273CC6BCBD9D39BE93256F02;
@@ -575,6 +642,10 @@
 			lastKnownFileType = sourcecode.swift;
 			path = ItemCatalog.swift;
 			sourceTree = "<group>";
+		};
+		6ABA1F81FA8E37AA56935681 = {
+			isa = PBXBuildFile;
+			fileRef = 84F9D795D24ECD9BBAB17EBA;
 		};
 		6C33725A2326D87327A12D17 = {
 			isa = PBXBuildFile;
@@ -740,6 +811,12 @@
 			path = LoginRewardView.swift;
 			sourceTree = "<group>";
 		};
+		84F9D795D24ECD9BBAB17EBA = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = WidgetSnapshot.swift;
+			sourceTree = "<group>";
+		};
 		853DFBD5A70AF08B5F340B32 = {
 			isa = PBXBuildFile;
 			fileRef = 025725EE5E86371684F03CA3;
@@ -753,6 +830,12 @@
 		85B4269635614BD0C8CA6978 = {
 			isa = PBXBuildFile;
 			fileRef = 3F06E74F624047097A43F1ED;
+		};
+		88419F21D86FB542569077F2 = {
+			isa = PBXFileReference;
+			lastKnownFileType = folder.assetcatalog;
+			path = Assets.xcassets;
+			sourceTree = "<group>";
 		};
 		8851A7B10DEB9D6E631A6068 = {
 			isa = PBXFileReference;
@@ -769,6 +852,7 @@
 			children = (
 				D80A94CBB67D01225CEC93BF,
 				013E63CE299CB0718C321E95,
+				BE51ADA5E54B774B992AB509,
 				2AC8BA37DAC32D5437812408,
 			);
 			sourceTree = "<group>";
@@ -857,6 +941,21 @@
 			isa = PBXBuildFile;
 			fileRef = DCA3F2E553F7474AB22BD3A5;
 		};
+		948D5768A8E60A8F2FA18926 = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B21AE41C2826C1078DAA3A76,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		954BE2FCECD1A242C169ECA2 = {
+			isa = PBXBuildFile;
+			fileRef = 0C480791CE6E4D004F8224C9;
+		};
 		994FAEFA4B50ACA688BFECA8 = {
 			isa = PBXFileReference;
 			lastKnownFileType = file;
@@ -873,6 +972,12 @@
 			path = Scenes;
 			sourceTree = "<group>";
 		};
+		9AD5D19080DE3307D573EE4A = {
+			isa = PBXFileReference;
+			lastKnownFileType = text.json.xcstrings;
+			path = Localizable.xcstrings;
+			sourceTree = "<group>";
+		};
 		9BF8CA865509CCDB7D16519C = {
 			isa = PBXBuildFile;
 			fileRef = 580544F59D745C748B7384E1;
@@ -884,10 +989,12 @@
 				F7EEE878C388C21EDF872EA6,
 				0206D15721B4D143CC79B8B3,
 				5519CE22010C9D7F54B41EBC,
+				948D5768A8E60A8F2FA18926,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B3A97AD006BED04A1CFDA834,
 			);
 			name = Meowchi;
 			productName = Meowchi;
@@ -947,6 +1054,28 @@
 			isa = PBXBuildFile;
 			fileRef = 25DBA27B5B8CEA516A43EA4D;
 		};
+		AA6B5186509E64ED1FB478FC = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = MeowchiWidget/MeowchiWidget.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				MARKETING_VERSION = 0.1.0;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MeowchiWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Meowchi;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.meowchi.game.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
 		AA7268D20DD1E55046E528BE = {
 			isa = PBXFileReference;
 			explicitFileType = wrapper.cfbundle;
@@ -962,6 +1091,15 @@
 			isa = PBXBuildFile;
 			fileRef = 380E4218840FC6C19BDD46A8;
 		};
+		B21AE41C2826C1078DAA3A76 = {
+			isa = PBXBuildFile;
+			fileRef = BF7F217DCE052F0FECA41467;
+			settings = {
+				ATTRIBUTES = (
+					RemoveHeadersOnCopy,
+				);
+			};
+		};
 		B2FA4A830BFFBD21DE322421 = {
 			isa = PBXGroup;
 			children = (
@@ -970,6 +1108,11 @@
 			);
 			path = Garden;
 			sourceTree = "<group>";
+		};
+		B3A97AD006BED04A1CFDA834 = {
+			isa = PBXTargetDependency;
+			target = 2366172B121F7603006B6562;
+			targetProxy = CE82FDD26B95F0CB96E3060C;
 		};
 		B5F745D3020D1F18393AD232 = {
 			isa = PBXBuildFile;
@@ -984,9 +1127,23 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		BA80918810617DCDBE64F634 = {
+			isa = PBXBuildFile;
+			fileRef = 88419F21D86FB542569077F2;
+		};
 		BDDF9BDB8C6E998BDB8A677C = {
 			isa = PBXBuildFile;
 			fileRef = 6CD03489BFE5E853914DADFF;
+		};
+		BE51ADA5E54B774B992AB509 = {
+			isa = PBXGroup;
+			children = (
+				88419F21D86FB542569077F2,
+				9AD5D19080DE3307D573EE4A,
+				0C480791CE6E4D004F8224C9,
+			);
+			path = MeowchiWidget;
+			sourceTree = "<group>";
 		};
 		BF0118815CD93CCC9D1F0143 = {
 			isa = XCBuildConfiguration;
@@ -1012,8 +1169,16 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.meowchi.game;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				CODE_SIGN_ENTITLEMENTS = Meowchi/Meowchi.entitlements;
 			};
 			name = Debug;
+		};
+		BF7F217DCE052F0FECA41467 = {
+			isa = PBXFileReference;
+			explicitFileType = "wrapper.app-extension";
+			includeInIndex = 0;
+			path = MeowchiWidget.appex;
+			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		C1F94725A8C0A27827E1BA6A = {
 			isa = PBXFileReference;
@@ -1044,6 +1209,13 @@
 		CE5A16000962214626D4EC4C = {
 			isa = PBXBuildFile;
 			fileRef = C69C64B1AC9D66D3E1F613F2;
+		};
+		CE82FDD26B95F0CB96E3060C = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46F86FAA6BBF9AC94A7E4595;
+			proxyType = 1;
+			remoteGlobalIDString = 2366172B121F7603006B6562;
+			remoteInfo = MeowchiWidget;
 		};
 		D010DAD361CA90D9CD1AA883 = {
 			isa = PBXFileReference;
@@ -1132,6 +1304,15 @@
 			path = MainMenu;
 			sourceTree = "<group>";
 		};
+		DDBAED25E9C501705F6DADC5 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA6B5186509E64ED1FB478FC,
+				EBE3C2877F1C2A02426AF117,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		E4C7E6B95CA148D360358147 = {
 			isa = PBXGroup;
 			children = (
@@ -1164,9 +1345,35 @@
 			path = GameplayTests.swift;
 			sourceTree = "<group>";
 		};
+		E7FD3C5D9876A5535EA89FB4 = {
+			isa = PBXBuildFile;
+			fileRef = 21BC8825C683F95C6762C23F;
+		};
 		EAD3E36F3E51714F22E4E748 = {
 			isa = PBXBuildFile;
 			fileRef = 84E6FC7F6B7CBD09E3B39E44;
+		};
+		EBE3C2877F1C2A02426AF117 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = MeowchiWidget/MeowchiWidget.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				MARKETING_VERSION = 0.1.0;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MeowchiWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Meowchi;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.meowchi.game.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
 		};
 		ED0147BDE902BFFB78F11EF6 = {
 			isa = PBXFileReference;
@@ -1193,6 +1400,7 @@
 			children = (
 				4DCAC55E3E1981C00BA1291F,
 				ED3163498D0A3A0B7D741E45,
+				FC4EA7268D2C84E382BE4893,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -1227,6 +1435,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.meowchi.game;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				CODE_SIGN_ENTITLEMENTS = Meowchi/Meowchi.entitlements;
 			};
 			name = Release;
 		};
@@ -1305,8 +1514,19 @@
 				B1C979E584FACB39F807F225,
 				F3D87BFB49906450FA0611BB,
 				1F0052988AD48929DD91A0D5,
+				E7FD3C5D9876A5535EA89FB4,
+				6ABA1F81FA8E37AA56935681,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC4EA7268D2C84E382BE4893 = {
+			isa = PBXGroup;
+			children = (
+				21BC8825C683F95C6762C23F,
+				84F9D795D24ECD9BBAB17EBA,
+			);
+			path = Widget;
+			sourceTree = "<group>";
 		};
 		FC6A31311E245F9D418EE423 = {
 			isa = PBXBuildFile;

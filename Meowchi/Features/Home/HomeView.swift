@@ -160,6 +160,7 @@ struct HomeView: View {
             } else if phase == .background {
                 store.save()
                 AudioManager.shared.pauseMusic()
+                WidgetBridge.update(from: store)
             }
         }
         .onChange(of: store.levelUpCount) { _, _ in

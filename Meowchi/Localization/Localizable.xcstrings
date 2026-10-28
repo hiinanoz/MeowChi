@@ -304,7 +304,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Checker Tiles"
+            "value": "Tiles"
           }
         }
       }
@@ -315,7 +315,62 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wood Floor"
+            "value": "Planks"
+          }
+        }
+      }
+    },
+    "decor.floorcolor_ash": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ash"
+          }
+        }
+      }
+    },
+    "decor.floorcolor_maple": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maple"
+          }
+        }
+      }
+    },
+    "decor.floorcolor_oak": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oak"
+          }
+        }
+      }
+    },
+    "decor.floorcolor_rose": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rosewood"
+          }
+        }
+      }
+    },
+    "decor.floorcolor_walnut": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walnut"
           }
         }
       }
@@ -485,6 +540,17 @@
         }
       }
     },
+    "decor.slot.floorColor": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Floor color"
+          }
+        }
+      }
+    },
     "decor.slot.plant": {
       "extractionState": "manual",
       "localizations": {
@@ -529,6 +595,17 @@
         }
       }
     },
+    "decor.slot.view": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Window view"
+          }
+        }
+      }
+    },
     "decor.slot.wallArt": {
       "extractionState": "manual",
       "localizations": {
@@ -536,6 +613,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Wall art"
+          }
+        }
+      }
+    },
+    "decor.slot.wallColor": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wall color"
           }
         }
       }
@@ -595,24 +683,79 @@
         }
       }
     },
+    "decor.view_city": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "City Sunset"
+          }
+        }
+      }
+    },
+    "decor.view_fuji": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mount Fuji"
+          }
+        }
+      }
+    },
+    "decor.view_sakura": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cherry Blossoms"
+          }
+        }
+      }
+    },
+    "decor.view_sea": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seaside"
+          }
+        }
+      }
+    },
+    "decor.view_sky": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blue Sky"
+          }
+        }
+      }
+    },
     "decor.wall_dots": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lilac Dots"
+            "value": "Polka Dots"
           }
         }
       }
     },
-    "decor.wall_mint": {
+    "decor.wall_plain": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mint Stripes"
+            "value": "Plain"
           }
         }
       }
@@ -623,7 +766,84 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Peach Stripes"
+            "value": "Stripes"
+          }
+        }
+      }
+    },
+    "decor.wallcolor_butter": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Butter"
+          }
+        }
+      }
+    },
+    "decor.wallcolor_lilac": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lilac"
+          }
+        }
+      }
+    },
+    "decor.wallcolor_mint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mint"
+          }
+        }
+      }
+    },
+    "decor.wallcolor_peach": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peach"
+          }
+        }
+      }
+    },
+    "decor.wallcolor_rose": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rose"
+          }
+        }
+      }
+    },
+    "decor.wallcolor_sage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sage"
+          }
+        }
+      }
+    },
+    "decor.wallcolor_sky": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sky"
           }
         }
       }

@@ -418,6 +418,15 @@ final class GameStore {
 
     #if DEBUG
     /// QA helper (`-refillStats`): full needs and an awake cat.
+    /// QA helper (`-debugDecor id,id`): owns and equips the given decorations.
+    func debugEquip(_ ids: [String]) {
+        for id in ids where DecorCatalog.item(id) != nil {
+            state.decor.owned.insert(id)
+            state.decor.equipped[DecorCatalog.item(id)!.slot.rawValue] = id
+        }
+        save()
+    }
+
     func debugRefill() {
         state.cat.stats = CatStats(hunger: 100, energy: 100, happiness: 100, cleanliness: 100, health: 100)
         state.cat.isSleeping = false

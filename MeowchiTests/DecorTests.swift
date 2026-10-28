@@ -15,6 +15,9 @@ final class DecorTests: XCTestCase {
             XCTAssertEqual(DecorCatalog.items(in: slot).filter(\.isFree).count, 1, "\(slot)")
         }
         XCTAssertEqual(Set(DecorCatalog.items.map(\.id)).count, DecorCatalog.items.count)
+        for item in DecorCatalog.items {
+            XCTAssertEqual(item.tint != nil, [.wallColor, .floorColor].contains(item.slot), "only color slots use tints: \(item.id)")
+        }
     }
 
     func testBuyEquipsAndCannotBuyTwice() {
@@ -60,7 +63,7 @@ final class DecorTests: XCTestCase {
     }
 
     func testEveryReferencedSpriteExistsInTheBundle() {
-        var names = DecorCatalog.items.map(\.id) + ["window_basic", "litter_clean", "litter_dirty", "bath_tub", "fx_laser",
+        var names = DecorCatalog.items.filter(\.hasSprite).map(\.id) + ["window_basic", "baseboard", "litter_clean", "litter_dirty", "bath_tub", "fx_laser",
                                                    "garden_background"] + ItemCatalog.foods.map(\.iconName)
         let bodyFrames = ["idle_0", "idle_1", "blink", "happy_0", "happy_1", "sad", "eat_0", "eat_1",
                           "walk_0", "walk_1", "walk_2", "walk_3", "sleep_0", "sleep_1"]

@@ -61,7 +61,7 @@ struct DecorView: View {
         let owned = decor.isOwned(item)
         let locked = store.state.progression.level < item.unlockLevel
         return VStack(spacing: 6) {
-            preview(item.id, cropBottom: item.slot == .floor)
+            itemPreview(item)
             Text(item.nameKey).font(PixelFont.body(10)).lineLimit(2).multilineTextAlignment(.center)
             Group {
                 if equipped {
@@ -83,6 +83,21 @@ struct DecorView: View {
         }
         .padding(8)
         .background(PixelBorder().fill(equipped ? PixelPalette.warn.opacity(0.35) : PixelPalette.panelShade))
+    }
+
+    @ViewBuilder private func itemPreview(_ item: DecorItem) -> some View {
+        let decor = store.state.decor
+        if let color = item.color {
+            // Color swatch shown on the currently equipped pattern.
+            let pattern = item.slot == .wallColor ? decor.equipped(.wallpaper).id : decor.equipped(.floor).id
+            preview(pattern, cropBottom: item.slot == .floorColor).colorMultiply(color)
+        } else if item.slot == .wallpaper {
+            preview(item.id, cropBottom: false).colorMultiply(decor.equipped(.wallColor).color ?? .white)
+        } else if item.slot == .floor {
+            preview(item.id, cropBottom: true).colorMultiply(decor.equipped(.floorColor).color ?? .white)
+        } else {
+            preview(item.id, cropBottom: false)
+        }
     }
 
     /// Big wall/floor textures are cropped to a swatch; small items are shown whole.

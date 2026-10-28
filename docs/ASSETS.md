@@ -60,9 +60,11 @@ Tail moods: happy = fast wag0/wag1, calm = slow wag, tired/sad = down, annoyed =
 
 | Asset | Canvas | Notes |
 |---|---|---|
-| `wall_stripes`, `wall_mint`, `wall_dots` | 440×720 | wallpaper layer: paint only the wall + baseboard (top 640 rows of the padded canvas: 160 padding + 240 core rows), transparent below. The core 360×400 room sits at offset (40, 160). |
-| `floor_wood`, `floor_tiles` | 440×720 | floor layer: paint only below row 640, transparent above |
-| `window_basic` | 176×152 | window + curtains; top-left at core (92, 28) |
+| `wall_stripes`, `wall_dots`, `wall_plain` | 440×720 | wallpaper **pattern in light grayscale** (the game tints it with the wall color). Paint only the wall (top 640 rows of the padded canvas), transparent below. The core 360×400 room sits at offset (40, 160). |
+| `floor_wood`, `floor_tiles` | 440×720 | floor **pattern in light grayscale**, tinted by the floor color; paint only below row 640 |
+| `baseboard` | 440×16 | sits on the floor line, never tinted |
+| `view_sky`, `view_sakura`, `view_sea`, `view_city`, `view_fuji` | 108×108 | window scenery behind the glass; top-left at core (126, 50) |
+| `window_basic` | 176×152 | window frame + curtains with **transparent glass**; top-left at core (92, 28) |
 | `rug_oval`, `rug_blue`, `rug_leaf` | 220×96 | centered at core (180, 330 from top) |
 | `frame_sun`, `frame_fish`, `frame_clock` | 48×40 | wall art; top-left at core (284, 76) |
 | `bed_cloud`, `bed_royal` | 72×28 | bed variants |

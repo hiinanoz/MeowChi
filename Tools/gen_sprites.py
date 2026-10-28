@@ -432,10 +432,12 @@ ICON_PAL = {"K": K, "O": (120, 170, 220, 255), "E": E, "S": (190, 200, 210, 255)
 ROOM_PAD_X, ROOM_PAD_Y = 20, 80  # extra art around the 180x200 core; keep in sync with RoomScene.artPadding
 
 
+# Wall and floor patterns are grayscale; the game tints them with the chosen wall/floor color.
+G_BASE, G_ALT = (255, 255, 255, 255), (243, 238, 234, 255)
 WALLS = {  # name: (base, stripe or None, dot or None)
-    "wall_stripes": ((250, 226, 200, 255), (244, 212, 184, 255), None),
-    "wall_mint": ((214, 240, 226, 255), (196, 228, 212, 255), None),
-    "wall_dots": ((236, 226, 250, 255), None, (220, 206, 242, 255)),
+    "wall_stripes": (G_BASE, G_ALT, None),
+    "wall_dots": (G_BASE, None, G_ALT),
+    "wall_plain": (G_BASE, None, None),
 }
 FLOORS = {"floor_wood": "wood", "floor_tiles": "tiles"}
 RUGS = {  # name: (outer, middle, inner)
@@ -457,7 +459,12 @@ def wall(base, stripe, dot):
             if dot and (x % 10, y % 10) in ((2, 2), (3, 2), (2, 3), (3, 3), (7, 7), (8, 7), (7, 8), (8, 8)):
                 col = dot
             c.set(x, y, col)
-    c.rect(0, FLOOR_TOP - 8, c.w, 8, (196, 140, 100, 255)); c.rect(0, FLOOR_TOP - 8, c.w, 1, (150, 100, 70, 255))
+    return c
+
+
+def baseboard():
+    c = Canvas(180 + 2 * ROOM_PAD_X, 8)
+    c.rect(0, 0, c.w, 8, (196, 140, 100, 255)); c.rect(0, 0, c.w, 1, (150, 100, 70, 255))
     return c
 
 
@@ -468,12 +475,12 @@ def floor(style):
             r = y - FLOOR_TOP
             if style == "wood":
                 seam = (x + (r // 10) * 23) % 46 == 0
-                col = (176, 112, 70, 255) if r % 10 == 0 or seam else (205, 140, 92, 255)
+                col = (220, 220, 220, 255) if r % 10 == 0 or seam else (255, 255, 255, 255)
             else:
                 light = ((x // 12) + (r // 12)) % 2 == 0
-                col = (240, 236, 228, 255) if light else (206, 196, 186, 255)
+                col = (255, 255, 255, 255) if light else (232, 232, 232, 255)
                 if x % 12 == 0 or r % 12 == 0:
-                    col = (180, 170, 160, 255)
+                    col = (210, 210, 210, 255)
             c.set(x, y, col)
     return c
 
@@ -482,14 +489,54 @@ def window():
     c = Canvas(88, 76)
     ox, oy = 46, 14  # position in the core room, logical
     def r(x, y, w, h, col): c.rect(x - ox, y - oy, w, h, col)
-    r(58, 20, 64, 64, K); r(60, 22, 60, 60, (255, 250, 240, 255)); r(63, 25, 54, 54, (150, 210, 240, 255))
-    for x, y, w in ((70, 34, 12), (68, 36, 16), (95, 50, 10), (93, 52, 14)):
-        r(x, y, w, 2, H)
+    r(58, 20, 64, 64, K); r(60, 22, 60, 60, (255, 250, 240, 255)); r(63, 25, 54, 54, None)  # glass: the view shows through
     r(89, 25, 2, 54, (255, 250, 240, 255)); r(63, 51, 54, 2, (255, 250, 240, 255))
     r(54, 84, 72, 4, (196, 140, 100, 255)); r(54, 88, 72, 1, K)
     for cx in (50, 122):
         r(cx, 16, 8, 74, (247, 170, 190, 255)); r(cx + 2, 16, 1, 74, (230, 140, 165, 255))
     r(46, 14, 88, 3, (150, 100, 70, 255))
+    return c
+
+
+def view(kind):
+    """Window scenery, 54x54 logical, sits behind the window frame's glass."""
+    import random
+    rnd = random.Random(kind)
+    c = Canvas(54, 54)
+    sky_top, sky_bottom = {"sky": ((140, 200, 240), (200, 232, 250)), "sakura": ((170, 205, 240), (230, 225, 245)),
+                           "sea": ((150, 205, 240), (210, 236, 250)), "city": ((250, 190, 150), (255, 225, 190)),
+                           "fuji": ((150, 190, 235), (215, 230, 248))}[kind]
+    for y in range(54):
+        t = y / 53
+        c.rect(0, y, 54, 1, tuple(int(a + (b - a) * t) for a, b in zip(sky_top, sky_bottom)) + (255,))
+    if kind == "sky":
+        for x, y, w in ((7, 9, 12), (5, 11, 16), (32, 25, 10), (30, 27, 14)):
+            c.rect(x, y, w, 2, H)
+    elif kind == "sakura":
+        c.rect(0, 44, 54, 10, (150, 200, 130, 255))
+        c.rect(36, 22, 4, 24, (120, 80, 70, 255)); c.rect(30, 30, 8, 2, (120, 80, 70, 255))
+        for _ in range(9):
+            c.ellipse(rnd.randrange(20, 54), rnd.randrange(8, 30), rnd.uniform(4, 7), rnd.uniform(3, 5), (248, 190, 210, 255))
+        for _ in range(14):
+            c.set(rnd.randrange(54), rnd.randrange(54), (255, 215, 230, 255))
+    elif kind == "sea":
+        c.rect(0, 30, 54, 24, (90, 160, 210, 255))
+        for y in range(32, 54, 4):
+            for x in range(rnd.randrange(4), 54, 9):
+                c.rect(x, y, 4, 1, (200, 230, 250, 255))
+        c.ellipse(40, 14, 5, 5, (255, 240, 180, 255)); c.rect(0, 46, 54, 8, (240, 220, 170, 255))
+    elif kind == "city":
+        c.ellipse(14, 20, 6, 6, (255, 230, 160, 255))
+        for x, h in ((0, 20), (8, 30), (17, 24), (25, 36), (34, 22), (41, 30), (49, 26)):
+            c.rect(x, 54 - h, 7, h, (110, 100, 140, 255))
+            for wy in range(54 - h + 3, 52, 5):
+                c.rect(x + 2, wy, 1, 2, (255, 225, 140, 255)); c.rect(x + 4, wy, 1, 2, (255, 225, 140, 255))
+    else:  # fuji
+        c.tri((4, 46), (27, 14), (50, 46), (120, 130, 175, 255))
+        c.tri((21, 22), (27, 14), (33, 22), (250, 250, 255, 255))
+        c.rect(23, 21, 2, 2, (250, 250, 255, 255)); c.rect(29, 21, 2, 2, (250, 250, 255, 255))
+        c.rect(0, 44, 54, 10, (140, 190, 130, 255))
+        c.ellipse(44, 10, 4, 4, (250, 120, 110, 255))
     return c
 
 
@@ -609,6 +656,8 @@ def main():
     }
     frames.update({name: wall(*spec) for name, spec in WALLS.items()})
     frames.update({name: floor(style) for name, style in FLOORS.items()})
+    frames["baseboard"] = baseboard()
+    frames.update({f"view_{kind}": view(kind) for kind in ("sky", "sakura", "sea", "city", "fuji")})
     frames.update({name: rug(*spec) for name, spec in RUGS.items()})
     frames["garden_background"] = garden()
     frames.update(cat_layers())

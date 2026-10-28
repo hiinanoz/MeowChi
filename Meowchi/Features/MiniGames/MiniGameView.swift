@@ -125,7 +125,12 @@ struct MiniGameView: View {
 
     private func finish() {
         scene.isRunning = false
-        if let reward = store.finishMiniGame(points: score) { phase = .results(reward) } else { phase = .intro }
+        if let reward = store.finishMiniGame(points: score) {
+            AudioManager.shared.play(.coin)
+            phase = .results(reward)
+        } else {
+            phase = .intro
+        }
     }
 
     private func quit() {

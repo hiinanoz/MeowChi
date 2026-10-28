@@ -105,6 +105,7 @@ final class LaserChaseScene: SKScene {
             armed = false
             lastCatchPoint = laser.position
             haptics.impactOccurred()
+            AudioManager.shared.play(.laserCatch)
             cat.react(.happy, duration: 0.5)
             let heart = SKSpriteNode(texture: SpriteLibrary.texture("fx_heart"))
             heart.position = CGPoint(x: cat.position.x.rounded(), y: cat.position.y.rounded() + 56)

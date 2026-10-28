@@ -42,7 +42,9 @@ struct ShopView: View {
     }
 
     private func buy(_ food: FoodItem) {
-        notice = store.buy(food.id) == .insufficientCoins ? "notice.noCoins" : nil
+        let result = store.buy(food.id)
+        if result == .ok { AudioManager.shared.play(.buy) }
+        notice = result == .insufficientCoins ? "notice.noCoins" : nil
     }
 }
 

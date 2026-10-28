@@ -8,6 +8,7 @@ Talk to the user in **Turkish**; code, identifiers and docs are in English. The 
 - **Toolchain: Xcode 15.2 / iOS 17 SDK / Swift 5.9** on the user's Mac. Don't use iOS 18+ APIs, Swift 6 language mode, Swift Testing, or Xcode 16 synchronized folders. Deployment target iOS 17.0, iPhone only for now (`DEVICE_FAMILY` in the generator).
 - **The Xcode project is generated**: after adding, moving or deleting any file under `Meowchi/` or `MeowchiTests/`, run `python3 Tools/generate_project.py` and commit the regenerated `Meowchi.xcodeproj`. Never hand-edit `project.pbxproj`.
 - **Cloud/Linux sessions can't build or test** (no Xcode). Say clearly that the change isn't compiled or tested, keep changes small, and leave verification to a Mac session.
+- Audio: `Tools/gen_audio.py` synthesizes `Resources/Audio/*.caf` (music ALAC for gapless looping, SFX PCM). `AudioManager` uses the `.ambient` session.
 - Placeholder art comes from `Tools/gen_sprites.py`. Final art will replace those PNGs under the same names (see `docs/ASSETS.md`). Don't run the generator once real art is in.
 - Bundle ID `com.meowchi.game`. Support site https://www.hii.othink.com, contact drinanoz@gmail.com.
 

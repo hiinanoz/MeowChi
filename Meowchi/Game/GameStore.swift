@@ -245,6 +245,16 @@ final class GameStore {
         return .ok
     }
 
+    // MARK: Settings
+
+    func updateSettings(_ settings: GameSettings) {
+        state.settings = settings
+        state.settings.sfxVolume = min(1, max(0, settings.sfxVolume))
+        state.settings.musicVolume = min(1, max(0, settings.musicVolume))
+        AudioManager.shared.apply(state.settings)
+        save()
+    }
+
     // MARK: Decoration
 
     /// Buys a decoration and puts it in its slot. Unique items can't be bought twice.

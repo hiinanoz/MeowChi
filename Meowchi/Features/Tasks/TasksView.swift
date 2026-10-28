@@ -23,7 +23,7 @@ struct TasksView: View {
                 if daily.bonusClaimed {
                     Text("tasks.claimed").font(PixelFont.body(11)).foregroundStyle(PixelPalette.accentShade)
                 } else {
-                    Button("tasks.claim") { store.claimDailyBonus() }
+                    Button("tasks.claim") { if store.claimDailyBonus() == .ok { AudioManager.shared.play(.levelUp) } }
                         .buttonStyle(PixelButtonStyle(fill: PixelPalette.warn))
                         .disabled(!daily.allClaimed)
                 }
@@ -50,7 +50,7 @@ struct TasksView: View {
             if task.claimed {
                 Text("tasks.claimed").font(PixelFont.body(10)).foregroundStyle(PixelPalette.good)
             } else {
-                Button { store.claimTask(task.id) } label: {
+                Button { if store.claimTask(task.id) == .ok { AudioManager.shared.play(.coin) } } label: {
                     HStack(spacing: 4) {
                         PixelIcon(name: "icon_coin", size: 14)
                         Text(definition.coins, format: .number)

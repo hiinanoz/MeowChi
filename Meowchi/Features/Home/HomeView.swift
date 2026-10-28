@@ -14,12 +14,14 @@ struct HomeView: View {
     @State private var showShop = false
     @State private var showTasks = false
     @State private var showDecor = false
+    @State private var showSettings = false
     @State private var activeGame: MiniGameKind?
     @State private var showGarden = false
 
     var body: some View {
         VStack(spacing: 8) {
-            HUDView(onShop: { panel = nil; showShop = true }, onTasks: { panel = nil; showTasks = true })
+            HUDView(onShop: { panel = nil; showShop = true }, onTasks: { panel = nil; showTasks = true },
+                    onSettings: { panel = nil; showSettings = true })
             SpriteView(scene: scene, preferredFramesPerSecond: 60, options: [.ignoresSiblingOrder])
                 .clipShape(PixelBorder(step: 4))
                 .overlay(PixelBorder(step: 4).stroke(PixelPalette.ink, lineWidth: 2))
@@ -44,6 +46,7 @@ struct HomeView: View {
         .sheet(isPresented: $showShop) { ShopView().environment(store) }
         .sheet(isPresented: $showTasks) { TasksView().environment(store) }
         .sheet(isPresented: $showDecor) { DecorView().environment(store) }
+        .sheet(isPresented: $showSettings) { SettingsView().environment(store) }
         .onChange(of: store.state.decor) { _, _ in scene.applyDecor() }
         .onChange(of: store.state.cat.look) { _, _ in scene.applyDecor() }
         .fullScreenCover(item: $activeGame) { MiniGameView(kind: $0).environment(store) }
@@ -60,6 +63,7 @@ struct HomeView: View {
                 case "shop": showShop = true
                 case "tasks": showTasks = true
                 case "decor": showDecor = true
+                case "settings": showSettings = true
                 case "laser": activeGame = .laserChase
                 case "garden": showGarden = true
                 case "play": panel = .play
@@ -77,9 +81,18 @@ struct HomeView: View {
         }
         .onChange(of: store.isLitterDirty) { _, _ in scene.refreshLitter() }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active { store.tick() } else if phase == .background { store.save() }
+            if phase == .active {
+                store.tick()
+                AudioManager.shared.resumeMusic()
+            } else if phase == .background {
+                store.save()
+                AudioManager.shared.pauseMusic()
+            }
         }
-        .onChange(of: store.levelUpCount) { _, _ in show("notice.levelUp") }
+        .onChange(of: store.levelUpCount) { _, _ in
+            AudioManager.shared.play(.levelUp)
+            show("notice.levelUp")
+        }
         .task {
             // Foreground refresh. Offline time is handled by elapsed-time simulation, not timers.
             while !Task.isCancelled {
@@ -219,7 +232,7 @@ private struct ActionButton: View {
     let action: @MainActor () -> Void
 
     var body: some View {
-        Button(action: { action() }) {
+        Button(action: { AudioManager.shared.play(.tap); action() }) {
             VStack(spacing: 3) {
                 PixelIcon(name: icon, size: 20)
                 Text(title).font(PixelFont.body(10)).lineLimit(1).minimumScaleFactor(0.7)

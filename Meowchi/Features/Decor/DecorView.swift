@@ -121,6 +121,7 @@ struct DecorView: View {
 
     private func buy(_ item: DecorItem) {
         switch store.buyDecor(item.id) {
+        case .ok: AudioManager.shared.play(.buy); notice = nil
         case .insufficientCoins: notice = "notice.noCoins"
         case .locked: notice = "decor.locked \(item.unlockLevel)"
         default: notice = nil

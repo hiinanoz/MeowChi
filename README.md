@@ -29,6 +29,7 @@ python3 Tools/generate_project.py
 ```
 
 Placeholder sprites are made by `python3 Tools/gen_sprites.py`. Don't run it once real art has replaced the placeholders.
+Music and sound effects are synthesized by `python3 Tools/gen_audio.py` (original, royalty-free; about 25 s to run).
 
 ## Layout
 

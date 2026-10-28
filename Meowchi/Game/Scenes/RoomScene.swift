@@ -210,6 +210,7 @@ final class RoomScene: SKScene {
         switch result {
         case .ok:
             if stroke { haptics.impactOccurred(intensity: 0.6) }
+            AudioManager.shared.play(stroke ? .purr : .meow)
             guard !cat.isScripted else { spawnHearts(); return }
             cat.stopMoving()
             cat.react(.happy, duration: stroke ? 2 : 1)
@@ -229,6 +230,7 @@ final class RoomScene: SKScene {
         switch result {
         case .ok:
             haptics.impactOccurred(intensity: 0.4)
+            AudioManager.shared.play(.purr)
             cat.stopMoving()
             cat.react(.happy, duration: 1.2)
             spawnEffect("fx_sparkle", offsetY: 40, dx: .random(in: -16...16))
@@ -256,6 +258,7 @@ final class RoomScene: SKScene {
             self.world.addChild(tub)
             self.cat.play(.happy)
             self.cat.flashTail(.annoyed, duration: 3.5) // cats tolerate baths, they don't love them
+            AudioManager.shared.play(.splash)
             let bubbles = SKAction.repeat(.sequence([.run { [weak self] in
                 self?.spawnEffect("fx_bubble", offsetY: .random(in: 24...48), dx: .random(in: -24...24))
             }, .wait(forDuration: 0.25)]), count: 14)
@@ -271,6 +274,7 @@ final class RoomScene: SKScene {
     }
 
     func playVet() {
+        AudioManager.shared.play(.meow)
         cat.stopMoving()
         cat.react(.happy, duration: 1.5)
         spawnHearts()
@@ -293,6 +297,7 @@ final class RoomScene: SKScene {
     func refreshLitter(sparkle: Bool = false) {
         litterBox.texture = SpriteLibrary.texture(store?.isLitterDirty == true ? "litter_dirty" : "litter_clean")
         guard sparkle else { return }
+        AudioManager.shared.play(.find)
         let node = SKSpriteNode(texture: SpriteLibrary.texture("fx_sparkle"))
         node.position = CGPoint(x: Spot.litter.x, y: Spot.litter.y + 28)
         node.zPosition = 2100
@@ -309,6 +314,7 @@ final class RoomScene: SKScene {
             guard let self else { return }
             self.cat.face(towardX: Spot.foodBowl.x)
             self.cat.play(.eat)
+            AudioManager.shared.play(.eat)
             self.run(.sequence([.wait(forDuration: 2.4), .run { [weak self] in
                 guard let self else { return }
                 self.foodBowl.texture = SpriteLibrary.texture("bowl_empty")

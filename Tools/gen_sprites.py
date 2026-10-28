@@ -420,6 +420,7 @@ ICONS = {
     "icon_shop": ["..KKK..", ".K...K.", "KKKKKKK", "KYYYYYK", "KYKYKYK", "KYYYYYK", "KKKKKKK"],
     "icon_tasks": ["KKKKKK.", "KWWWWK.", "KWKKWK.", "KWWWWKK", "KWKKWKY", "KWWWWKK", "KKKKKK."],
     "icon_decor": ["..KKK..", ".KYYYK.", "..KWK..", "KKKKKKK", "KPPPPPK", "KPKKKPK", "KK...KK"],
+    "icon_settings": ["..K.K..", ".KWKWK.", "KWWWWWK", ".WWKWW.", "KWWWWWK", ".KWKWK.", "..K.K.."],
     "icon_coin": [".KKKK.", "KYYYYK", "KYKYYK", "KYKYYK", "KYYYYK", ".KKKK."],
     "icon_xp": ["...K...", "..KYK..", "KKYYYKK", ".KYYYK.", ".KYKYK.", "KK...KK"],
 }

@@ -22,6 +22,7 @@ struct MeowchiApp: App {
             if parts.count == 3 { store.setLook(CatLook(coat: parts[0], ears: parts[1], tail: parts[2])) }
         }
         #endif
+        AudioManager.shared.apply(store.state.settings)
     }
 
     var body: some Scene {

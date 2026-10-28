@@ -5,6 +5,7 @@ struct HUDView: View {
     @Environment(GameStore.self) private var store
     var onShop: @MainActor () -> Void = {}
     var onTasks: @MainActor () -> Void = {}
+    var onSettings: @MainActor () -> Void = {}
 
     var body: some View {
         let state = store.state
@@ -44,6 +45,14 @@ struct HUDView: View {
                     .buttonStyle(.plain)
                     .accessibilityLabel(Text("hud.coins \(state.coins)"))
                     .accessibilityHint(Text("shop.title"))
+                    HStack(spacing: 6) {
+                    Button { onSettings() } label: {
+                        PixelIcon(name: "icon_settings", size: 14)
+                            .padding(.horizontal, 6).padding(.vertical, 4)
+                            .pixelPanel(PixelPalette.panelShade)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text("settings.title"))
                     Button { onTasks() } label: {
                         HStack(spacing: 4) {
                             PixelIcon(name: "icon_tasks", size: 14)
@@ -55,6 +64,7 @@ struct HUDView: View {
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(Text("tasks.title"))
+                    }
                 }
             }
             HStack(spacing: 6) {

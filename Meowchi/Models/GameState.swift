@@ -152,6 +152,18 @@ struct RewardLog: Codable, Equatable {
 struct GameSettings: Codable, Equatable {
     var soundEnabled = true
     var musicEnabled = true
+    var sfxVolume = 0.8
+    var musicVolume = 0.5
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        soundEnabled = try c.decodeIfPresent(Bool.self, forKey: .soundEnabled) ?? true
+        musicEnabled = try c.decodeIfPresent(Bool.self, forKey: .musicEnabled) ?? true
+        sfxVolume = min(1, max(0, try c.decodeIfPresent(Double.self, forKey: .sfxVolume) ?? 0.8))
+        musicVolume = min(1, max(0, try c.decodeIfPresent(Double.self, forKey: .musicVolume) ?? 0.5))
+    }
 }
 
 enum Mood: String, CaseIterable {

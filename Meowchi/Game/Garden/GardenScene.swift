@@ -90,6 +90,7 @@ final class GardenScene: SKScene {
         findNodes[index] = nil
         node.removeFromParent()
         haptics.impactOccurred()
+        if case .coins = reward { AudioManager.shared.play(.coin) } else { AudioManager.shared.play(.find) }
         cat.react(.happy, duration: 1)
         let icon: String
         switch reward {

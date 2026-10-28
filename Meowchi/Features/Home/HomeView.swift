@@ -13,6 +13,7 @@ struct HomeView: View {
     @State private var isBrushing = false
     @State private var showShop = false
     @State private var showTasks = false
+    @State private var showDecor = false
     @State private var activeGame: MiniGameKind?
 
     var body: some View {
@@ -22,6 +23,14 @@ struct HomeView: View {
                 .clipShape(PixelBorder(step: 4))
                 .overlay(PixelBorder(step: 4).stroke(PixelPalette.ink, lineWidth: 2))
                 .overlay(alignment: .top) { noticeBanner }
+                .overlay(alignment: .topTrailing) {
+                    Button { panel = nil; showDecor = true } label: {
+                        PixelIcon(name: "icon_decor", size: 22).padding(6).pixelPanel()
+                    }
+                    .buttonStyle(.plain)
+                    .padding(8)
+                    .accessibilityLabel(Text("decor.title"))
+                }
                 .overlay(alignment: .bottom) {
                     VStack(spacing: 0) {
                         if isBrushing { brushBanner } else { TutorialBanner() }
@@ -33,6 +42,9 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showShop) { ShopView().environment(store) }
         .sheet(isPresented: $showTasks) { TasksView().environment(store) }
+        .sheet(isPresented: $showDecor) { DecorView().environment(store) }
+        .onChange(of: store.state.decor) { _, _ in scene.applyDecor() }
+        .onChange(of: store.state.cat.appearanceID) { _, _ in scene.applyDecor() }
         .fullScreenCover(item: $activeGame) { MiniGameView(kind: $0).environment(store) }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
@@ -45,6 +57,7 @@ struct HomeView: View {
                 switch CommandLine.arguments[i + 1] {
                 case "shop": showShop = true
                 case "tasks": showTasks = true
+                case "decor": showDecor = true
                 case "laser": activeGame = .laserChase
                 case "food": panel = .food
                 case "clean": panel = .clean
@@ -132,6 +145,7 @@ struct HomeView: View {
         case .tooSoon: show("notice.tooSoon")
         case .insufficientCoins: show("notice.noCoins")
         case .tooTired: show("notice.tooTired")
+        case .locked, .alreadyOwned: break
         case .noReward: if let noReward { show(noReward) }
         case .unknownItem: break
         }

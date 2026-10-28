@@ -7,6 +7,7 @@ struct OnboardingView: View {
     @Environment(GameStore.self) private var store
     @State private var step = Step.welcome
     @State private var name = ""
+    @State private var appearance = CatAppearance.defaultID
     @FocusState private var nameFocused: Bool
 
     private enum Step { case welcome, name }
@@ -14,7 +15,7 @@ struct OnboardingView: View {
     var body: some View {
         VStack(spacing: 20) {
             Spacer()
-            PixelIcon(name: step == .welcome ? "cat_happy_0" : "cat_idle_0", size: 192)
+            PixelIcon(name: CatAppearance.textureName(step == .welcome ? "happy_0" : "idle_0", appearance: appearance), size: 192)
             Group {
                 switch step {
                 case .welcome: welcome
@@ -64,8 +65,19 @@ struct OnboardingView: View {
                 .onChange(of: name) { _, new in
                     if new.count > store.balance.maxNameLength { name = String(new.prefix(store.balance.maxNameLength)) }
                 }
-                .onSubmit { if valid { store.completeOnboarding(name: name) } }
-            Button("onboarding.name.button") { store.completeOnboarding(name: name) }
+                .onSubmit { if valid { store.completeOnboarding(name: name, appearance: appearance) } }
+            HStack(spacing: 10) {
+                ForEach(CatAppearance.allCases) { option in
+                    Button { appearance = option.rawValue } label: {
+                        PixelIcon(name: CatAppearance.textureName("idle_0", appearance: option.rawValue), size: 44)
+                            .padding(4)
+                            .background(PixelBorder().fill(appearance == option.rawValue ? PixelPalette.warn : PixelPalette.panelShade))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text(option.nameKey))
+                }
+            }
+            Button("onboarding.name.button") { store.completeOnboarding(name: name, appearance: appearance) }
                 .buttonStyle(PixelButtonStyle())
                 .disabled(!valid)
         }

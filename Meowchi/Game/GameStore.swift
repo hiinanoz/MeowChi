@@ -16,6 +16,9 @@ enum ActionResult: Equatable {
     case insufficientCoins
     /// Not enough energy for a mini-game.
     case tooTired
+    /// Requires a higher level.
+    case locked
+    case alreadyOwned
 }
 
 /// Single source of truth for game state. All mutations go through here so they are validated and saved.
@@ -218,8 +221,9 @@ final class GameStore {
 
     var needsOnboarding: Bool { state.onboardedAt == nil }
 
-    func completeOnboarding(name: String) {
+    func completeOnboarding(name: String, appearance: String = CatAppearance.defaultID) {
         state.cat.name = CatState.sanitizedName(name, maxLength: balance.maxNameLength) ?? state.cat.name
+        if CatAppearance(rawValue: appearance) != nil { state.cat.appearanceID = appearance }
         state.onboardedAt = clock()
         tutorialStep = .feed
         save()
@@ -235,6 +239,39 @@ final class GameStore {
         guard state.coins >= cost else { return .insufficientCoins }
         state.coins -= cost
         state.inventory[itemID, default: 0] += quantity
+        save()
+        return .ok
+    }
+
+    // MARK: Decoration
+
+    /// Buys a decoration and puts it in its slot. Unique items can't be bought twice.
+    @discardableResult
+    func buyDecor(_ id: String) -> ActionResult {
+        guard let item = DecorCatalog.item(id) else { return .unknownItem }
+        guard !state.decor.isOwned(item) else { return .alreadyOwned }
+        guard state.progression.level >= item.unlockLevel else { return .locked }
+        guard state.coins >= item.price else { return .insufficientCoins }
+        state.coins -= item.price
+        state.decor.owned.insert(id)
+        state.decor.equipped[item.slot.rawValue] = id
+        save()
+        return .ok
+    }
+
+    @discardableResult
+    func equipDecor(_ id: String) -> ActionResult {
+        guard let item = DecorCatalog.item(id) else { return .unknownItem }
+        guard state.decor.isOwned(item) else { return .noReward }
+        state.decor.equipped[item.slot.rawValue] = id
+        save()
+        return .ok
+    }
+
+    @discardableResult
+    func setAppearance(_ id: String) -> ActionResult {
+        guard CatAppearance(rawValue: id) != nil else { return .unknownItem }
+        state.cat.appearanceID = id
         save()
         return .ok
     }

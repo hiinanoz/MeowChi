@@ -18,6 +18,7 @@ struct GameState: Codable, Equatable {
     var onboardedAt: Date?
     var care = CareState()
     var daily = DailyTasks()
+    var decor = DecorState()
 
     static func newGame(now: Date, balance: Balance) -> GameState {
         GameState(
@@ -79,6 +80,7 @@ extension GameState {
         onboardedAt = try c.decodeIfPresent(Date.self, forKey: .onboardedAt)
         care = try c.decodeIfPresent(CareState.self, forKey: .care) ?? CareState()
         daily = try c.decodeIfPresent(DailyTasks.self, forKey: .daily) ?? DailyTasks()
+        decor = try c.decodeIfPresent(DecorState.self, forKey: .decor) ?? DecorState()
     }
 }
 

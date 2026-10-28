@@ -26,7 +26,16 @@ final class RoomScene: SKScene {
         static let bath = CGPoint(x: 180, y: 64)
     }
 
-    weak var store: GameStore?
+    /// Set by the hosting view; may arrive after `didMove`, so it re-applies saved decor.
+    weak var store: GameStore? {
+        didSet {
+            guard isBuilt else { return }
+            applyDecor()
+            refreshLitter()
+            if store?.state.cat.isSleeping == true, cat.animation != .sleep { setSleeping(true, animated: false) }
+            refreshLighting(animated: false)
+        }
+    }
     /// While true, strokes over the cat brush it instead of petting.
     var isBrushing = false
 
@@ -34,6 +43,9 @@ final class RoomScene: SKScene {
     private let cat = CatNode()
     private let foodBowl = SKSpriteNode(texture: SpriteLibrary.texture("bowl_empty"))
     private let litterBox = SKSpriteNode(texture: SpriteLibrary.texture("litter_clean"))
+    private let backdrop = RoomBackdrop()
+    /// Furniture nodes driven by decoration slots.
+    private var furniture: [DecorSlot: SKSpriteNode] = [:]
     private let nightOverlay = SKSpriteNode(color: SKColor(red: 0.08, green: 0.07, blue: 0.25, alpha: 1), size: RoomScene.roomSize)
     private var isBuilt = false
     private var lastUpdate: TimeInterval = 0
@@ -58,28 +70,27 @@ final class RoomScene: SKScene {
         guard !isBuilt else { return }
         isBuilt = true
         addChild(world)
-        let background = SKSpriteNode(texture: SpriteLibrary.texture("room_background"))
-        background.anchorPoint = .zero
-        background.position = CGPoint(x: -Self.artPadding.width, y: -Self.artPadding.height)
-        background.zPosition = -1000
-        world.addChild(background)
+        world.addChild(backdrop)
 
         place(foodBowl, at: Spot.foodBowl)
         place(SKSpriteNode(texture: SpriteLibrary.texture("bowl_water")), at: Spot.waterBowl)
-        place(SKSpriteNode(texture: SpriteLibrary.texture("bed_basic")), at: Spot.bed)
-        place(SKSpriteNode(texture: SpriteLibrary.texture("scratching_post")), at: Spot.scratchingPost)
-        place(SKSpriteNode(texture: SpriteLibrary.texture("plant_basic")), at: Spot.plant)
-        place(SKSpriteNode(texture: SpriteLibrary.texture("toy_yarn")), at: Spot.yarn)
+        for (slot, spot) in [(DecorSlot.bed, Spot.bed), (.post, Spot.scratchingPost), (.plant, Spot.plant), (.toy, Spot.yarn)] {
+            let node = SKSpriteNode()
+            furniture[slot] = node
+            place(node, at: spot)
+        }
         place(litterBox, at: Spot.litter)
         refreshLitter()
+        applyDecor()
 
         cat.position = Spot.catStart
+        cat.appearance = store?.state.cat.appearanceID ?? CatAppearance.defaultID
         world.addChild(cat)
 
         nightOverlay.anchorPoint = .zero
         nightOverlay.size = CGSize(width: Self.roomSize.width + 2 * Self.artPadding.width,
                                    height: Self.roomSize.height + 2 * Self.artPadding.height)
-        nightOverlay.position = background.position
+        nightOverlay.position = CGPoint(x: -Self.artPadding.width, y: -Self.artPadding.height)
         nightOverlay.alpha = 0
         nightOverlay.zPosition = 2000
         world.addChild(nightOverlay)
@@ -209,7 +220,7 @@ final class RoomScene: SKScene {
             cat.react(.happy, duration: 0.6)
         case .sleeping:
             spawnEffect("fx_zzz", offsetY: 36)
-        case .busy, .outOfStock, .unknownItem, .tooSoon, .insufficientCoins, .tooTired:
+        case .busy, .outOfStock, .unknownItem, .tooSoon, .insufficientCoins, .tooTired, .locked, .alreadyOwned:
             break
         }
     }
@@ -263,6 +274,19 @@ final class RoomScene: SKScene {
         cat.react(.happy, duration: 1.5)
         spawnHearts()
         nextDecisionAt = lastUpdate + 3
+    }
+
+    /// Re-reads equipped decorations and the cat's coat. Slots are fixed, so the walk area never changes.
+    func applyDecor() {
+        guard let store else { return }
+        let decor = store.state.decor
+        backdrop.apply(decor)
+        for (slot, node) in furniture {
+            let texture = SpriteLibrary.texture(decor.equipped(slot).id)
+            node.texture = texture
+            node.size = texture.size()
+        }
+        cat.appearance = store.state.cat.appearanceID
     }
 
     func refreshLitter(sparkle: Bool = false) {

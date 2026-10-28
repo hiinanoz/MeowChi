@@ -13,6 +13,10 @@ final class LaserChaseScene: SKScene {
     /// Called on the main thread with the new score after every catch.
     var onScore: ((Int) -> Void)?
     var isRunning = false
+    /// Set before presenting so the play area matches the player's room.
+    var decor = DecorState() { didSet { backdrop.apply(decor) } }
+    var appearance = CatAppearance.defaultID { didSet { cat.appearance = appearance } }
+    private let backdrop = RoomBackdrop()
 
     private let world = SKNode()
     private let cat = CatNode()
@@ -36,11 +40,7 @@ final class LaserChaseScene: SKScene {
         guard !isBuilt else { return }
         isBuilt = true
         addChild(world)
-        let background = SKSpriteNode(texture: SpriteLibrary.texture("room_background"))
-        background.anchorPoint = .zero
-        background.position = CGPoint(x: -RoomScene.artPadding.width, y: -RoomScene.artPadding.height)
-        background.zPosition = -1000
-        world.addChild(background)
+        world.addChild(backdrop)
         cat.position = CGPoint(x: RoomScene.roomSize.width / 2, y: 40)
         world.addChild(cat)
         laser.zPosition = 2000

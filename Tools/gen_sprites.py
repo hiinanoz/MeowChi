@@ -283,6 +283,7 @@ ICONS = {
     "icon_play": ["...KK..", "..KPPK.", ".KPKPPK", "KPPKPPK", "KPPPKPK", ".KPPPK.", "..KKK.K"],
     "icon_shop": ["..KKK..", ".K...K.", "KKKKKKK", "KYYYYYK", "KYKYKYK", "KYYYYYK", "KKKKKKK"],
     "icon_tasks": ["KKKKKK.", "KWWWWK.", "KWKKWK.", "KWWWWKK", "KWKKWKY", "KWWWWKK", "KKKKKK."],
+    "icon_decor": ["..KKK..", ".KYYYK.", "..KWK..", "KKKKKKK", "KPPPPPK", "KPKKKPK", "KK...KK"],
     "icon_coin": [".KKKK.", "KYYYYK", "KYKYYK", "KYKYYK", "KYYYYK", ".KKKK."],
     "icon_xp": ["...K...", "..KYK..", "KKYYYKK", ".KYYYK.", ".KYKYK.", "KK...KK"],
 }
@@ -295,41 +296,139 @@ ICON_PAL = {"K": K, "O": (120, 170, 220, 255), "E": E, "S": (190, 200, 210, 255)
 ROOM_PAD_X, ROOM_PAD_Y = 20, 80  # extra art around the 180x200 core; keep in sync with RoomScene.artPadding
 
 
-def room():
-    """Core room is 180x200; padding extends wall and floor for taller/wider screens."""
-    full = Canvas(180 + 2 * ROOM_PAD_X, 200 + 2 * ROOM_PAD_Y)
-    floor_top = ROOM_PAD_Y + 120
-    for y in range(full.h):
-        for x in range(full.w):
-            if y < floor_top:
-                full.set(x, y, (244, 212, 184, 255) if ((x - ROOM_PAD_X) // 6) % 2 else (250, 226, 200, 255))
+WALLS = {  # name: (base, stripe or None, dot or None)
+    "wall_stripes": ((250, 226, 200, 255), (244, 212, 184, 255), None),
+    "wall_mint": ((214, 240, 226, 255), (196, 228, 212, 255), None),
+    "wall_dots": ((236, 226, 250, 255), None, (220, 206, 242, 255)),
+}
+FLOORS = {"floor_wood": "wood", "floor_tiles": "tiles"}
+RUGS = {  # name: (outer, middle, inner)
+    "rug_oval": ((230, 160, 140, 255), (240, 190, 160, 255), (245, 205, 175, 255)),
+    "rug_blue": ((120, 160, 210, 255), (150, 190, 230, 255), (185, 215, 240, 255)),
+    "rug_leaf": ((120, 175, 110, 255), (160, 205, 140, 255), (195, 225, 170, 255)),
+}
+FLOOR_TOP = ROOM_PAD_Y + 120  # logical rows, in the padded canvas
+
+
+def wall(base, stripe, dot):
+    """Full padded canvas; only the wall part (and baseboard) is painted."""
+    c = Canvas(180 + 2 * ROOM_PAD_X, 200 + 2 * ROOM_PAD_Y)
+    for y in range(FLOOR_TOP):
+        for x in range(c.w):
+            col = base
+            if stripe and ((x - ROOM_PAD_X) // 6) % 2:
+                col = stripe
+            if dot and (x % 10, y % 10) in ((2, 2), (3, 2), (2, 3), (3, 3), (7, 7), (8, 7), (7, 8), (8, 8)):
+                col = dot
+            c.set(x, y, col)
+    c.rect(0, FLOOR_TOP - 8, c.w, 8, (196, 140, 100, 255)); c.rect(0, FLOOR_TOP - 8, c.w, 1, (150, 100, 70, 255))
+    return c
+
+
+def floor(style):
+    c = Canvas(180 + 2 * ROOM_PAD_X, 200 + 2 * ROOM_PAD_Y)
+    for y in range(FLOOR_TOP, c.h):
+        for x in range(c.w):
+            r = y - FLOOR_TOP
+            if style == "wood":
+                seam = (x + (r // 10) * 23) % 46 == 0
+                col = (176, 112, 70, 255) if r % 10 == 0 or seam else (205, 140, 92, 255)
             else:
-                seam = (x + ((y - floor_top) // 10) * 23) % 46 == 0
-                full.set(x, y, (176, 112, 70, 255) if (y - floor_top) % 10 == 0 or seam else (205, 140, 92, 255))
-    full.rect(0, floor_top - 8, full.w, 8, (196, 140, 100, 255)); full.rect(0, floor_top - 8, full.w, 1, (150, 100, 70, 255))
-    c = Canvas(180, 200)
-    # window
-    c.rect(58, 20, 64, 64, K); c.rect(60, 22, 60, 60, (255, 250, 240, 255))
-    c.rect(63, 25, 54, 54, (150, 210, 240, 255))
+                light = ((x // 12) + (r // 12)) % 2 == 0
+                col = (240, 236, 228, 255) if light else (206, 196, 186, 255)
+                if x % 12 == 0 or r % 12 == 0:
+                    col = (180, 170, 160, 255)
+            c.set(x, y, col)
+    return c
+
+
+def window():
+    c = Canvas(88, 76)
+    ox, oy = 46, 14  # position in the core room, logical
+    def r(x, y, w, h, col): c.rect(x - ox, y - oy, w, h, col)
+    r(58, 20, 64, 64, K); r(60, 22, 60, 60, (255, 250, 240, 255)); r(63, 25, 54, 54, (150, 210, 240, 255))
     for x, y, w in ((70, 34, 12), (68, 36, 16), (95, 50, 10), (93, 52, 14)):
-        c.rect(x, y, w, 2, H)
-    c.rect(89, 25, 2, 54, (255, 250, 240, 255)); c.rect(63, 51, 54, 2, (255, 250, 240, 255))
-    c.rect(54, 84, 72, 4, (196, 140, 100, 255)); c.rect(54, 88, 72, 1, K)
+        r(x, y, w, 2, H)
+    r(89, 25, 2, 54, (255, 250, 240, 255)); r(63, 51, 54, 2, (255, 250, 240, 255))
+    r(54, 84, 72, 4, (196, 140, 100, 255)); r(54, 88, 72, 1, K)
     for cx in (50, 122):
-        c.rect(cx, 16, 8, 74, (247, 170, 190, 255)); c.rect(cx + 2, 16, 1, 74, (230, 140, 165, 255))
-    c.rect(46, 14, 88, 3, (150, 100, 70, 255))
-    # picture frame
-    c.rect(142, 38, 24, 20, K); c.rect(144, 40, 20, 16, (255, 236, 170, 255))
-    c.ellipse(154, 49, 5, 4, (242, 153, 74, 255))
-    # rug
-    c.ellipse(90, 165, 54, 23, (230, 160, 140, 255))
-    c.ellipse(90, 165, 50, 20, (240, 190, 160, 255))
-    c.ellipse(90, 165, 38, 14, (245, 205, 175, 255))
-    for Y in range(c.H):
-        for X in range(c.W):
-            if c.p[Y][X]:
-                full.pset(X + ROOM_PAD_X * SCALE, Y + ROOM_PAD_Y * SCALE, c.p[Y][X])
-    return full
+        r(cx, 16, 8, 74, (247, 170, 190, 255)); r(cx + 2, 16, 1, 74, (230, 140, 165, 255))
+    r(46, 14, 88, 3, (150, 100, 70, 255))
+    return c
+
+
+def frame(kind):
+    c = Canvas(24, 20)
+    c.rect(0, 0, 24, 20, K); c.rect(2, 2, 20, 16, (255, 236, 170, 255) if kind != "fish" else (200, 230, 245, 255))
+    if kind == "sun":
+        c.ellipse(12, 11, 5, 4, (242, 153, 74, 255))
+    elif kind == "fish":
+        c.ellipse(11, 10, 5, 3, (120, 170, 220, 255)); c.tri((15, 10), (19, 7), (19, 13), (120, 170, 220, 255)); c.set(9, 9, E)
+    else:  # clock
+        c.rect(0, 0, 24, 20, None); c.ellipse(12, 10, 9.5, 9.5, K); c.ellipse(12, 10, 8, 8, (255, 250, 240, 255))
+        c.rect(12, 4, 1, 6, E); c.rect(12, 10, 4, 1, E)
+    return c
+
+
+def rug(outer, middle, inner):
+    c = Canvas(110, 48)
+    c.ellipse(55, 24, 54, 23, outer); c.ellipse(55, 24, 50, 20, middle); c.ellipse(55, 24, 38, 14, inner)
+    return c
+
+
+def bed_variant(outer, inner):
+    c = Canvas(36, 14)
+    c.shaded_ellipse(18, 8.5, 17, 5, outer, tuple(max(0, v - 30) for v in outer[:3]) + (255,))
+    c.ellipse(18, 7.5, 12.5, 3, inner)
+    c.outline()
+    return c
+
+
+def post_tower():
+    c = Canvas(24, 52)
+    wood, rope, top = (170, 112, 72, 255), (222, 190, 140, 255), (120, 190, 170, 255)
+    c.rect(1, 46, 22, 5, wood)
+    c.rect(9, 6, 6, 40, rope)
+    for y in range(8, 46, 3):
+        c.rect(9, y, 6, 1, (190, 150, 100, 255))
+    c.rect(2, 22, 20, 4, top); c.rect(3, 2, 18, 4, top)
+    c.outline()
+    return c
+
+
+def cactus():
+    c = Canvas(16, 24)
+    g1, g2 = (120, 185, 120, 255), (90, 155, 95, 255)
+    c.rect(6, 3, 4, 13, g1); c.rect(2, 7, 3, 5, g2); c.rect(11, 5, 3, 6, g2); c.rect(4, 10, 2, 2, g2); c.rect(10, 9, 2, 2, g2)
+    c.set(7, 2, (240, 120, 160, 255))
+    c.rect(4, 15, 8, 7, (110, 150, 200, 255)); c.rect(3, 15, 10, 2, (130, 170, 220, 255))
+    c.outline()
+    return c
+
+
+def toy_mouse():
+    c = Canvas(14, 9)
+    c.ellipse(6, 5, 5, 3, (170, 170, 185, 255)); c.ellipse(3, 3, 1.6, 1.6, (240, 170, 185, 255))
+    c.set(2, 5, E); c.rect(11, 6, 3, 1, (240, 170, 185, 255))
+    c.outline()
+    return c
+
+
+CAT_COLORWAYS = {  # appearance id: palette overrides (orange_white is the default art)
+    "gray_white": {"O": (160, 165, 182, 255), "D": (112, 117, 138, 255), "OS": (136, 141, 160, 255), "OL": (196, 200, 214, 255)},
+    "cream": {"O": (240, 214, 176, 255), "D": (204, 160, 116, 255), "OS": (220, 190, 150, 255), "OL": (250, 232, 205, 255)},
+}
+
+
+def with_palette(overrides, fn, *args, **kwargs):
+    """Recolors the cat by temporarily swapping module palette globals."""
+    g = globals()
+    saved = {k: g[k] for k in overrides}
+    g.update(overrides)
+    try:
+        return fn(*args, **kwargs)
+    finally:
+        g.update(saved)
 
 
 def main():
@@ -347,8 +446,12 @@ def main():
         "cat_sad": cat_sit(eyes="sad", mouth="flat", tail=0),
         "cat_eat_0": cat_sit(eyes="closed", mouth="open", head_dy=3), "cat_eat_1": cat_sit(eyes="closed", mouth="smile", head_dy=4),
         "cat_sleep_0": cat_sleep(0), "cat_sleep_1": cat_sleep(1),
-        "room_background": room(), "bowl_empty": bowl("empty"), "bowl_food": bowl("food"),
+"bowl_empty": bowl("empty"), "bowl_food": bowl("food"),
         "bowl_water": bowl("water"), "bed_basic": bed(), "scratching_post": scratching_post(),
+        "bed_cloud": bed_variant((120, 170, 230, 255), (200, 225, 250, 255)),
+        "bed_royal": bed_variant((150, 100, 190, 255), (250, 210, 110, 255)),
+        "post_tower": post_tower(), "plant_cactus": cactus(), "toy_mouse": toy_mouse(),
+        "window_basic": window(), "frame_sun": frame("sun"), "frame_fish": frame("fish"), "frame_clock": frame("clock"),
         "toy_yarn": yarn(), "plant_basic": plant(),
         "bath_tub": tub(), "litter_clean": litter(False), "litter_dirty": litter(True),
         "fx_bubble": small(BUBBLE, {"K": (120, 170, 210, 255), "H": H, "B": (200, 235, 255, 255)}),
@@ -356,6 +459,23 @@ def main():
         "fx_sparkle": small(SPARKLE, {"Y": (250, 220, 90, 255), "H": H}),
         "fx_heart": small(HEART, {"H": K, "P": (240, 90, 120, 255)}), "fx_zzz": small(ZED, {"K": (90, 110, 200, 255)}),
     }
+    frames.update({name: wall(*spec) for name, spec in WALLS.items()})
+    frames.update({name: floor(style) for name, style in FLOORS.items()})
+    frames.update({name: rug(*spec) for name, spec in RUGS.items()})
+    cat_specs = {
+        "idle_0": lambda: cat_sit(tail=0), "idle_1": lambda: cat_sit(tail=1, breath=1),
+        "blink": lambda: cat_sit(eyes="closed", tail=0),
+        "walk_0": lambda: cat_sit(tail=0, lift=(2, 0)), "walk_1": lambda: cat_sit(tail=1, lift=(0, 2)),
+        "happy_0": lambda: cat_sit(eyes="happy", mouth="open", tail=1),
+        "happy_1": lambda: cat_sit(eyes="happy", mouth="smile", tail=0, breath=1),
+        "sad": lambda: cat_sit(eyes="sad", mouth="flat", tail=0),
+        "eat_0": lambda: cat_sit(eyes="closed", mouth="open", head_dy=3),
+        "eat_1": lambda: cat_sit(eyes="closed", mouth="smile", head_dy=4),
+        "sleep_0": lambda: cat_sleep(0), "sleep_1": lambda: cat_sleep(1),
+    }
+    for appearance, palette in CAT_COLORWAYS.items():
+        for frame_name, make in cat_specs.items():
+            frames[f"cat_{appearance}_{frame_name}"] = with_palette(palette, make)
     for name, canvas in frames.items():
         save_image("Sprites", name, canvas)
     for name, rows in ICONS.items():

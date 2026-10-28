@@ -31,7 +31,11 @@ struct MiniGameView: View {
         .padding(.vertical, 6)
         .background(PixelPalette.frame.ignoresSafeArea())
         .foregroundStyle(PixelPalette.ink)
-        .onAppear { scene.onScore = { score = $0 } }
+        .onAppear {
+            scene.decor = store.state.decor
+            scene.appearance = store.state.cat.appearanceID
+            scene.onScore = { score = $0 }
+        }
         .onChange(of: scenePhase) { _, newPhase in
             // Leaving the app forfeits the round; energy was paid at the start.
             if newPhase == .background, phase == .playing { quit() }

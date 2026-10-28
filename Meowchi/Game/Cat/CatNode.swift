@@ -16,6 +16,14 @@ final class CatNode: SKNode {
     private(set) var animation: CatAnimation?
     /// True while a scripted sequence (feeding, going to bed) owns the cat.
     var isScripted = false
+    /// Coat color; changing it swaps the running animation's frames in place.
+    var appearance = CatAppearance.defaultID {
+        didSet {
+            guard appearance != oldValue, let current = animation else { return }
+            sprite.texture = SpriteLibrary.texture(CatAppearance.textureName("idle_0", appearance: appearance))
+            play(current, force: true)
+        }
+    }
 
     override init() {
         super.init()
@@ -35,7 +43,7 @@ final class CatNode: SKNode {
         guard force || next != animation else { return }
         animation = next
         sprite.removeAction(forKey: "anim")
-        sprite.run(Self.action(for: next), withKey: "anim")
+        sprite.run(action(for: next), withKey: "anim")
     }
 
     func face(towardX x: CGFloat) {
@@ -68,18 +76,20 @@ final class CatNode: SKNode {
         }]), withKey: "react")
     }
 
-    private static func action(for animation: CatAnimation) -> SKAction {
+    private func action(for animation: CatAnimation) -> SKAction {
+        let appearance = appearance
         func loop(_ names: [String], _ time: TimeInterval) -> SKAction {
-            .repeatForever(.animate(with: SpriteLibrary.textures(names), timePerFrame: time))
+            .repeatForever(.animate(with: SpriteLibrary.textures(names.map { CatAppearance.textureName($0, appearance: appearance) }),
+                                    timePerFrame: time))
         }
         switch animation {
         case .idle:
-            return loop(["cat_idle_0", "cat_idle_1", "cat_idle_0", "cat_idle_1", "cat_idle_0", "cat_blink", "cat_idle_1"], 0.45)
-        case .walk: return loop(["cat_walk_0", "cat_walk_1"], 0.18)
-        case .happy: return loop(["cat_happy_0", "cat_happy_1"], 0.25)
-        case .sad: return loop(["cat_sad", "cat_sad", "cat_blink"], 0.6)
-        case .eat: return loop(["cat_eat_0", "cat_eat_1"], 0.22)
-        case .sleep: return loop(["cat_sleep_0", "cat_sleep_1"], 0.9)
+            return loop(["idle_0", "idle_1", "idle_0", "idle_1", "idle_0", "blink", "idle_1"], 0.45)
+        case .walk: return loop(["walk_0", "walk_1"], 0.18)
+        case .happy: return loop(["happy_0", "happy_1"], 0.25)
+        case .sad: return loop(["sad", "sad", "blink"], 0.6)
+        case .eat: return loop(["eat_0", "eat_1"], 0.22)
+        case .sleep: return loop(["sleep_0", "sleep_1"], 0.9)
         }
     }
 }

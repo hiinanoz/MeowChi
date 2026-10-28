@@ -192,6 +192,16 @@ final class GameStore {
         return .ok
     }
 
+    /// When the next bath / vet visit is allowed, or nil if it is allowed now.
+    var bathReadyAt: Date? { readyAt(state.care.lastBathAt, hours: balance.bathCooldownHours) }
+    var vetReadyAt: Date? { readyAt(state.care.lastVetAt, hours: balance.vetCooldownHours) }
+
+    private func readyAt(_ last: Date?, hours: Double) -> Date? {
+        guard let last, last <= clock() else { return nil }
+        let ready = last.addingTimeInterval(hours * 3600)
+        return ready > clock() ? ready : nil
+    }
+
     var isLitterDirty: Bool { state.care.litter >= balance.litterDirtyThreshold }
 
     /// Shared preconditions for actions that involve the cat.
@@ -251,6 +261,7 @@ final class GameStore {
         state.settings = settings
         state.settings.sfxVolume = min(1, max(0, settings.sfxVolume))
         state.settings.musicVolume = min(1, max(0, settings.musicVolume))
+        if MusicTrack(rawValue: settings.musicTrack) == nil { state.settings.musicTrack = MusicTrack.calm.rawValue }
         AudioManager.shared.apply(state.settings)
         save()
     }

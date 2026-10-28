@@ -35,16 +35,30 @@ struct MeowchiApp: App {
 
 struct RootView: View {
     @Environment(GameStore.self) private var store
+    /// Launch shows the main menu; "Go home" enters the room. Onboarding drops straight into the room.
+    @State private var atHome = Self.startsAtHome
+
+    private static var startsAtHome: Bool {
+        #if DEBUG
+        return CommandLine.arguments.contains("-skipOnboarding")
+        #else
+        return false
+        #endif
+    }
 
     var body: some View {
         Group {
             if store.needsOnboarding {
                 OnboardingView().transition(.opacity)
+            } else if atHome {
+                HomeView(onMainMenu: { atHome = false }).transition(.opacity)
             } else {
-                HomeView().transition(.opacity)
+                MainMenuView(onGoHome: { atHome = true }).transition(.opacity)
             }
         }
         .animation(.easeInOut(duration: 0.4), value: store.needsOnboarding)
+        .animation(.easeInOut(duration: 0.3), value: atHome)
+        .onChange(of: store.needsOnboarding) { _, needs in if !needs { atHome = true } }
         .preferredColorScheme(.dark)
             .alert("save.error.title", isPresented: Binding(get: { store.loadIssue != nil },
                                                             set: { if !$0 { store.loadIssue = nil } })) {

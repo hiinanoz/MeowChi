@@ -99,6 +99,50 @@ struct PixelBar: View {
     }
 }
 
+/// The one back button used everywhere: arrow + "Back", top-left of a screen.
+struct BackButton: View {
+    var title: LocalizedStringKey = "common.back"
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                PixelIcon(name: "icon_back", size: 14)
+                Text(title).font(PixelFont.body(12))
+            }
+            .foregroundStyle(PixelPalette.ink)
+            .padding(.horizontal, 8).padding(.vertical, 5)
+            .pixelPanel(PixelPalette.panelShade)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+/// Screen header: back button on the left, centered title, optional trailing content.
+struct PixelHeader<Trailing: View>: View {
+    let title: LocalizedStringKey
+    let onBack: () -> Void
+    @ViewBuilder var trailing: Trailing
+
+    var body: some View {
+        ZStack {
+            Text(title).font(PixelFont.body(16)).lineLimit(1).minimumScaleFactor(0.7).padding(.horizontal, 90)
+            HStack {
+                BackButton(action: onBack)
+                Spacer()
+                trailing
+            }
+        }
+        .foregroundStyle(PixelPalette.ink)
+    }
+}
+
+extension PixelHeader where Trailing == EmptyView {
+    init(title: LocalizedStringKey, onBack: @escaping () -> Void) {
+        self.init(title: title, onBack: onBack) { EmptyView() }
+    }
+}
+
 struct PixelIcon: View {
     let name: String
     var size: CGFloat = 18

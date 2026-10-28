@@ -25,6 +25,12 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		025725EE5E86371684F03CA3 = {
+			isa = PBXFileReference;
+			lastKnownFileType = file;
+			path = music_calm.caf;
+			sourceTree = "<group>";
+		};
 		0620665EAAAF5B5FE9E3713F = {
 			isa = PBXBuildFile;
 			fileRef = 8D82267BFE46D33C4A4E10E7;
@@ -112,7 +118,10 @@
 		21A6350BE7DCC37AFB04395A = {
 			isa = PBXGroup;
 			children = (
-				BBF6CD9BC2FA2D402FC3FD5A,
+				025725EE5E86371684F03CA3,
+				A6D23A0640FBC9812E590118,
+				D972EBC0C3AD154C941ADB32,
+				29F5E4BB4E0E06CED42969DF,
 				40CA8C37F01E9974835E98C2,
 				EE16C658DE68F122AFCC682B,
 				6CD03489BFE5E853914DADFF,
@@ -150,6 +159,12 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = ShopView.swift;
+			sourceTree = "<group>";
+		};
+		29F5E4BB4E0E06CED42969DF = {
+			isa = PBXFileReference;
+			lastKnownFileType = file;
+			path = music_upbeat.caf;
 			sourceTree = "<group>";
 		};
 		2ABDAA1F2FC7BA27B6D5E174 = {
@@ -272,6 +287,10 @@
 			path = sfx_tap.caf;
 			sourceTree = "<group>";
 		};
+		44C3E8508EBE83BD81E74BC2 = {
+			isa = PBXBuildFile;
+			fileRef = D1096FC6CC217F8CA3C99248;
+		};
 		45FEF11BEFC41C0C92ED67BC = {
 			isa = PBXFileReference;
 			lastKnownFileType = folder.assetcatalog;
@@ -323,6 +342,7 @@
 				CB56D8D48D7229C13626A421,
 				B2FA4A830BFFBD21DE322421,
 				11AF12A87622A613DAE4C415,
+				DDB282E4EC83CC60ECA79E43,
 				8C8BFF97D4427BB7DA313615,
 				2ABDAA1F2FC7BA27B6D5E174,
 				72A6551B898407A06B1A2A43,
@@ -402,6 +422,10 @@
 			path = CatPreview.swift;
 			sourceTree = "<group>";
 		};
+		539E514A0E514143D2981EC0 = {
+			isa = PBXBuildFile;
+			fileRef = D972EBC0C3AD154C941ADB32;
+		};
 		5412CADE00A808717EEC3557 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
@@ -424,7 +448,10 @@
 			files = (
 				A2F429E3B45EF701C8384B42,
 				0DCE3E0E16B5D4CBF192D043,
-				8084F24436B6ED369B362DA1,
+				853DFBD5A70AF08B5F340B32,
+				746B4C7A5AC7AC75AA973038,
+				539E514A0E514143D2981EC0,
+				D1458FC3F3053B50C0AAFEC5,
 				FC6A31311E245F9D418EE423,
 				DB3A0DCF4B117B6FCB6E5F19,
 				BDDF9BDB8C6E998BDB8A677C,
@@ -577,6 +604,10 @@
 			path = MiniGameView.swift;
 			sourceTree = "<group>";
 		};
+		746B4C7A5AC7AC75AA973038 = {
+			isa = PBXBuildFile;
+			fileRef = A6D23A0640FBC9812E590118;
+		};
 		772F9DDC1B2C2F1F7B100B44 = {
 			isa = PBXBuildFile;
 			fileRef = 4F1F491039760DF3DC099379;
@@ -602,10 +633,6 @@
 			lastKnownFileType = file;
 			path = sfx_eat.caf;
 			sourceTree = "<group>";
-		};
-		8084F24436B6ED369B362DA1 = {
-			isa = PBXBuildFile;
-			fileRef = BBF6CD9BC2FA2D402FC3FD5A;
 		};
 		80DB6ACE13380ADC3D86D6C5 = {
 			isa = XCBuildConfiguration;
@@ -650,6 +677,10 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		853DFBD5A70AF08B5F340B32 = {
+			isa = PBXBuildFile;
+			fileRef = 025725EE5E86371684F03CA3;
 		};
 		85A7D8E49FCB0865855CFC23 = {
 			isa = PBXFileReference;
@@ -806,6 +837,12 @@
 			path = LaserChaseScene.swift;
 			sourceTree = "<group>";
 		};
+		A6D23A0640FBC9812E590118 = {
+			isa = PBXFileReference;
+			lastKnownFileType = file;
+			path = music_retro16.caf;
+			sourceTree = "<group>";
+		};
 		A71FA2572889AFD8D65FDDCF = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -864,12 +901,6 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
-		};
-		BBF6CD9BC2FA2D402FC3FD5A = {
-			isa = PBXFileReference;
-			lastKnownFileType = file;
-			path = music_home.caf;
-			sourceTree = "<group>";
 		};
 		BDDF9BDB8C6E998BDB8A677C = {
 			isa = PBXBuildFile;
@@ -944,6 +975,16 @@
 			path = CarePanels.swift;
 			sourceTree = "<group>";
 		};
+		D1096FC6CC217F8CA3C99248 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = MainMenuView.swift;
+			sourceTree = "<group>";
+		};
+		D1458FC3F3053B50C0AAFEC5 = {
+			isa = PBXBuildFile;
+			fileRef = 29F5E4BB4E0E06CED42969DF;
+		};
 		D2278803016B4274806DD093 = {
 			isa = PBXBuildFile;
 			fileRef = A61DA19FB4D2F4865E349C36;
@@ -975,6 +1016,12 @@
 			path = Meowchi;
 			sourceTree = "<group>";
 		};
+		D972EBC0C3AD154C941ADB32 = {
+			isa = PBXFileReference;
+			lastKnownFileType = file;
+			path = music_retro8.caf;
+			sourceTree = "<group>";
+		};
 		DAE215AAC8568CFABE38AC45 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
@@ -989,6 +1036,14 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = DailyTasks.swift;
+			sourceTree = "<group>";
+		};
+		DDB282E4EC83CC60ECA79E43 = {
+			isa = PBXGroup;
+			children = (
+				D1096FC6CC217F8CA3C99248,
+			);
+			path = MainMenu;
 			sourceTree = "<group>";
 		};
 		E4C7E6B95CA148D360358147 = {
@@ -1127,6 +1182,7 @@
 				D55CDEF545172B9A0F09A3F2,
 				D6C4B81BC28233E2FF4E74C3,
 				31402007750C9E62EFE4F6C8,
+				44C3E8508EBE83BD81E74BC2,
 				3E3AD8FEE8CBC8695D914923,
 				F36E3D0720E665059BFE0599,
 				8D64F533E338D56D8B52CC69,

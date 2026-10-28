@@ -23,6 +23,7 @@ final class AudioManager {
 
     private var effects: [Sound: AVAudioPlayer] = [:]
     private var music: AVAudioPlayer?
+    private var loadedTrack: MusicTrack?
     private var lastPlayed: [Sound: Date] = [:]
     private var settings = GameSettings()
     private let log = Logger(subsystem: "Meowchi", category: "Audio")
@@ -39,15 +40,21 @@ final class AudioManager {
             player.prepareToPlay()
             effects[sound] = player
         }
-        if let url = Bundle.main.url(forResource: "music_home", withExtension: "caf") {
-            music = try? AVAudioPlayer(contentsOf: url)
-            music?.numberOfLoops = -1
-            music?.prepareToPlay()
-        }
+    }
+
+    /// Loads a track only when it changes; tracks are a few MB, so just one is kept in memory.
+    private func load(_ track: MusicTrack) {
+        guard loadedTrack != track else { return }
+        music?.stop()
+        music = Bundle.main.url(forResource: track.fileName, withExtension: "caf").flatMap { try? AVAudioPlayer(contentsOf: $0) }
+        music?.numberOfLoops = -1
+        music?.prepareToPlay()
+        loadedTrack = track
     }
 
     func apply(_ settings: GameSettings) {
         self.settings = settings
+        load(MusicTrack(rawValue: settings.musicTrack) ?? .calm)
         music?.volume = Float(settings.musicVolume)
         for player in effects.values { player.volume = Float(settings.sfxVolume) }
         if settings.musicEnabled { resumeMusic() } else { music?.pause() }

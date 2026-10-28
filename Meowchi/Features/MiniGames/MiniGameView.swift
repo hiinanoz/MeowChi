@@ -14,6 +14,7 @@ struct MiniGameView: View {
     @State private var score = 0
     @State private var remaining = 0
     @State private var notice: LocalizedStringKey?
+    @State private var confirmLeave = false
 
     private enum Phase: Equatable {
         case intro, playing, results(MiniGameReward)
@@ -52,20 +53,23 @@ struct MiniGameView: View {
     }
 
     private var topBar: some View {
-        HStack(spacing: 10) {
-            Text(kind.titleKey).font(PixelFont.body(15))
-            Spacer()
+        PixelHeader(title: kind.titleKey, onBack: { phase == .playing ? (confirmLeave = true) : quit() }) {
             if phase == .playing {
-                Label { Text(verbatim: "\(score)") } icon: { PixelIcon(name: "icon_happiness", size: 16) }
-                Text(Duration.seconds(remaining), format: .time(pattern: .minuteSecond)).monospacedDigit()
-            }
-            Button { quit() } label: { Text("common.close") }
+                HStack(spacing: 8) {
+                    Label { Text(verbatim: "\(score)") } icon: { PixelIcon(name: "icon_happiness", size: 14) }
+                    Text(Duration.seconds(remaining), format: .time(pattern: .minuteSecond)).monospacedDigit()
+                }
                 .font(PixelFont.body(12))
-                .foregroundStyle(PixelPalette.accentShade)
+            }
         }
-        .font(PixelFont.body(13))
         .padding(10)
         .pixelPanel()
+        .alert("game.leave.title", isPresented: $confirmLeave) {
+            Button("game.leave.confirm", role: .destructive) { quit() }
+            Button("common.cancel", role: .cancel) {}
+        } message: {
+            Text("game.leave.message")
+        }
     }
 
     @ViewBuilder private var overlay: some View {

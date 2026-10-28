@@ -63,6 +63,8 @@ def tone(freq, seconds, wave="sine", attack=0.01, release=0.1, vibrato=0.0, duty
             v = math.sin(2 * math.pi * phase) + 0.25 * math.sin(4 * math.pi * phase)
         elif wave == "triangle":
             v = 4 * abs(phase - 0.5) - 1
+        elif wave == "saw":
+            v = 2 * phase - 1
         else:  # square with duty
             v = 1.0 if phase < duty else -1.0
         env = min(1, t / attack) * min(1, max(0, seconds - t) / release)
@@ -157,6 +159,183 @@ def music():
     return looped
 
 
+# ---------- More tracks ----------
+
+NAMES = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
+
+
+def note(name):
+    """'F#5' -> MIDI number."""
+    pitch = NAMES[name[0]] + (1 if "#" in name else -1 if name[1:2] == "b" else 0)
+    return 12 * (int(name.lstrip("ABCDEFG#b")) + 1) + pitch
+
+
+def parse(melody):
+    """'A4:1 B4:.5 r:1 | ...' -> [(beat, length, midi)]; bars are only visual."""
+    out, beat = [], 0.0
+    for token in melody.replace("|", " ").split():
+        name, length = token.split(":")
+        if name != "r":
+            out.append((beat, float(length), note(name)))
+        beat += float(length)
+    return out
+
+
+def kick():
+    out = buffer(0.18)
+    phase = 0.0
+    for i in range(len(out)):
+        t = i / SR
+        phase += (45 + 105 * math.exp(-t * 30)) / SR
+        out[i] = math.sin(2 * math.pi * phase) * math.exp(-t * 18)
+    return out
+
+
+def snare(raw=False):
+    body = noise_burst(0.18, 22)
+    if not raw:
+        mix(body, noise_burst(0.1, 40, tone_hz=190), 0, 0.6)
+    return body
+
+
+def hat(raw=False):
+    n = noise_burst(0.04, 110)
+    if raw:
+        return n
+    smooth = lowpass(array.array("f", n), 0.3)
+    return array.array("f", (a - b for a, b in zip(n, smooth)))
+
+
+def echo(out, taps):
+    for delay, fb in taps:
+        d = int(delay * SR)
+        for i in range(d, len(out)):
+            out[i] += out[i - d] * fb
+
+
+def finish_loop(out, loop_seconds):
+    n = int(loop_seconds * SR)
+    looped = out[:n]
+    for i in range(len(out) - n):
+        looped[i] += out[n + i]
+    return looped
+
+
+def track(bpm, melody, chords, lead, chord_voice, bass_voice, drums, echo_taps, tail=2.0):
+    """Generic 16-bar renderer. `chords` = one (bass midi, [tones]) per bar, repeated to 16 bars."""
+    beat = 60 / bpm
+    bars = 16
+    loop_seconds = bars * 4 * beat
+    out = buffer(loop_seconds + tail)
+    for b, length, n in parse(melody):
+        lead(out, b * beat, length * beat, n)
+    for bar in range(bars):
+        root, tones = chords[bar % len(chords)]
+        chord_voice(out, bar * 4 * beat, beat, tones)
+        bass_voice(out, bar * 4 * beat, beat, root)
+        drums(out, bar * 4 * beat, beat, bar)
+    echo(out, echo_taps)
+    return finish_loop(out, loop_seconds)
+
+
+def music_upbeat():
+    """Energetic: 120 BPM, D major pentatonic, bright plucks over a bouncy groove."""
+    melody = ("F#5:.5 A5:.5 B5:.5 A5:.5 F#5:1 E5:1 | D5:.5 E5:.5 F#5:1 A5:1 r:1 | B5:.5 A5:.5 F#5:.5 E5:.5 D5:1 E5:1 | "
+              "F#5:3 r:1 | A5:.5 B5:.5 D6:1 B5:.5 A5:.5 F#5:1 | E5:.5 F#5:.5 A5:1 F#5:1 E5:1 | "
+              "D5:.5 E5:.5 F#5:.5 A5:.5 B5:1 A5:1 | D5:3 r:1 | "
+              "D5:1 F#5:1 A5:1 F#5:1 | E5:1.5 D5:.5 B4:2 | D5:1 E5:1 F#5:1 A5:1 | B5:4 | "
+              "A5:1 F#5:1 E5:1 D5:1 | E5:1.5 F#5:.5 A5:2 | B5:.5 A5:.5 F#5:.5 E5:.5 D5:1 E5:1 | D5:4")
+    chords = [(38, [62, 66, 69]), (35, [59, 62, 66]), (43, [55, 59, 62]), (45, [57, 61, 64])]
+
+    def lead(out, t, d, n):
+        mix(out, pluck(midi(n), d + 0.6, decay=0.993, bright=0.7), t, 0.28)
+        mix(out, lowpass(tone(midi(n), d * 0.9, "square", attack=0.005, release=0.05, duty=0.25), 0.35), t, 0.05)
+
+    def stabs(out, t, beat, tones):
+        for k in (0.5, 1.5, 2.5, 3.5):
+            for n in tones:
+                mix(out, lowpass(tone(midi(n), beat * 0.3, "square", attack=0.003, release=0.05), 0.25), t + k * beat, 0.035)
+
+    def bass(out, t, beat, root):
+        for k in range(8):
+            n = root + (12 if k % 2 else 0)
+            mix(out, lowpass(tone(midi(n), beat * 0.45, "triangle", attack=0.003, release=0.05), 0.5), t + k * beat / 2, 0.2)
+
+    def drums(out, t, beat, bar):
+        for k in (0, 2, 2.5 if bar % 2 else 2):
+            mix(out, kick(), t + k * beat, 0.5)
+        for k in (1, 3):
+            mix(out, snare(), t + k * beat, 0.18)
+        for k in range(8):
+            mix(out, hat(), t + k * beat / 2, 0.07 if k % 2 else 0.04)
+
+    return track(120, melody, chords, lead, stabs, bass, drums, [(0.25, 0.22)])
+
+
+def music_retro8():
+    """8-bit: NES-style pulse lead, pulse arpeggios, triangle bass, raw noise drums. 140 BPM, C major."""
+    melody = ("E5:.5 G5:.5 C6:.5 G5:.5 E5:.5 G5:.5 C6:1 | A5:.5 C6:.5 E6:.5 C6:.5 A5:1 G5:1 | "
+              "F5:.5 A5:.5 C6:.5 A5:.5 F5:.5 A5:.5 C6:1 | B5:.5 G5:.5 D5:.5 G5:.5 B5:2 | "
+              "C6:1 B5:.5 A5:.5 G5:1 E5:1 | A5:1 G5:.5 F5:.5 E5:1 C5:1 | D5:.5 E5:.5 F5:.5 G5:.5 A5:.5 B5:.5 C6:1 | "
+              "C6:2 G5:1 r:1 | G5:1 E5:1 C5:1 E5:1 | A5:1.5 G5:.5 E5:2 | F5:1 A5:1 C6:1 A5:1 | G5:1.5 F5:.5 D5:2 | "
+              "E5:.5 F5:.5 G5:1 C6:1 G5:1 | A5:.5 G5:.5 F5:1 E5:1 D5:1 | C5:.5 D5:.5 E5:.5 F5:.5 G5:1 B5:1 | C6:3 r:1")
+    chords = [(48, [60, 64, 67]), (45, [57, 60, 64]), (41, [53, 57, 60]), (43, [55, 59, 62])]
+
+    def lead(out, t, d, n):
+        mix(out, tone(midi(n), d * 0.92, "square", attack=0.002, release=0.02, duty=0.125), t, 0.11)
+
+    def arps(out, t, beat, tones):
+        for k in range(16):
+            mix(out, tone(midi(tones[k % 3] + 12), beat * 0.22, "square", attack=0.002, release=0.01, duty=0.25), t + k * beat / 4, 0.035)
+
+    def bass(out, t, beat, root):
+        for k in range(8):
+            mix(out, tone(midi(root - 12 + (12 if k % 2 else 0)), beat * 0.45, "triangle", attack=0.002, release=0.02), t + k * beat / 2, 0.3)
+
+    def drums(out, t, beat, bar):
+        for k in (0, 2):
+            mix(out, noise_burst(0.06, 60), t + k * beat, 0.25)
+        for k in (1, 3):
+            mix(out, snare(raw=True), t + k * beat, 0.16)
+        for k in range(8):
+            mix(out, hat(raw=True), t + k * beat / 2, 0.04)
+
+    return track(140, melody, chords, lead, arps, bass, drums, [], tail=0.5)
+
+
+def music_retro16():
+    """16-bit: SNES-style vibrato lead, string pad, plucked arps, echo. 100 BPM, A minor pentatonic."""
+    melody = ("E5:1 D5:.5 C5:.5 D5:1 E5:1 | A5:2 G5:1 E5:1 | C5:1 D5:1 E5:1 G5:1 | D5:3 r:1 | "
+              "E5:1 G5:.5 A5:.5 G5:1 E5:1 | C6:1.5 A5:.5 G5:2 | E5:.5 D5:.5 C5:1 D5:1 G4:1 | A4:3 r:1 | "
+              "A5:1 C6:1 D6:1 C6:1 | A5:2 G5:2 | F5:1 A5:1 C6:1 A5:1 | G5:3 r:1 | "
+              "E5:1 G5:1 A5:1 C6:1 | D6:1.5 C6:.5 A5:2 | G5:.5 A5:.5 G5:.5 E5:.5 D5:1 C5:1 | A4:4")
+    chords = [(45, [57, 60, 64]), (41, [53, 57, 60]), (48, [55, 60, 64]), (43, [55, 59, 62])]
+
+    def lead(out, t, d, n):
+        mix(out, lowpass(tone(midi(n), d, "square", attack=0.02, release=0.12, vibrato=0.008), 0.2), t, 0.09)
+
+    def strings(out, t, beat, tones):
+        for n in tones:
+            for detune in (0.997, 1.003):
+                mix(out, lowpass(tone(midi(n) * detune, beat * 4, "saw", attack=0.4, release=0.6), 0.08), t, 0.03)
+        for k in range(8):
+            mix(out, pluck(midi(tones[k % 3] + 12), 0.6, decay=0.985), t + k * beat / 2, 0.06)
+
+    def bass(out, t, beat, root):
+        for k in (0, 1.5, 2, 3):
+            mix(out, lowpass(tone(midi(root - 12), beat * 0.8, "triangle", attack=0.005, release=0.1), 0.4), t + k * beat, 0.22)
+
+    def drums(out, t, beat, bar):
+        for k in (0, 2.5):
+            mix(out, kick(), t + k * beat, 0.35)
+        for k in (1, 3):
+            mix(out, snare(), t + k * beat, 0.12)
+        for k in range(4):
+            mix(out, hat(), t + k * beat + beat / 2, 0.035)
+
+    return track(100, melody, chords, lead, strings, bass, drums, [(0.3, 0.3), (0.45, 0.18)])
+
+
 # ---------- Sound effects ----------
 
 def sfx():
@@ -232,7 +411,10 @@ def write(name, samples, codec):
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
-    write("music_home", music(), "alac")
+    write("music_calm", music(), "alac")
+    write("music_upbeat", music_upbeat(), "alac")
+    write("music_retro8", music_retro8(), "alac")
+    write("music_retro16", music_retro16(), "alac")
     for name, samples in sfx().items():
         write(name, samples, "LEI16")
 

@@ -154,6 +154,7 @@ struct GameSettings: Codable, Equatable {
     var musicEnabled = true
     var sfxVolume = 0.8
     var musicVolume = 0.5
+    var musicTrack = MusicTrack.calm.rawValue
 
     init() {}
 
@@ -163,7 +164,16 @@ struct GameSettings: Codable, Equatable {
         musicEnabled = try c.decodeIfPresent(Bool.self, forKey: .musicEnabled) ?? true
         sfxVolume = min(1, max(0, try c.decodeIfPresent(Double.self, forKey: .sfxVolume) ?? 0.8))
         musicVolume = min(1, max(0, try c.decodeIfPresent(Double.self, forKey: .musicVolume) ?? 0.5))
+        musicTrack = try c.decodeIfPresent(String.self, forKey: .musicTrack) ?? MusicTrack.calm.rawValue
     }
+}
+
+enum MusicTrack: String, CaseIterable, Identifiable {
+    case calm, upbeat, retro8, retro16
+
+    var id: String { rawValue }
+    var fileName: String { "music_" + rawValue }
+    var nameKey: LocalizedStringKey { LocalizedStringKey("music." + rawValue) }
 }
 
 enum Mood: String, CaseIterable {

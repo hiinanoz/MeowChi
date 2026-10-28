@@ -421,6 +421,9 @@ ICONS = {
     "icon_tasks": ["KKKKKK.", "KWWWWK.", "KWKKWK.", "KWWWWKK", "KWKKWKY", "KWWWWKK", "KKKKKK."],
     "icon_decor": ["..KKK..", ".KYYYK.", "..KWK..", "KKKKKKK", "KPPPPPK", "KPKKKPK", "KK...KK"],
     "icon_settings": ["..K.K..", ".KWKWK.", "KWWWWWK", ".WWKWW.", "KWWWWWK", ".KWKWK.", "..K.K.."],
+    "icon_back": ["...K...", "..KK...", ".KWKKKK", "KWWWWWK", ".KWKKKK", "..KK...", "...K..."],
+    "icon_menu": ["KKKKKKK", "KWWWWWK", "KKKKKKK", "KWWWWWK", "KKKKKKK", "KWWWWWK", "KKKKKKK"],
+    "icon_close": ["KK...KK", "KWK.KWK", ".KWKWK.", "..KWK..", ".KWKWK.", "KWK.KWK", "KK...KK"],
     "icon_coin": [".KKKK.", "KYYYYK", "KYKYYK", "KYKYYK", "KYYYYK", ".KKKK."],
     "icon_xp": ["...K...", "..KYK..", "KKYYYKK", ".KYYYK.", ".KYKYK.", "KK...KK"],
 }

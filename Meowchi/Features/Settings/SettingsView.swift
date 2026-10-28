@@ -11,6 +11,21 @@ struct SettingsView: View {
             section {
                 Toggle(isOn: binding(\.musicEnabled)) { Text("settings.music").font(PixelFont.body(13)) }
                 volume(binding(\.musicVolume), enabled: settings.musicEnabled)
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 6) {
+                    ForEach(MusicTrack.allCases) { track in
+                        let selected = settings.musicTrack == track.rawValue
+                        Button { binding(\.musicTrack).wrappedValue = track.rawValue } label: {
+                            Text(track.nameKey).font(PixelFont.body(11)).lineLimit(1).minimumScaleFactor(0.7)
+                                .frame(maxWidth: .infinity).padding(.vertical, 8)
+                                .background(PixelBorder().fill(selected ? PixelPalette.warn : PixelPalette.panel))
+                                .overlay(PixelBorder().stroke(PixelPalette.ink, lineWidth: 1.5))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityAddTraits(selected ? .isSelected : [])
+                    }
+                }
+                .disabled(!settings.musicEnabled)
+                .opacity(settings.musicEnabled ? 1 : 0.5)
             }
             section {
                 Toggle(isOn: binding(\.soundEnabled)) { Text("settings.sound").font(PixelFont.body(13)) }

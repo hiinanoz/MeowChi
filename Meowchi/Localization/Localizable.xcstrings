@@ -89,6 +89,17 @@
         }
       }
     },
+    "care.ready": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ready"
+          }
+        }
+      }
+    },
     "cat.defaultName": {
       "extractionState": "manual",
       "localizations": {
@@ -118,6 +129,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Brush"
+          }
+        }
+      }
+    },
+    "clean.brush.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroke to brush"
           }
         }
       }
@@ -195,6 +217,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Snow"
+          }
+        }
+      }
+    },
+    "common.back": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        }
+      }
+    },
+    "common.cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
           }
         }
       }
@@ -1013,6 +1057,39 @@
         }
       }
     },
+    "game.leave.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave"
+          }
+        }
+      }
+    },
+    "game.leave.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This round's energy is already used, and the round won't count."
+          }
+        }
+      }
+    },
+    "game.leave.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave the game?"
+          }
+        }
+      }
+    },
     "game.points %lld": {
       "extractionState": "manual",
       "localizations": {
@@ -1140,7 +1217,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Free check-up, available every few hours."
+            "value": "Free check-up every few hours."
           }
         }
       }
@@ -1175,6 +1252,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "Lv. %lld"
+          }
+        }
+      }
+    },
+    "menu.goHome": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go home"
+          }
+        }
+      }
+    },
+    "menu.mainMenu": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Main menu"
+          }
+        }
+      }
+    },
+    "menu.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A cozy pixel cat life"
           }
         }
       }
@@ -1252,6 +1362,50 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sleepy"
+          }
+        }
+      }
+    },
+    "music.calm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calm"
+          }
+        }
+      }
+    },
+    "music.retro16": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retro 16-bit"
+          }
+        }
+      }
+    },
+    "music.retro8": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retro 8-bit"
+          }
+        }
+      }
+    },
+    "music.upbeat": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upbeat"
           }
         }
       }

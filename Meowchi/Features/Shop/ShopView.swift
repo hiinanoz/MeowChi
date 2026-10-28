@@ -56,13 +56,7 @@ struct SheetScaffold<Content: View>: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            HStack {
-                Text(title).font(PixelFont.body(17))
-                Spacer()
-                Button(action: onClose) { Text("common.close") }
-                    .font(PixelFont.body(12))
-                    .foregroundStyle(PixelPalette.accentShade)
-            }
+            PixelHeader(title: title, onBack: onClose)
             ScrollView {
                 VStack(spacing: 8) { content }
             }

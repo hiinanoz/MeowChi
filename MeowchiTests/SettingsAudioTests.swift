@@ -19,14 +19,18 @@ final class SettingsAudioTests: XCTestCase {
         var settings = store.state.settings
         settings.musicEnabled = false
         settings.musicVolume = 3
+        settings.musicTrack = "polka"
         store.updateSettings(settings)
         let reloaded = try XCTUnwrap(try save.load())
         XCTAssertFalse(reloaded.settings.musicEnabled)
         XCTAssertEqual(reloaded.settings.musicVolume, 1)
+        XCTAssertEqual(reloaded.settings.musicTrack, "calm", "unknown track falls back")
     }
 
     func testEveryAudioFileIsBundled() {
-        XCTAssertNotNil(Bundle.main.url(forResource: "music_home", withExtension: "caf"))
+        for track in MusicTrack.allCases {
+            XCTAssertNotNil(Bundle.main.url(forResource: track.fileName, withExtension: "caf"), track.fileName)
+        }
         for sound in AudioManager.Sound.allCases {
             XCTAssertNotNil(Bundle.main.url(forResource: sound.fileName, withExtension: "caf"), sound.fileName)
         }

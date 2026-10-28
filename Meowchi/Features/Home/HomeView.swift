@@ -4,6 +4,7 @@ import SwiftUI
 /// Main screen: HUD on top, the SpriteKit room in the middle, the action bar at the bottom.
 @MainActor
 struct HomeView: View {
+    var onMainMenu: @MainActor () -> Void = {}
     @Environment(GameStore.self) private var store
     @Environment(\.scenePhase) private var scenePhase
     @State private var scene = RoomScene(size: CGSize(width: 390, height: 500))
@@ -21,7 +22,8 @@ struct HomeView: View {
     var body: some View {
         VStack(spacing: 8) {
             HUDView(onShop: { panel = nil; showShop = true }, onTasks: { panel = nil; showTasks = true },
-                    onSettings: { panel = nil; showSettings = true })
+                    onSettings: { panel = nil; showSettings = true },
+                    onMainMenu: { panel = nil; setBrushing(false); onMainMenu() })
             SpriteView(scene: scene, preferredFramesPerSecond: 60, options: [.ignoresSiblingOrder])
                 .clipShape(PixelBorder(step: 4))
                 .overlay(PixelBorder(step: 4).stroke(PixelPalette.ink, lineWidth: 2))
@@ -37,7 +39,17 @@ struct HomeView: View {
                 .overlay(alignment: .bottom) {
                     VStack(spacing: 0) {
                         if isBrushing { brushBanner } else { TutorialBanner() }
-                        panelView.padding(8)
+                        panelView
+                            .overlay(alignment: .topTrailing) {
+                                if panel != nil {
+                                    Button { withAnimation(.easeOut(duration: 0.2)) { panel = nil } } label: {
+                                        PixelIcon(name: "icon_close", size: 12).padding(10)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .accessibilityLabel(Text("common.close"))
+                                }
+                            }
+                            .padding(8)
                     }
                     .animation(.easeOut(duration: 0.2), value: panel)
                 }

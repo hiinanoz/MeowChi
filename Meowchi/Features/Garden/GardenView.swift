@@ -17,18 +17,13 @@ struct GardenView: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            HStack(spacing: 10) {
-                Text("game.garden.title").font(PixelFont.body(15))
-                Spacer()
+            PixelHeader(title: "game.garden.title", onBack: { goHome() }) {
                 if let walk = store.activeWalk {
                     Label { Text(verbatim: "\(walk.finds.filter(\.collected).count)/\(walk.finds.count)") }
                         icon: { PixelIcon(name: "fx_sparkle", size: 14) }
+                        .font(PixelFont.body(12))
                 }
-                Button { goHome() } label: { Text(phase == .walking ? "garden.goHome" : "common.close") }
-                    .font(PixelFont.body(12))
-                    .foregroundStyle(PixelPalette.accentShade)
             }
-            .font(PixelFont.body(13))
             .padding(10)
             .pixelPanel()
             SpriteView(scene: scene, preferredFramesPerSecond: 60, options: [.ignoresSiblingOrder])

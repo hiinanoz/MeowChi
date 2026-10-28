@@ -1,5 +1,12 @@
 import SwiftUI
 
+/// "Ready" or the time left until a cooldown ends.
+@MainActor
+func readiness(_ date: Date?) -> Text {
+    guard let date, date > .now else { return Text("care.ready").foregroundColor(PixelPalette.good) }
+    return Text(date, style: .relative)
+}
+
 /// Bottom-sheet style panels that open above the action bar.
 enum CarePanel: Equatable {
     case food, clean, play, health
@@ -59,9 +66,9 @@ struct CleanPanel: View {
 
     var body: some View {
         PanelContainer(title: "action.clean") {
-            Button { onBath() } label: { PanelRow(icon: "icon_clean", title: "clean.bath", detail: nil) }
+            Button { onBath() } label: { PanelRow(icon: "icon_clean", title: "clean.bath", detail: readiness(store.bathReadyAt)) }
                 .buttonStyle(.plain)
-            Button { onBrush() } label: { PanelRow(icon: "icon_brush", title: "clean.brush", detail: nil) }
+            Button { onBrush() } label: { PanelRow(icon: "icon_brush", title: "clean.brush", detail: Text("clean.brush.detail")) }
                 .buttonStyle(.plain)
             Button { onLitter() } label: {
                 PanelRow(icon: "icon_cleanliness", title: "clean.litter",
@@ -97,7 +104,11 @@ struct HealthPanel: View {
                 }
             }
             .buttonStyle(PixelButtonStyle(fill: PixelPalette.good))
-            Text("health.vet.hint").font(PixelFont.body(9)).foregroundStyle(PixelPalette.accentShade)
+            HStack(spacing: 4) {
+                Text("health.vet.hint")
+                readiness(store.vetReadyAt)
+            }
+            .font(PixelFont.body(9)).foregroundStyle(PixelPalette.accentShade)
         }
     }
 

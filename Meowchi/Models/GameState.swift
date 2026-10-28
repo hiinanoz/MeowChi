@@ -124,6 +124,8 @@ struct CareState: Codable, Equatable {
     var lastVetAt: Date?
     var lastNailTrimAt: Date?
     var lastScratchAt: Date?
+    var lastFriendVisitAt: Date?
+    var lastTVAt: Date?
     var brushLog = RewardLog(windowStart: .distantPast)
 
     init() {}
@@ -136,6 +138,8 @@ struct CareState: Codable, Equatable {
         lastVetAt = try c.decodeIfPresent(Date.self, forKey: .lastVetAt)
         lastNailTrimAt = try c.decodeIfPresent(Date.self, forKey: .lastNailTrimAt)
         lastScratchAt = try c.decodeIfPresent(Date.self, forKey: .lastScratchAt)
+        lastFriendVisitAt = try c.decodeIfPresent(Date.self, forKey: .lastFriendVisitAt)
+        lastTVAt = try c.decodeIfPresent(Date.self, forKey: .lastTVAt)
         brushLog = try c.decodeIfPresent(RewardLog.self, forKey: .brushLog) ?? RewardLog(windowStart: .distantPast)
     }
 }

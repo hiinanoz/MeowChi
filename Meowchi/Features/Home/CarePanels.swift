@@ -15,11 +15,21 @@ enum CarePanel: Equatable {
 @MainActor
 struct PlayPanel: View {
     @Environment(GameStore.self) private var store
+    let onCozy: @MainActor () -> Void
+    let onFriend: @MainActor () -> Void
     let onLaser: @MainActor () -> Void
     let onGarden: @MainActor () -> Void
 
     var body: some View {
         PanelContainer(title: "action.play") {
+            Button { onCozy() } label: {
+                PanelRow(icon: "icon_happiness", title: "cozy.title", detail: Text("cozy.detail"))
+            }
+            .buttonStyle(.plain)
+            Button { onFriend() } label: {
+                PanelRow(icon: "icon_play", title: "friend.invite", detail: readiness(store.friendReadyAt))
+            }
+            .buttonStyle(.plain)
             Button { onLaser() } label: {
                 PanelRow(icon: "icon_play", title: MiniGameKind.laserChase.titleKey,
                          detail: Text("game.energyCost \(Int(store.balance.laserChase.energyCost))"))

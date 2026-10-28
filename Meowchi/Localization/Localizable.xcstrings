@@ -287,6 +287,39 @@
         }
       }
     },
+    "cozy.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pet up close"
+          }
+        }
+      }
+    },
+    "cozy.hint %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroke %@ slowly. Purrs guaranteed!"
+          }
+        }
+      }
+    },
+    "cozy.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cozy time"
+          }
+        }
+      }
+    },
     "customize.coat": {
       "extractionState": "manual",
       "localizations": {
@@ -998,6 +1031,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Wet Food"
+          }
+        }
+      }
+    },
+    "friend.arrived %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ came to visit!"
+          }
+        }
+      }
+    },
+    "friend.invite": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invite a friend"
           }
         }
       }
@@ -1923,6 +1978,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Feed your cat twice."
+          }
+        }
+      }
+    },
+    "task.friend1": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invite a friend over."
           }
         }
       }

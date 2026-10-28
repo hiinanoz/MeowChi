@@ -161,3 +161,18 @@ final class CareExtrasTests: XCTestCase {
         XCTAssertNil(care.lastNailTrimAt)
     }
 }
+
+@MainActor
+final class FriendTests: XCTestCase {
+    func testFriendVisitHasCooldownAndDiffersFromPlayer() {
+        var now = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = GameStore(saveStore: InMemorySaveStore(), clock: { now })
+        let (first, friend) = store.inviteFriend(seed: 3)
+        XCTAssertEqual(first, .ok)
+        XCTAssertNotEqual(friend?.look.coat, store.state.cat.look.coat)
+        now = now.addingTimeInterval(60)
+        XCTAssertEqual(store.inviteFriend().0, .tooSoon)
+        now = now.addingTimeInterval(Balance.standard.friendVisitCooldownHours * 3600)
+        XCTAssertEqual(store.inviteFriend().0, .ok)
+    }
+}

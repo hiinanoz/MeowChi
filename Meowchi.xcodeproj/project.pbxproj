@@ -340,6 +340,7 @@
 			isa = PBXGroup;
 			children = (
 				76A2EB9CFAAFDC91733066FE,
+				7115448C6E1621F02CE8CE7B,
 				CB56D8D48D7229C13626A421,
 				B2FA4A830BFFBD21DE322421,
 				11AF12A87622A613DAE4C415,
@@ -591,6 +592,14 @@
 			isa = PBXBuildFile;
 			fileRef = C38CF4ADFAC5DB20A94BC4F2;
 		};
+		7115448C6E1621F02CE8CE7B = {
+			isa = PBXGroup;
+			children = (
+				78614B87F7D046494071D5B8,
+			);
+			path = Cozy;
+			sourceTree = "<group>";
+		};
 		71EC139CFF6C64BFBCCF827D = {
 			isa = PBXBuildFile;
 			fileRef = 5274747BC7D6552F40B2B1A7;
@@ -624,6 +633,12 @@
 		772F9DDC1B2C2F1F7B100B44 = {
 			isa = PBXBuildFile;
 			fileRef = 4F1F491039760DF3DC099379;
+		};
+		78614B87F7D046494071D5B8 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = CozyView.swift;
+			sourceTree = "<group>";
 		};
 		7B3171749DEA097B2D9242BA = {
 			isa = PBXFileReference;
@@ -895,6 +910,10 @@
 			includeInIndex = 0;
 			path = MeowchiTests.xctest;
 			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		ACCD548B98951BF0FF513D86 = {
+			isa = PBXBuildFile;
+			fileRef = 78614B87F7D046494071D5B8;
 		};
 		B1C979E584FACB39F807F225 = {
 			isa = PBXBuildFile;
@@ -1197,6 +1216,7 @@
 				54C6F49BDA0C9C63E4CB70E5,
 				3CD5F876D3396D6125FF6250,
 				5010629949EB1FA3E866EED3,
+				ACCD548B98951BF0FF513D86,
 				F33BD2DB8EDB378A35E7FA20,
 				88E8B294FDA2F5CE596D23CD,
 				D55CDEF545172B9A0F09A3F2,

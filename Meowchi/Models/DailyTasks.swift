@@ -37,6 +37,7 @@ struct DailyTasks: Codable, Equatable {
         DailyTaskDefinition(id: "task.happy80", event: .reachedHappiness, target: 1, coins: 20, xp: 5),
         DailyTaskDefinition(id: "task.walk1", event: .walked, target: 1, coins: 20, xp: 5),
         DailyTaskDefinition(id: "task.water1", event: .waterChanged, target: 1, coins: 10, xp: 3),
+        DailyTaskDefinition(id: "task.friend1", event: .friendVisited, target: 1, coins: 15, xp: 4),
     ]
 
     static func definition(_ id: String) -> DailyTaskDefinition? { pool.first { $0.id == id } }

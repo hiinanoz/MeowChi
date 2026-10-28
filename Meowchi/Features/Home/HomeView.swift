@@ -17,6 +17,7 @@ struct HomeView: View {
     @State private var showDecor = false
     @State private var showSettings = false
     @State private var showNails = false
+    @State private var showCozy = false
     @State private var activeGame: MiniGameKind?
     @State private var showGarden = false
 
@@ -61,6 +62,7 @@ struct HomeView: View {
         .sheet(isPresented: $showDecor) { DecorView().environment(store) }
         .sheet(isPresented: $showSettings) { SettingsView().environment(store) }
         .sheet(isPresented: $showNails) { NailTrimView().environment(store) }
+        .fullScreenCover(isPresented: $showCozy) { CozyView().environment(store) }
         .onChange(of: store.isWaterLow) { _, _ in scene.refreshWater() }
         .onChange(of: store.state.decor) { _, _ in scene.applyDecor() }
         .onChange(of: store.state.cat.look) { _, _ in scene.applyDecor() }
@@ -85,6 +87,7 @@ struct HomeView: View {
                 case "decor": showDecor = true
                 case "settings": showSettings = true
                 case "nails": showNails = true
+                case "cozy": showCozy = true
                 case "laser": activeGame = .laserChase
                 case "garden": showGarden = true
                 case "play": panel = .play
@@ -159,7 +162,9 @@ struct HomeView: View {
             )
             .transition(.move(edge: .bottom).combined(with: .opacity))
         case .play:
-            PlayPanel(onLaser: { startActivity { activeGame = .laserChase } },
+            PlayPanel(onCozy: { startActivity { showCozy = true } },
+                      onFriend: inviteFriend,
+                      onLaser: { startActivity { activeGame = .laserChase } },
                       onGarden: { startActivity { showGarden = true } })
                 .transition(.move(edge: .bottom).combined(with: .opacity))
         case .health:
@@ -207,6 +212,15 @@ struct HomeView: View {
     private func setBrushing(_ on: Bool) {
         isBrushing = on
         scene.isBrushing = on
+    }
+
+    private func inviteFriend() {
+        let (result, friend) = store.inviteFriend()
+        run(result, noReward: nil) {
+            guard let friend else { return }
+            scene.playFriendVisit(look: friend.look)
+            show("friend.arrived \(friend.name)")
+        }
     }
 
     private func startActivity(_ open: () -> Void) {

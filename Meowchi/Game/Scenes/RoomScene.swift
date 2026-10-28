@@ -49,6 +49,7 @@ final class RoomScene: SKScene {
     private let waterBowl = SKSpriteNode(texture: SpriteLibrary.texture("bowl_water"))
     private let backdrop = RoomBackdrop()
     private let attentionBubble = SKSpriteNode()
+    private weak var friendNode: CatNode?
     /// Furniture nodes driven by decoration slots.
     private var furniture: [DecorSlot: SKSpriteNode] = [:]
     private let nightOverlay = SKSpriteNode(color: SKColor(red: 0.08, green: 0.07, blue: 0.25, alpha: 1), size: RoomScene.roomSize)
@@ -145,6 +146,11 @@ final class RoomScene: SKScene {
         cat.sprite.position = CGPoint(x: cat.position.x.rounded() - cat.position.x,
                                       y: cat.position.y.rounded() - cat.position.y)
         cat.zPosition = depth(for: cat.position.y)
+        if let friend = friendNode {
+            friend.sprite.position = CGPoint(x: friend.position.x.rounded() - friend.position.x,
+                                             y: friend.position.y.rounded() - friend.position.y)
+            friend.zPosition = depth(for: friend.position.y)
+        }
     }
 
     private func decideNextBehavior(mood: Mood) {
@@ -328,6 +334,44 @@ final class RoomScene: SKScene {
         }
     }
 
+    /// A friend walks in, the cats greet and chase a little, then the friend leaves. ~14 s.
+    func playFriendVisit(look: CatLook) {
+        cancelScript()
+        cat.isScripted = true
+        let friend = CatNode()
+        friend.look = look
+        friend.setTailMood(.happy)
+        friend.position = CGPoint(x: -40, y: 70)
+        world.addChild(friend)
+        let meet = CGPoint(x: 150, y: 70)
+        friend.walk(to: meet)
+        cat.walk(to: CGPoint(x: meet.x + 44, y: meet.y)) { [weak self] in
+            guard let self else { return }
+            self.cat.face(towardX: meet.x)
+            friend.face(towardX: self.cat.position.x)
+        }
+        let greet = SKAction.run { [weak self] in
+            self?.cat.react(.happy, duration: 2)
+            friend.react(.happy, duration: 2)
+            self?.spawnHearts()
+            AudioManager.shared.play(.meow)
+        }
+        let chase = SKAction.run { [weak self] in
+            guard let self else { return }
+            let spot = self.randomFloorPoint()
+            friend.walk(to: spot)
+            self.cat.walk(to: CGPoint(x: spot.x + 36, y: spot.y))
+        }
+        let leave = SKAction.run { friend.walk(to: CGPoint(x: -60, y: 70)) { friend.removeFromParent() } }
+        let done = SKAction.run { [weak self] in
+            self?.cat.isScripted = false
+            self?.cat.play(.idle)
+        }
+        run(.sequence([.wait(forDuration: 3.5), greet, .wait(forDuration: 2.5), chase, .wait(forDuration: 3),
+                       chase, .wait(forDuration: 3), leave, .wait(forDuration: 2), done]), withKey: "script")
+        friendNode = friend
+    }
+
     /// Bowl art follows the water level; after a refresh the cat comes for a drink.
     func refreshWater(drink: Bool = false) {
         waterBowl.texture = SpriteLibrary.texture(store?.isWaterLow == true ? "bowl_empty" : "bowl_water")
@@ -430,6 +474,7 @@ final class RoomScene: SKScene {
 
     private func cancelScript() {
         removeAction(forKey: "script")
+        friendNode?.removeFromParent()
         world.childNode(withName: "tub")?.removeFromParent()
         cat.stopMoving()
         foodBowl.texture = SpriteLibrary.texture("bowl_empty")

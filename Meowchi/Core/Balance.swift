@@ -33,6 +33,15 @@ struct Balance {
     var scratchCooldownMinutes = 30.0
     var scratchChance = 0.08
 
+    // Friends & TV
+    var friendVisitCooldownHours = 4.0
+    var friendVisitHappiness = 12.0
+    var friendVisitXP = 5
+    var tvCooldownHours = 2.0
+    var tvHappiness = 8.0
+    var tvEnergy = -3.0
+    var tvXP = 3
+
     // MARK: Health
     var healthRecoveryPerHour = 1.0
     var healthDecayPerHour = 1.5

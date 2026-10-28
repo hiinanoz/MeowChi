@@ -264,6 +264,35 @@ final class GameStore {
         return .ok
     }
 
+    // MARK: Friends
+
+    struct FriendCat: Equatable {
+        let name: String
+        let look: CatLook
+    }
+
+    var friendReadyAt: Date? { readyAt(state.care.lastFriendVisitAt, hours: balance.friendVisitCooldownHours) }
+
+    /// A neighbour cat drops by. Returns the result and, on success, who came.
+    func inviteFriend(seed: UInt64? = nil) -> (ActionResult, FriendCat?) {
+        let now = clock()
+        if let result = careGuard(now) { return (result, nil) }
+        guard !isOnCooldown(state.care.lastFriendVisitAt, hours: balance.friendVisitCooldownHours, now: now) else { return (.tooSoon, nil) }
+        var rng = SplitMix64(seed: seed ?? UInt64(bitPattern: Int64(now.timeIntervalSince1970)))
+        let names = ["Luna", "Kiki", "Tofu", "Mango", "Sushi", "Pudding", "Miso", "Nori"]
+        func pick<T>(_ items: [T]) -> T { items[Int(rng.next() % UInt64(items.count))] }
+        var look = CatLook(coat: pick(CatCoat.allCases).rawValue, ears: pick(EarStyle.allCases).rawValue,
+                           tail: pick(TailLength.allCases).rawValue)
+        if look.coat == state.cat.look.coat { look.coat = (look.coatValue == .smoke ? CatCoat.cream : .smoke).rawValue }
+        state.care.lastFriendVisitAt = now
+        state.cat.stats[.happiness] += balance.friendVisitHappiness
+        grantXP(balance.friendVisitXP)
+        record(.friendVisited)
+        busyUntil = now.addingTimeInterval(14)
+        save()
+        return (.ok, FriendCat(name: pick(names), look: look))
+    }
+
     var isLitterDirty: Bool { state.care.litter >= balance.litterDirtyThreshold }
 
     /// Shared preconditions for actions that involve the cat.

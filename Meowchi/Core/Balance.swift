@@ -73,6 +73,16 @@ struct Balance {
     var laserChase = MiniGameConfig(durationSeconds: 45, energyCost: 10, minimumEnergy: 15, happiness: 12,
                                     coinsPerPoint: 2, xpPerPoint: 1, maxRewardedPoints: 30, minSecondsPerPoint: 0.5)
 
+    // MARK: Garden walk
+    var walkEnergyCost = 8.0
+    var walkMinimumEnergy = 12.0
+    var walkHappiness = 8.0
+    var walkXP = 3
+    var walkFindCount = 5
+    var walkCoinRange = 3...8
+    var walkItemChance = 0.2
+    var walkItemPool = ["food.treat", "food.fish"]
+
     // MARK: Daily tasks
     var dailyTaskCount = 4
     var allTasksBonusCoins = 40

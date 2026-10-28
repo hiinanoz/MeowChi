@@ -12,6 +12,7 @@ struct MeowchiApp: App {
             store.completeOnboarding(name: "Mochi")
             store.tutorialStep = nil
         }
+        if CommandLine.arguments.contains("-refillStats") { store.debugRefill() }
         #endif
     }
 

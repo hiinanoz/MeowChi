@@ -650,6 +650,28 @@
         }
       }
     },
+    "game.garden.hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap the path to walk. Tap a sparkle to dig up a surprise!"
+          }
+        }
+      }
+    },
+    "game.garden.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garden Walk"
+          }
+        }
+      }
+    },
     "game.laserChase.hint": {
       "extractionState": "manual",
       "localizations": {
@@ -701,6 +723,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Start"
+          }
+        }
+      }
+    },
+    "garden.goHome": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go home"
+          }
+        }
+      }
+    },
+    "garden.summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What a lovely walk!"
           }
         }
       }
@@ -1241,6 +1285,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Play one mini-game."
+          }
+        }
+      }
+    },
+    "task.walk1": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Take your cat for a walk."
           }
         }
       }

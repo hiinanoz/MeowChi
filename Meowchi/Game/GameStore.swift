@@ -39,6 +39,8 @@ final class GameStore {
     private let calendar: () -> Calendar
     /// The mini-game in progress. Not persisted: quitting the app forfeits the round (energy was already paid).
     @ObservationIgnored private var activeGame: (kind: MiniGameKind, startedAt: Date)?
+    /// The garden walk in progress (not persisted; collected finds are already paid out).
+    private(set) var activeWalk: WalkSession?
     @ObservationIgnored private var busyUntil = Date.distantPast
     private let log = Logger(subsystem: "Meowchi", category: "GameStore")
 
@@ -317,6 +319,51 @@ final class GameStore {
 
     func cancelMiniGame() { activeGame = nil }
 
+    // MARK: Garden walk
+
+    @discardableResult
+    func startWalk(seed: UInt64? = nil) -> ActionResult {
+        let now = clock()
+        if let result = careGuard(now) { return result }
+        guard state.cat.stats.energy >= balance.walkMinimumEnergy else { return .tooTired }
+        state.cat.stats[.energy] -= balance.walkEnergyCost
+        activeWalk = .generate(seed: seed ?? UInt64(bitPattern: Int64(now.timeIntervalSince1970 * 1000)), balance: balance)
+        save()
+        return .ok
+    }
+
+    /// Pays out one find. Returns nil for an invalid index or a find that was already collected.
+    @discardableResult
+    func collectFind(_ index: Int) -> FindReward? {
+        guard var walk = activeWalk, walk.finds.indices.contains(index), !walk.finds[index].collected else { return nil }
+        walk.finds[index].collected = true
+        let reward = walk.finds[index].reward
+        switch reward {
+        case .coins(let amount):
+            state.coins += amount
+            walk.coinsFound += amount
+        case .item(let id):
+            state.inventory[id, default: 0] += 1
+            walk.itemsFound += 1
+        }
+        activeWalk = walk
+        save()
+        return reward
+    }
+
+    /// Ends the walk: a happier cat and a little XP. Returns the summary, or nil if no walk was running.
+    @discardableResult
+    func finishWalk() -> WalkSession? {
+        guard let walk = activeWalk else { return nil }
+        activeWalk = nil
+        simulate(clock())
+        state.cat.stats[.happiness] += balance.walkHappiness
+        grantXP(balance.walkXP)
+        record(.walked)
+        save()
+        return walk
+    }
+
     // MARK: Daily tasks
 
     func definition(for task: DailyTaskProgress) -> DailyTaskDefinition? { DailyTasks.definition(task.id) }
@@ -370,6 +417,15 @@ final class GameStore {
             levelUpCount += 1
         }
     }
+
+    #if DEBUG
+    /// QA helper (`-refillStats`): full needs and an awake cat.
+    func debugRefill() {
+        state.cat.stats = CatStats(hunger: 100, energy: 100, happiness: 100, cleanliness: 100, health: 100)
+        state.cat.isSleeping = false
+        save()
+    }
+    #endif
 
     // MARK: Persistence
 

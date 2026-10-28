@@ -26,7 +26,7 @@ Talk to the user in **Turkish**; code, identifiers and docs are in English. The 
 xcodebuild test -project Meowchi.xcodeproj -scheme Meowchi -destination 'platform=iOS Simulator,name=iPhone 15' CODE_SIGNING_ALLOWED=NO
 ```
 
-DEBUG launch arguments for screenshots: `-skipOnboarding` opens straight into the room; `-openScreen shop|tasks|laser|food|clean|health` opens that screen too.
+DEBUG launch arguments for screenshots: `-skipOnboarding` opens straight into the room; `-openScreen shop|tasks|decor|laser|garden|play|food|clean|health` opens that screen; `-refillStats` fills all needs.
 
 ## Workflow
 

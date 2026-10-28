@@ -128,3 +128,45 @@ final class GameplayTests: XCTestCase {
         XCTAssertEqual(store.state.daily.tasks[0].progress, 1)
     }
 }
+
+@MainActor
+final class WalkTests: XCTestCase {
+    private let now = Date(timeIntervalSince1970: 1_800_000_000)
+
+    private func makeStore(energy: Double = 60) -> GameStore {
+        var state = GameState.newGame(now: now, balance: .standard)
+        state.cat.stats.energy = energy
+        let now = now
+        return GameStore(saveStore: InMemorySaveStore(state: state), clock: { now })
+    }
+
+    func testWalkGenerationIsDeterministicAndInRange() {
+        let balance = Balance.standard
+        let a = WalkSession.generate(seed: 42, balance: balance)
+        XCTAssertEqual(a, WalkSession.generate(seed: 42, balance: balance))
+        XCTAssertEqual(a.finds.count, balance.walkFindCount)
+        for find in a.finds {
+            XCTAssertTrue((0...1).contains(find.x) && (0...1).contains(find.y))
+            if case .coins(let c) = find.reward { XCTAssertTrue(balance.walkCoinRange.contains(c)) }
+            if case .item(let id) = find.reward { XCTAssertTrue(balance.walkItemPool.contains(id)) }
+        }
+    }
+
+    func testFindsPayOnceAndWalkNeedsEnergy() {
+        XCTAssertEqual(makeStore(energy: 5).startWalk(), .tooTired)
+        let store = makeStore()
+        XCTAssertNil(store.collectFind(0), "no walk yet")
+        XCTAssertEqual(store.startWalk(seed: 1), .ok)
+        XCTAssertEqual(store.state.cat.stats.energy, 60 - Balance.standard.walkEnergyCost, accuracy: 0.001)
+        let coins = store.state.coins
+        let reward = store.collectFind(0)
+        XCTAssertNotNil(reward)
+        XCTAssertNil(store.collectFind(0), "already dug up")
+        XCTAssertNil(store.collectFind(99))
+        if case .coins(let c) = reward { XCTAssertEqual(store.state.coins, coins + c) }
+        let summary = store.finishWalk()
+        XCTAssertEqual(summary?.finds.filter(\.collected).count, 1)
+        XCTAssertNil(store.activeWalk)
+        XCTAssertNil(store.finishWalk(), "finishes once")
+    }
+}

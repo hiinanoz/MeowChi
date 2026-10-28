@@ -45,6 +45,7 @@ AI image tools don't produce real pixel grids. Each image needs these steps:
 | Sad | `cat_sad` | |
 | Eat | `cat_eat_0`, `cat_eat_1` (head down toward a bowl on the left) | 0.22 s |
 | Sleep | `cat_sleep_0`, `cat_sleep_1` (curled up, breathing) | 0.9 s |
+| Coat colors | every frame above again as `cat_gray_white_<frame>` and `cat_cream_<frame>` (e.g. `cat_cream_idle_0`) | the default ginger coat keeps the plain `cat_<frame>` names |
 | Coming in Phases 3–5 | drink, wake-up, jump, turn, groom, look around, excited, curious, annoyed, purr, play, bath | |
 
 **Highest priority for final art:** idle, blink, walk (side view), happy, sleep. These are on screen most of the time.
@@ -53,7 +54,16 @@ AI image tools don't produce real pixel grids. Each image needs these steps:
 
 | Asset | Canvas | Notes |
 |---|---|---|
-| `room_background` | 440×720 | the core 360×400 room sits at offset (40, 160) from the top left; inside the core, the floor starts 240 px from its top. The outer area only shows on tall or wide phones; keep it to plain wall and floor. Window, rug and frames go inside the core. |
+| `wall_stripes`, `wall_mint`, `wall_dots` | 440×720 | wallpaper layer: paint only the wall + baseboard (top 640 rows of the padded canvas: 160 padding + 240 core rows), transparent below. The core 360×400 room sits at offset (40, 160). |
+| `floor_wood`, `floor_tiles` | 440×720 | floor layer: paint only below row 640, transparent above |
+| `window_basic` | 176×152 | window + curtains; top-left at core (92, 28) |
+| `rug_oval`, `rug_blue`, `rug_leaf` | 220×96 | centered at core (180, 330 from top) |
+| `frame_sun`, `frame_fish`, `frame_clock` | 48×40 | wall art; top-left at core (284, 76) |
+| `bed_cloud`, `bed_royal` | 72×28 | bed variants |
+| `post_tower` | 48×104 | scratcher variant |
+| `plant_cactus` | 32×48 | |
+| `toy_mouse` | 28×18 | |
+| `garden_background` | 1080×720 | side-scrolling garden; same vertical layout as the room (core band rows 160–560, ground starts at row 400, path rows 448–540) |
 | `bed_basic` | 72×28 | anchor: bottom center (applies to every object) |
 | `bowl_empty` / `bowl_food` / `bowl_water` | 32×18 | |
 | `scratching_post` | 32×72 | |

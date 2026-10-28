@@ -414,6 +414,43 @@ def toy_mouse():
     return c
 
 
+def garden():
+    """Side-scrolling garden, 540x360 logical (1080x720 PNG). Same vertical layout as the room:
+    the 200-row core starts at row 80 and the ground starts 120 rows into the core."""
+    import random
+    rnd = random.Random(7)
+    c = Canvas(540, 360)
+    ground = 200
+    for y in range(ground):
+        t = y / ground
+        col = tuple(int(a + (b - a) * t) for a, b in zip((160, 210, 245), (215, 238, 250))) + (255,)
+        c.rect(0, y, 540, 1, col)
+    for cx, cy in ((60, 60), (210, 40), (380, 70), (500, 35)):
+        for dx, dy, r in ((-8, 2, 7), (0, 0, 9), (9, 2, 7)):
+            c.ellipse(cx + dx, cy + dy, r * 1.3, r * .8, (255, 255, 255, 255))
+    for cx, rx, col in ((90, 130, (170, 215, 160, 255)), (330, 160, (165, 210, 150, 255)), (520, 110, (175, 218, 165, 255))):
+        c.ellipse(cx, ground + 6, rx, 44, col)
+    for cx in (70, 290, 455):
+        c.rect(cx - 3, ground - 34, 6, 34, (150, 100, 70, 255))
+        c.shaded_ellipse(cx, ground - 46, 22, 20, (110, 175, 100, 255), (85, 145, 80, 255), (140, 200, 120, 255))
+    for x in range(0, 540, 12):
+        c.rect(x + 2, ground - 22, 5, 22, (250, 245, 235, 255)); c.rect(x + 2, ground - 22, 5, 1, (210, 200, 190, 255))
+    c.rect(0, ground - 16, 540, 2, (235, 228, 215, 255)); c.rect(0, ground - 7, 540, 2, (235, 228, 215, 255))
+    for y in range(ground, 360):
+        for x in range(540):
+            c.set(x, y, (132, 196, 104, 255) if (x * 7 + y * 13) % 23 else (112, 176, 90, 255))
+    c.rect(0, ground + 24, 540, 46, (226, 198, 152, 255))
+    c.rect(0, ground + 24, 540, 2, (200, 170, 125, 255)); c.rect(0, ground + 68, 540, 2, (200, 170, 125, 255))
+    for _ in range(60):
+        c.rect(rnd.randrange(540), rnd.randrange(ground + 27, ground + 66), 2, 1, (190, 160, 120, 255))
+    for cx in (30, 160, 250, 410, 515):
+        c.shaded_ellipse(cx, ground + 4, 14, 8, (95, 160, 85, 255), (75, 135, 70, 255))
+    for _ in range(140):
+        x, y = rnd.randrange(540), rnd.choice([rnd.randrange(ground + 6, ground + 22), rnd.randrange(ground + 74, 360)])
+        c.rect(x, y, 2, 2, rnd.choice([(250, 160, 190, 255), (255, 230, 110, 255), (255, 255, 255, 255), (200, 170, 240, 255)]))
+    return c
+
+
 CAT_COLORWAYS = {  # appearance id: palette overrides (orange_white is the default art)
     "gray_white": {"O": (160, 165, 182, 255), "D": (112, 117, 138, 255), "OS": (136, 141, 160, 255), "OL": (196, 200, 214, 255)},
     "cream": {"O": (240, 214, 176, 255), "D": (204, 160, 116, 255), "OS": (220, 190, 150, 255), "OL": (250, 232, 205, 255)},
@@ -462,6 +499,7 @@ def main():
     frames.update({name: wall(*spec) for name, spec in WALLS.items()})
     frames.update({name: floor(style) for name, style in FLOORS.items()})
     frames.update({name: rug(*spec) for name, spec in RUGS.items()})
+    frames["garden_background"] = garden()
     cat_specs = {
         "idle_0": lambda: cat_sit(tail=0), "idle_1": lambda: cat_sit(tail=1, breath=1),
         "blink": lambda: cat_sit(eyes="closed", tail=0),

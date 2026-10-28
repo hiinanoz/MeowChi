@@ -15,6 +15,7 @@ struct HomeView: View {
     @State private var showTasks = false
     @State private var showDecor = false
     @State private var activeGame: MiniGameKind?
+    @State private var showGarden = false
 
     var body: some View {
         VStack(spacing: 8) {
@@ -38,7 +39,7 @@ struct HomeView: View {
                     }
                     .animation(.easeOut(duration: 0.2), value: panel)
                 }
-            ActionBar(panel: $panel, onPlay: play, onToggleSleep: toggleSleep)
+            ActionBar(panel: $panel, onToggleSleep: toggleSleep)
         }
         .sheet(isPresented: $showShop) { ShopView().environment(store) }
         .sheet(isPresented: $showTasks) { TasksView().environment(store) }
@@ -46,6 +47,7 @@ struct HomeView: View {
         .onChange(of: store.state.decor) { _, _ in scene.applyDecor() }
         .onChange(of: store.state.cat.appearanceID) { _, _ in scene.applyDecor() }
         .fullScreenCover(item: $activeGame) { MiniGameView(kind: $0).environment(store) }
+        .fullScreenCover(isPresented: $showGarden) { GardenView().environment(store) }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .background(PixelPalette.frame.ignoresSafeArea())
@@ -59,6 +61,8 @@ struct HomeView: View {
                 case "tasks": showTasks = true
                 case "decor": showDecor = true
                 case "laser": activeGame = .laserChase
+                case "garden": showGarden = true
+                case "play": panel = .play
                 case "food": panel = .food
                 case "clean": panel = .clean
                 case "health": panel = .health
@@ -109,6 +113,10 @@ struct HomeView: View {
                 onLitter: { run(store.cleanLitter(), noReward: "notice.litterClean") { scene.refreshLitter(sparkle: true) } }
             )
             .transition(.move(edge: .bottom).combined(with: .opacity))
+        case .play:
+            PlayPanel(onLaser: { startActivity { activeGame = .laserChase } },
+                      onGarden: { startActivity { showGarden = true } })
+                .transition(.move(edge: .bottom).combined(with: .opacity))
         case .health:
             HealthPanel { run(store.visitVet(), noReward: "notice.healthy") { scene.playVet() } }
                 .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -156,11 +164,11 @@ struct HomeView: View {
         scene.isBrushing = on
     }
 
-    private func play() {
+    private func startActivity(_ open: () -> Void) {
         panel = nil
         setBrushing(false)
         if store.state.cat.isSleeping { return show("notice.sleeping") }
-        activeGame = .laserChase
+        open()
     }
 
     private func toggleSleep() {
@@ -180,7 +188,6 @@ struct HomeView: View {
 private struct ActionBar: View {
     @Environment(GameStore.self) private var store
     @Binding var panel: CarePanel?
-    let onPlay: @MainActor () -> Void
     let onToggleSleep: @MainActor () -> Void
 
     var body: some View {
@@ -189,8 +196,8 @@ private struct ActionBar: View {
             ActionButton(icon: "icon_hunger", title: "action.feed", selected: panel == .food) { toggle(.food) }
                 .disabled(sleeping)
             ActionButton(icon: "icon_clean", title: "action.clean", selected: panel == .clean) { toggle(.clean) }
-            ActionButton(icon: "icon_play", title: "action.play", selected: false,
-                         fill: Color(red: 0.98, green: 0.70, blue: 0.78)) { onPlay() }
+            ActionButton(icon: "icon_play", title: "action.play", selected: panel == .play,
+                         fill: Color(red: 0.98, green: 0.70, blue: 0.78)) { toggle(.play) }
                 .disabled(sleeping)
             ActionButton(icon: "icon_energy", title: sleeping ? "action.wake" : "action.sleep", selected: false,
                          fill: Color(red: 0.62, green: 0.74, blue: 0.98)) { onToggleSleep() }

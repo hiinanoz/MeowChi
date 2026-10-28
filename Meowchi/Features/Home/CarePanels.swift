@@ -2,7 +2,29 @@ import SwiftUI
 
 /// Bottom-sheet style panels that open above the action bar.
 enum CarePanel: Equatable {
-    case food, clean, health
+    case food, clean, play, health
+}
+
+@MainActor
+struct PlayPanel: View {
+    @Environment(GameStore.self) private var store
+    let onLaser: @MainActor () -> Void
+    let onGarden: @MainActor () -> Void
+
+    var body: some View {
+        PanelContainer(title: "action.play") {
+            Button { onLaser() } label: {
+                PanelRow(icon: "icon_play", title: MiniGameKind.laserChase.titleKey,
+                         detail: Text("game.energyCost \(Int(store.balance.laserChase.energyCost))"))
+            }
+            .buttonStyle(.plain)
+            Button { onGarden() } label: {
+                PanelRow(icon: "fx_sparkle", title: "game.garden.title",
+                         detail: Text("game.energyCost \(Int(store.balance.walkEnergyCost))"))
+            }
+            .buttonStyle(.plain)
+        }
+    }
 }
 
 @MainActor
@@ -86,7 +108,7 @@ struct HealthPanel: View {
     }
 }
 
-private struct PanelContainer<Content: View>: View {
+struct PanelContainer<Content: View>: View {
     let title: LocalizedStringKey
     @ViewBuilder let content: Content
 
@@ -102,7 +124,7 @@ private struct PanelContainer<Content: View>: View {
     }
 }
 
-private struct PanelRow: View {
+struct PanelRow: View {
     let icon: String
     let title: LocalizedStringKey
     let detail: Text?

@@ -179,6 +179,12 @@
 			path = HUDView.swift;
 			sourceTree = "<group>";
 		};
+		380E4218840FC6C19BDD46A8 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = Walk.swift;
+			sourceTree = "<group>";
+		};
 		3CD5F876D3396D6125FF6250 = {
 			isa = PBXBuildFile;
 			fileRef = FE5C46E160C6D42D40175B51;
@@ -249,6 +255,7 @@
 			isa = PBXGroup;
 			children = (
 				CB56D8D48D7229C13626A421,
+				B2FA4A830BFFBD21DE322421,
 				11AF12A87622A613DAE4C415,
 				8C8BFF97D4427BB7DA313615,
 				2ABDAA1F2FC7BA27B6D5E174,
@@ -266,6 +273,10 @@
 			);
 			path = Shared;
 			sourceTree = "<group>";
+		};
+		4C84BA05AA47F3B33BE3D7FC = {
+			isa = PBXBuildFile;
+			fileRef = 6719EBD4F1F228FC09A46FB6;
 		};
 		4D5B1C97095A6DCC0A47FBE8 = {
 			isa = PBXBuildFile;
@@ -337,6 +348,20 @@
 			path = Core;
 			sourceTree = "<group>";
 		};
+		59554AA77E05EE549D14631D = {
+			isa = PBXGroup;
+			children = (
+				6719EBD4F1F228FC09A46FB6,
+			);
+			path = Garden;
+			sourceTree = "<group>";
+		};
+		5C44811EE72F89E6B6EBB883 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = GardenView.swift;
+			sourceTree = "<group>";
+		};
 		5DE577FFAB824FEF616568CF = {
 			isa = PBXGroup;
 			children = (
@@ -354,6 +379,7 @@
 				C69C64B1AC9D66D3E1F613F2,
 				68549A064F85EDA1EC86D408,
 				A0E6A47092FB2B38ADF1201D,
+				380E4218840FC6C19BDD46A8,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -368,6 +394,12 @@
 				A61DA19FB4D2F4865E349C36,
 			);
 			path = MiniGames;
+			sourceTree = "<group>";
+		};
+		6719EBD4F1F228FC09A46FB6 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = GardenScene.swift;
 			sourceTree = "<group>";
 		};
 		6811F60E3E123DA7324FFE5D = {
@@ -389,6 +421,7 @@
 			children = (
 				9296D7564BCB5E19556C7808,
 				DAE215AAC8568CFABE38AC45,
+				59554AA77E05EE549D14631D,
 				6515A609724A5E5075B85003,
 				9A3FD2639F3FE963123F8B60,
 				A785C618E41568D8867C57F5,
@@ -486,6 +519,10 @@
 			lastKnownFileType = sourcecode.swift;
 			path = TasksView.swift;
 			sourceTree = "<group>";
+		};
+		88E8B294FDA2F5CE596D23CD = {
+			isa = PBXBuildFile;
+			fileRef = 5C44811EE72F89E6B6EBB883;
 		};
 		8A2934BF8E67675297A3835F = {
 			isa = PBXGroup;
@@ -630,6 +667,18 @@
 			includeInIndex = 0;
 			path = MeowchiTests.xctest;
 			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B1C979E584FACB39F807F225 = {
+			isa = PBXBuildFile;
+			fileRef = 380E4218840FC6C19BDD46A8;
+		};
+		B2FA4A830BFFBD21DE322421 = {
+			isa = PBXGroup;
+			children = (
+				5C44811EE72F89E6B6EBB883,
+			);
+			path = Garden;
+			sourceTree = "<group>";
 		};
 		B61A476A5531CC175278BDCF = {
 			isa = XCConfigurationList;
@@ -855,6 +904,7 @@
 				54C6F49BDA0C9C63E4CB70E5,
 				3CD5F876D3396D6125FF6250,
 				F33BD2DB8EDB378A35E7FA20,
+				88E8B294FDA2F5CE596D23CD,
 				D55CDEF545172B9A0F09A3F2,
 				D6C4B81BC28233E2FF4E74C3,
 				31402007750C9E62EFE4F6C8,
@@ -865,6 +915,7 @@
 				4D6AEE8206C6E53667815C96,
 				10E503C5A938234DB3E6EB61,
 				8FF958351626617C7DFD67A0,
+				4C84BA05AA47F3B33BE3D7FC,
 				D2278803016B4274806DD093,
 				0620665EAAAF5B5FE9E3713F,
 				238367DBEBE1F6AA71AAD920,
@@ -876,6 +927,7 @@
 				CE5A16000962214626D4EC4C,
 				D7EE625C8CD283337AA0E050,
 				FE2DB1CE5903E7B8B9031C70,
+				B1C979E584FACB39F807F225,
 				1F0052988AD48929DD91A0D5,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

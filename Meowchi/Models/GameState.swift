@@ -22,6 +22,10 @@ struct GameState: Codable, Equatable {
     var login = LoginState()
     /// Accessories the player owns.
     var wardrobe: Set<String> = []
+    /// Lifetime counts per TaskEvent raw value, plus "photos". Never reset; drives badges.
+    var lifetime: [String: Int] = [:]
+    /// Unlocked badge ids with the unlock date.
+    var badges: [String: Date] = [:]
 
     static func newGame(now: Date, balance: Balance) -> GameState {
         GameState(
@@ -116,6 +120,8 @@ extension GameState {
         decor = try c.decodeIfPresent(DecorState.self, forKey: .decor) ?? DecorState()
         login = try c.decodeIfPresent(LoginState.self, forKey: .login) ?? LoginState()
         wardrobe = try c.decodeIfPresent(Set<String>.self, forKey: .wardrobe) ?? []
+        lifetime = try c.decodeIfPresent([String: Int].self, forKey: .lifetime) ?? [:]
+        badges = try c.decodeIfPresent([String: Date].self, forKey: .badges) ?? [:]
     }
 }
 

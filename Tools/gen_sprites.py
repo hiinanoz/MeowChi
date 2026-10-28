@@ -535,10 +535,16 @@ ICONS = {
     "icon_back": ["...K...", "..KK...", ".KWKKKK", "KWWWWWK", ".KWKKKK", "..KK...", "...K..."],
     "icon_menu": ["KKKKKKK", "KWWWWWK", "KKKKKKK", "KWWWWWK", "KKKKKKK", "KWWWWWK", "KKKKKKK"],
     "icon_close": ["KK...KK", "KWK.KWK", ".KWKWK.", "..KWK..", ".KWKWK.", "KWK.KWK", "KK...KK"],
+    "icon_badge_bronze": ["KK...KK", "KRK.KRK", ".KRKRK.", ".KKKKK.", "KTTTTTK", "KTTHTTK", "KTTTTTK", ".KKKKK."],
+    "icon_badge_silver": ["KK...KK", "KRK.KRK", ".KRKRK.", ".KKKKK.", "KSSSSSK", "KSSHSSK", "KSSSSSK", ".KKKKK."],
+    "icon_badge_gold": ["KK...KK", "KRK.KRK", ".KRKRK.", ".KKKKK.", "KYYYYYK", "KYYHYYK", "KYYYYYK", ".KKKKK."],
+    "icon_badge_locked": ["KK...KK", "KLK.KLK", ".KLKLK.", ".KKKKK.", "KLLLLLK", "KLLKLLK", "KLLLLLK", ".KKKKK."],
+    "icon_camera": ["..KKK..", "KKKKKKK", "KWWKWWK", "KWKBKWK", "KWWKWWK", "KKKKKKK"],
+    "icon_collection": ["KKKKKKK", "KYKPKBK", "KKKKKKK", "KPKBKYK", "KKKKKKK", "KBKYKPK", "KKKKKKK"],
     "icon_coin": [".KKKK.", "KYYYYK", "KYKYYK", "KYKYYK", "KYYYYK", ".KKKK."],
     "icon_xp": ["...K...", "..KYK..", "KKYYYKK", ".KYYYK.", ".KYKYK.", "KK...KK"],
 }
-ICON_PAL = {"K": K, "O": (120, 170, 220, 255), "E": E, "S": (190, 200, 210, 255), "W": W, "T": (196, 134, 72, 255), "Y": (250, 205, 70, 255), "P": (240, 90, 120, 255),
+ICON_PAL = {"L": (170, 165, 160, 255), "K": K, "O": (120, 170, 220, 255), "E": E, "S": (190, 200, 210, 255), "W": W, "T": (196, 134, 72, 255), "Y": (250, 205, 70, 255), "P": (240, 90, 120, 255),
             "B": (110, 180, 230, 255), "H": H, "R": (230, 70, 70, 255)}
 
 

@@ -195,3 +195,22 @@ final class WalkTests: XCTestCase {
         XCTAssertNil(store.finishWalk(), "finishes once")
     }
 }
+
+@MainActor
+final class BadgeTests: XCTestCase {
+    func testBadgesUnlockOnceAndPayCoins() {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        let store = GameStore(saveStore: InMemorySaveStore(), clock: { now })
+        XCTAssertNil(store.state.badges["firstMeal"])
+        let coins = store.state.coins
+        store.feed("food.dry")
+        XCTAssertNotNil(store.state.badges["firstMeal"])
+        XCTAssertEqual(store.lastUnlockedBadge?.id, "firstMeal")
+        XCTAssertEqual(store.progress(of: Badge.all.first { $0.id == "gourmet" }!), 1)
+        let afterFirst = store.state.coins
+        XCTAssertGreaterThanOrEqual(afterFirst, coins + 10)
+        store.save()
+        XCTAssertEqual(store.state.coins, afterFirst, "no double payout")
+        XCTAssertEqual(Set(Badge.all.map(\.id)).count, Badge.all.count)
+    }
+}

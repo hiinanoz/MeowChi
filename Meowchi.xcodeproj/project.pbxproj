@@ -105,6 +105,12 @@
 			path = Home;
 			sourceTree = "<group>";
 		};
+		14D2F904850A889C23F0B8F1 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = Badges.swift;
+			sourceTree = "<group>";
+		};
 		1F0052988AD48929DD91A0D5 = {
 			isa = PBXBuildFile;
 			fileRef = C1F94725A8C0A27827E1BA6A;
@@ -199,6 +205,10 @@
 			};
 			name = Release;
 		};
+		2BE9C88CB9B7DE597547751D = {
+			isa = PBXBuildFile;
+			fileRef = 14D2F904850A889C23F0B8F1;
+		};
 		2C6864DC2BB1F1659BF47980 = {
 			isa = PBXGroup;
 			children = (
@@ -274,6 +284,12 @@
 			path = sfx_buy.caf;
 			sourceTree = "<group>";
 		};
+		42BA576C0C6D5965F7C2AD57 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = CollectionView.swift;
+			sourceTree = "<group>";
+		};
 		431387EB7262E1CFC79B125E = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 46F86FAA6BBF9AC94A7E4595;
@@ -340,6 +356,7 @@
 			isa = PBXGroup;
 			children = (
 				76A2EB9CFAAFDC91733066FE,
+				909974CAB7D9F1A65F4BBED1,
 				7115448C6E1621F02CE8CE7B,
 				CB56D8D48D7229C13626A421,
 				B2FA4A830BFFBD21DE322421,
@@ -512,6 +529,7 @@
 		612B66A4D810A05F8E5A6A3C = {
 			isa = PBXGroup;
 			children = (
+				14D2F904850A889C23F0B8F1,
 				F74331CEA7AF264CDA7CEE8C,
 				3F06E74F624047097A43F1ED,
 				DCA3F2E553F7474AB22BD3A5,
@@ -814,6 +832,14 @@
 			isa = PBXBuildFile;
 			fileRef = DAE215AAC8568CFABE38AC45;
 		};
+		909974CAB7D9F1A65F4BBED1 = {
+			isa = PBXGroup;
+			children = (
+				42BA576C0C6D5965F7C2AD57,
+			);
+			path = Collection;
+			sourceTree = "<group>";
+		};
 		9296D7564BCB5E19556C7808 = {
 			isa = PBXGroup;
 			children = (
@@ -1072,6 +1098,10 @@
 			path = Meowchi;
 			sourceTree = "<group>";
 		};
+		D8674966FC7A4D7E39DF84B8 = {
+			isa = PBXBuildFile;
+			fileRef = 42BA576C0C6D5965F7C2AD57;
+		};
 		D972EBC0C3AD154C941ADB32 = {
 			isa = PBXFileReference;
 			lastKnownFileType = file;
@@ -1238,6 +1268,7 @@
 				54C6F49BDA0C9C63E4CB70E5,
 				3CD5F876D3396D6125FF6250,
 				5010629949EB1FA3E866EED3,
+				D8674966FC7A4D7E39DF84B8,
 				ACCD548B98951BF0FF513D86,
 				F33BD2DB8EDB378A35E7FA20,
 				88E8B294FDA2F5CE596D23CD,
@@ -1263,6 +1294,7 @@
 				238367DBEBE1F6AA71AAD920,
 				7BA86DA25DD34116FA3F401E,
 				4D5B1C97095A6DCC0A47FBE8,
+				2BE9C88CB9B7DE597547751D,
 				B5F745D3020D1F18393AD232,
 				85B4269635614BD0C8CA6978,
 				9471C56DCB66A3471904FF1D,

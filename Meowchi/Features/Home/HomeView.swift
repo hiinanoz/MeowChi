@@ -20,6 +20,8 @@ struct HomeView: View {
     @State private var showCozy = false
     @State private var chooseChannel = false
     @State private var showLogin = false
+    @State private var showCollection = false
+    @State private var flash = false
     @State private var activeGame: MiniGameKind?
     @State private var walkLocation: WalkLocation?
     @State private var showWalkPicker = false
@@ -28,11 +30,21 @@ struct HomeView: View {
         VStack(spacing: 8) {
             HUDView(onShop: { panel = nil; showShop = true }, onTasks: { panel = nil; showTasks = true },
                     onSettings: { panel = nil; showSettings = true },
-                    onMainMenu: { panel = nil; setBrushing(false); onMainMenu() })
+                    onMainMenu: { panel = nil; setBrushing(false); onMainMenu() },
+                    onCollection: { panel = nil; showCollection = true })
             SpriteView(scene: scene, preferredFramesPerSecond: 60, options: [.ignoresSiblingOrder])
                 .clipShape(PixelBorder(step: 4))
                 .overlay(PixelBorder(step: 4).stroke(PixelPalette.ink, lineWidth: 2))
                 .overlay(alignment: .top) { noticeBanner }
+                .overlay { if flash { Color.white.allowsHitTesting(false).transition(.opacity) } }
+                .overlay(alignment: .topLeading) {
+                    Button(action: takePhoto) {
+                        PixelIcon(name: "icon_camera", size: 22).padding(6).pixelPanel()
+                    }
+                    .buttonStyle(.plain)
+                    .padding(8)
+                    .accessibilityLabel(Text("collection.takePhoto"))
+                }
                 .overlay(alignment: .topTrailing) {
                     Button { panel = nil; showDecor = true } label: {
                         PixelIcon(name: "icon_decor", size: 22).padding(6).pixelPanel()
@@ -67,6 +79,12 @@ struct HomeView: View {
         .sheet(isPresented: $showNails) { NailTrimView().environment(store) }
         .fullScreenCover(isPresented: $showCozy) { CozyView().environment(store) }
         .sheet(isPresented: $showLogin) { LoginRewardView().environment(store) }
+        .sheet(isPresented: $showCollection) { CollectionView().environment(store) }
+        .onChange(of: store.lastUnlockedBadge) { _, badge in
+            guard badge != nil else { return }
+            AudioManager.shared.play(.levelUp)
+            show("notice.badge")
+        }
         .task {
             // Greet with the daily check-in once the room has settled (not during onboarding hints).
             try? await Task.sleep(for: .seconds(0.8))
@@ -112,6 +130,7 @@ struct HomeView: View {
                 case "settings": showSettings = true
                 case "nails": showNails = true
                 case "login": showLogin = true
+                case "collection": showCollection = true
                 case "cozy": showCozy = true
                 case "tv": DispatchQueue.main.asyncAfter(deadline: .now() + 1) { watch("fish") }
                 case "friend": DispatchQueue.main.asyncAfter(deadline: .now() + 1) { inviteFriend() }
@@ -242,6 +261,15 @@ struct HomeView: View {
     private func setBrushing(_ on: Bool) {
         isBrushing = on
         scene.isBrushing = on
+    }
+
+    private func takePhoto() {
+        guard let image = scene.snapshot(), PhotoAlbum.save(image) != nil else { return }
+        store.recordPhoto()
+        AudioManager.shared.play(.tap)
+        withAnimation(.easeOut(duration: 0.08)) { flash = true }
+        withAnimation(.easeIn(duration: 0.4).delay(0.08)) { flash = false }
+        show("notice.photoSaved")
     }
 
     private func watch(_ channel: String) {

@@ -7,6 +7,7 @@ struct HUDView: View {
     var onTasks: @MainActor () -> Void = {}
     var onSettings: @MainActor () -> Void = {}
     var onMainMenu: @MainActor () -> Void = {}
+    var onCollection: @MainActor () -> Void = {}
 
     var body: some View {
         let state = store.state
@@ -54,6 +55,13 @@ struct HUDView: View {
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(Text("menu.mainMenu"))
+                    Button { onCollection() } label: {
+                        PixelIcon(name: "icon_collection", size: 14)
+                            .padding(.horizontal, 6).padding(.vertical, 4)
+                            .pixelPanel(PixelPalette.panelShade)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text("collection.title"))
                     Button { onSettings() } label: {
                         PixelIcon(name: "icon_settings", size: 14)
                             .padding(.horizontal, 6).padding(.vertical, 4)

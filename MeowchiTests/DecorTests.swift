@@ -36,8 +36,9 @@ final class DecorTests: XCTestCase {
         let store = makeStore { $0.coins = 1000; $0.progression.level = 1 }
         XCTAssertEqual(store.buyDecor("bed_royal"), .locked)
         let poor = makeStore { $0.coins = 10; $0.progression.level = 5 }
+        let before = poor.state.coins // may include a level badge payout
         XCTAssertEqual(poor.buyDecor("bed_royal"), .insufficientCoins)
-        XCTAssertEqual(poor.state.coins, 10)
+        XCTAssertEqual(poor.state.coins, before, "a failed purchase never charges")
         XCTAssertEqual(poor.equipDecor("bed_royal"), .noReward, "can't equip what you don't own")
         XCTAssertEqual(poor.buyDecor("sofa_nope"), .unknownItem)
     }

@@ -31,6 +31,8 @@ final class GameStore {
     /// Increments on every level up so views can react.
     private(set) var levelUpCount = 0
     var tutorialStep: TutorialStep?
+    /// The most recently unlocked badge, for a celebration banner.
+    private(set) var lastUnlockedBadge: Badge?
 
     let balance: Balance
     private let saveStore: SaveStore
@@ -578,10 +580,38 @@ final class GameStore {
     }
 
     private func record(_ event: TaskEvent) {
+        state.lifetime[event.rawValue, default: 0] += 1
         for i in state.daily.tasks.indices {
             guard let definition = DailyTasks.definition(state.daily.tasks[i].id),
                   definition.event == event, !state.daily.tasks[i].claimed else { continue }
             state.daily.tasks[i].progress = min(definition.target, state.daily.tasks[i].progress + 1)
+        }
+    }
+
+    // MARK: Collection
+
+    func recordPhoto() {
+        state.lifetime["photos", default: 0] += 1
+        save()
+    }
+
+    func progress(of badge: Badge) -> Int {
+        switch badge.metric {
+        case .event(let event): state.lifetime[event.rawValue] ?? 0
+        case .photos: state.lifetime["photos"] ?? 0
+        case .level: state.progression.level
+        case .checkInDays: state.login.days
+        case .decorOwned: state.decor.owned.count
+        case .accessoriesOwned: state.wardrobe.count
+        }
+    }
+
+    /// Unlocks every badge whose target is reached and pays its coins once.
+    private func unlockBadges() {
+        for badge in Badge.all where state.badges[badge.id] == nil && progress(of: badge) >= badge.target {
+            state.badges[badge.id] = clock()
+            state.coins += badge.coins
+            lastUnlockedBadge = badge
         }
     }
 
@@ -632,6 +662,7 @@ final class GameStore {
     // MARK: Persistence
 
     func save() {
+        unlockBadges()
         if state.cat.stats.happiness >= balance.happinessTaskThreshold,
            state.daily.tasks.contains(where: { DailyTasks.definition($0.id)?.event == .reachedHappiness && $0.progress == 0 }) {
             record(.reachedHappiness)

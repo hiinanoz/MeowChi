@@ -421,6 +421,21 @@ final class RoomScene: SKScene {
         }
     }
 
+    /// Renders the room (without the HUD) as a crisp image, upscaled 3x with nearest-neighbor.
+    func snapshot() -> UIImage? {
+        guard let view, let texture = view.texture(from: self) else { return nil }
+        let cg = texture.cgImage()
+        let size = CGSize(width: cg.width * 3, height: cg.height * 3)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        return UIGraphicsImageRenderer(size: size, format: format).image { ctx in
+            ctx.cgContext.interpolationQuality = .none
+            ctx.cgContext.translateBy(x: 0, y: size.height)
+            ctx.cgContext.scaleBy(x: 1, y: -1)
+            ctx.cgContext.draw(cg, in: CGRect(origin: .zero, size: size))
+        }
+    }
+
     /// Thought bubble over the cat: "!" for a low need, a red cross when unwell.
     func refreshAttention() {
         let name: String?

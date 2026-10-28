@@ -144,6 +144,358 @@
         }
       }
     },
+    "badge.bestFriend": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Best Friends"
+          }
+        }
+      }
+    },
+    "badge.bestFriend.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pet your cat 200 times."
+          }
+        }
+      }
+    },
+    "badge.cuddles": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuddles"
+          }
+        }
+      }
+    },
+    "badge.cuddles.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pet your cat 25 times."
+          }
+        }
+      }
+    },
+    "badge.decorator": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Decorator"
+          }
+        }
+      }
+    },
+    "badge.decorator.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Own 5 decorations."
+          }
+        }
+      }
+    },
+    "badge.devoted": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Devoted"
+          }
+        }
+      }
+    },
+    "badge.devoted.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check in on 30 days."
+          }
+        }
+      }
+    },
+    "badge.explorer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Explorer"
+          }
+        }
+      }
+    },
+    "badge.explorer.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go on 5 walks."
+          }
+        }
+      }
+    },
+    "badge.firstMeal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First Meal"
+          }
+        }
+      }
+    },
+    "badge.firstMeal.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feed your cat once."
+          }
+        }
+      }
+    },
+    "badge.gourmet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gourmet"
+          }
+        }
+      }
+    },
+    "badge.gourmet.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feed your cat 50 times."
+          }
+        }
+      }
+    },
+    "badge.level10": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All Grown Up"
+          }
+        }
+      }
+    },
+    "badge.level10.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reach level 10."
+          }
+        }
+      }
+    },
+    "badge.level5": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Growing Up"
+          }
+        }
+      }
+    },
+    "badge.level5.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reach level 5."
+          }
+        }
+      }
+    },
+    "badge.loyal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loyal"
+          }
+        }
+      }
+    },
+    "badge.loyal.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check in on 7 days."
+          }
+        }
+      }
+    },
+    "badge.photographer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photographer"
+          }
+        }
+      }
+    },
+    "badge.photographer.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Take 5 photos."
+          }
+        }
+      }
+    },
+    "badge.player": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playful"
+          }
+        }
+      }
+    },
+    "badge.player.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play 10 mini-games."
+          }
+        }
+      }
+    },
+    "badge.social": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Social Cat"
+          }
+        }
+      }
+    },
+    "badge.social.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Host 5 friend visits."
+          }
+        }
+      }
+    },
+    "badge.squeaky": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Squeaky Clean"
+          }
+        }
+      }
+    },
+    "badge.squeaky.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Give 5 baths."
+          }
+        }
+      }
+    },
+    "badge.stylish": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stylish"
+          }
+        }
+      }
+    },
+    "badge.stylish.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Own 3 accessories."
+          }
+        }
+      }
+    },
+    "badge.traveler": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Globetrotter"
+          }
+        }
+      }
+    },
+    "badge.traveler.detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go on 25 walks."
+          }
+        }
+      }
+    },
     "brush.done": {
       "extractionState": "manual",
       "localizations": {
@@ -294,6 +646,105 @@
           "stringUnit": {
             "state": "translated",
             "value": "Snow"
+          }
+        }
+      }
+    },
+    "collection.badges %lld %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Badges %lld/%lld"
+          }
+        }
+      }
+    },
+    "collection.delete": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete"
+          }
+        }
+      }
+    },
+    "collection.delete.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete this photo?"
+          }
+        }
+      }
+    },
+    "collection.noPhotos": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No photos yet. Tap the camera in the room to take one!"
+          }
+        }
+      }
+    },
+    "collection.photo": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo"
+          }
+        }
+      }
+    },
+    "collection.photos %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photos (%lld)"
+          }
+        }
+      }
+    },
+    "collection.share": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share"
+          }
+        }
+      }
+    },
+    "collection.takePhoto": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Take a photo"
+          }
+        }
+      }
+    },
+    "collection.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collection"
           }
         }
       }
@@ -1740,6 +2191,17 @@
         }
       }
     },
+    "notice.badge": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New badge unlocked!"
+          }
+        }
+      }
+    },
     "notice.busy": {
       "extractionState": "manual",
       "localizations": {
@@ -1824,6 +2286,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "You're out of food."
+          }
+        }
+      }
+    },
+    "notice.photoSaved": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo saved to your Collection."
           }
         }
       }

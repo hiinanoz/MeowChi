@@ -51,6 +51,7 @@ Applied in 15-minute steps from `lastSimulatedAt` to now:
 | 3 | Care system | Food picker, bath (in-room tub), brushing (drag in brush mode), litter box that fills over time, free vet check-up with cooldown, health tips | ✅ code |
 | 4 | Gameplay expansion | Mini-game framework + Laser Chase (45 s, energy paid up front, capped and plausibility-checked rewards, results screen), food shop with atomic purchases, 4 daily tasks from a pool of 7 + all-done bonus, timezone/clock-safe reset | ✅ code |
 | 5 | Content & customization | Layered room; wall/floor patterns + colors, window views; 11 decor slots; cat customization (6 coats via palette shader, 3 ears, 3 tails); side-view walk; mood-driven tail; garden walk; synthesized Japanese-pentatonic music + 10 SFX; audio settings | ✅ code; Yarn Ball / Toy Mouse and extra animations wait for final art |
+| 5e | Living room & habits | Sickness + attention bubble, water bowl, nail trimming, scratching post, friend visits, Cozy time, TV channels, park/beach/forest walks, daily check-in, accessories, badges + photo album, home-screen widget; music contexts (menu 16-bit, games upbeat) | ✅ code |
 | 6 | Polish & release | 6 extra languages, audio manager + SFX/music, settings, accessibility, notifications (opt-in), icon, App Store metadata | |
 | 7 | iPad (+ landscape) | Adaptive HUD and side panels, iPad simulator QA | |
 
@@ -69,3 +70,8 @@ Each phase is its own branch → PR into `main`. Build + tests must pass before 
 - Developer website / support URL: https://www.hii.othink.com
 - Support e-mail: drinanoz@gmail.com
 - Privacy: offline, no account, no tracking, no data collected (→ "Data Not Collected" label). The privacy policy page is a Phase 6 task.
+
+## Planning docs
+
+- [Cat growth plan](GROWTH_PLAN.md) (not implemented yet)
+- [UX review against Apple HIG (Turkish)](UX_REVIEW_TR.md)

@@ -63,18 +63,3 @@ struct DecorState: Codable, Equatable {
         return DecorCatalog.defaultItem(slot)
     }
 }
-
-/// Cat coat colors. The default uses the plain `cat_<frame>` sprites; others use `cat_<id>_<frame>`.
-enum CatAppearance: String, CaseIterable, Identifiable {
-    case orangeWhite = "orange_white", grayWhite = "gray_white", cream
-
-    static let defaultID = CatAppearance.orangeWhite.rawValue
-
-    var id: String { rawValue }
-    var nameKey: LocalizedStringKey { LocalizedStringKey("appearance." + rawValue) }
-
-    static func textureName(_ frame: String, appearance: String) -> String {
-        guard appearance != defaultID, CatAppearance(rawValue: appearance) != nil else { return "cat_" + frame }
-        return "cat_\(appearance)_\(frame)"
-    }
-}

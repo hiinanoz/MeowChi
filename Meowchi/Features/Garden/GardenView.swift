@@ -82,7 +82,7 @@ struct GardenView: View {
         guard !started else { return }
         started = true
         scene.store = store
-        scene.appearance = store.state.cat.appearanceID
+        scene.look = store.state.cat.look
         switch store.startWalk() {
         case .ok:
             if let walk = store.activeWalk { scene.showFinds(walk) }

@@ -84,7 +84,7 @@ final class RoomScene: SKScene {
         applyDecor()
 
         cat.position = Spot.catStart
-        cat.appearance = store?.state.cat.appearanceID ?? CatAppearance.defaultID
+        cat.look = store?.state.cat.look ?? CatLook()
         world.addChild(cat)
 
         nightOverlay.anchorPoint = .zero
@@ -149,6 +149,7 @@ final class RoomScene: SKScene {
         case .sad, .hungry, .bored: walkChance = 0.3
         case .happy, .neutral: walkChance = 0.5
         }
+        cat.setTailMood(TailMood(mood))
         if Double.random(in: 0...1) < walkChance {
             cat.walk(to: randomFloorPoint())
         } else {
@@ -215,9 +216,8 @@ final class RoomScene: SKScene {
             if stroke { spawnHearts() } else { spawnEffect("fx_heart", offsetY: 56) }
             nextDecisionAt = lastUpdate + 3
         case .noReward:
-            guard !cat.isScripted else { return }
-            cat.stopMoving()
-            cat.react(.happy, duration: 0.6)
+            // Too much petting at once: a short, annoyed tail flick.
+            cat.flashTail(.annoyed, duration: 1.2)
         case .sleeping:
             spawnEffect("fx_zzz", offsetY: 36)
         case .busy, .outOfStock, .unknownItem, .tooSoon, .insufficientCoins, .tooTired, .locked, .alreadyOwned:
@@ -255,6 +255,7 @@ final class RoomScene: SKScene {
             tub.name = "tub"
             self.world.addChild(tub)
             self.cat.play(.happy)
+            self.cat.flashTail(.annoyed, duration: 3.5) // cats tolerate baths, they don't love them
             let bubbles = SKAction.repeat(.sequence([.run { [weak self] in
                 self?.spawnEffect("fx_bubble", offsetY: .random(in: 24...48), dx: .random(in: -24...24))
             }, .wait(forDuration: 0.25)]), count: 14)
@@ -286,7 +287,7 @@ final class RoomScene: SKScene {
             node.texture = texture
             node.size = texture.size()
         }
-        cat.appearance = store.state.cat.appearanceID
+        cat.look = store.state.cat.look
     }
 
     func refreshLitter(sparkle: Bool = false) {

@@ -1,0 +1,13 @@
+{
+  "images": [
+    {
+      "filename": "cat_tail_short_side_down.png",
+      "idiom": "universal",
+      "scale": "1x"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}

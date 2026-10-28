@@ -7,6 +7,7 @@ struct DecorView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var tab: Tab = .slot(.bed)
     @State private var notice: LocalizedStringKey?
+    @State private var debugTabApplied = false
 
     enum Tab: Hashable {
         case cat
@@ -17,6 +18,9 @@ struct DecorView: View {
 
     var body: some View {
         SheetScaffold(title: "decor.title", onClose: { dismiss() }) {
+            #if DEBUG
+            let _ = debugSelectTab()
+            #endif
             HStack {
                 PixelIcon(name: "icon_coin", size: 18)
                 Text(store.state.coins, format: .number).font(PixelFont.body(15)).monospacedDigit()
@@ -29,11 +33,13 @@ struct DecorView: View {
                     ForEach(DecorSlot.allCases) { chip(.slot($0), $0.titleKey) }
                 }
             }
-            LazyVGrid(columns: columns, spacing: 8) {
-                switch tab {
-                case .cat:
-                    ForEach(CatAppearance.allCases) { appearanceCell($0) }
-                case .slot(let slot):
+            switch tab {
+            case .cat:
+                CatCustomizer(look: Binding(get: { store.state.cat.look }, set: { store.setLook($0) }))
+                    .padding(10)
+                    .background(PixelBorder().fill(PixelPalette.panelShade))
+            case .slot(let slot):
+                LazyVGrid(columns: columns, spacing: 8) {
                     ForEach(DecorCatalog.items(in: slot)) { itemCell($0) }
                 }
             }
@@ -79,25 +85,6 @@ struct DecorView: View {
         .background(PixelBorder().fill(equipped ? PixelPalette.warn.opacity(0.35) : PixelPalette.panelShade))
     }
 
-    private func appearanceCell(_ appearance: CatAppearance) -> some View {
-        let selected = store.state.cat.appearanceID == appearance.rawValue
-        return VStack(spacing: 6) {
-            preview(CatAppearance.textureName("idle_0", appearance: appearance.rawValue), cropBottom: false)
-            Text(appearance.nameKey).font(PixelFont.body(10))
-            Group {
-                if selected {
-                    Text("decor.inUse").font(PixelFont.body(10)).foregroundStyle(PixelPalette.good)
-                } else {
-                    Button("decor.use") { store.setAppearance(appearance.rawValue) }
-                        .buttonStyle(PixelButtonStyle(fill: PixelPalette.xp))
-                }
-            }
-            .frame(height: 34)
-        }
-        .padding(8)
-        .background(PixelBorder().fill(selected ? PixelPalette.warn.opacity(0.35) : PixelPalette.panelShade))
-    }
-
     /// Big wall/floor textures are cropped to a swatch; small items are shown whole.
     private func preview(_ sprite: String, cropBottom: Bool) -> some View {
         Image(sprite)
@@ -108,6 +95,14 @@ struct DecorView: View {
             .clipped()
             .accessibilityHidden(true)
     }
+
+    #if DEBUG
+    /// QA helper: `-decorTab cat` opens the cat tab.
+    private func debugSelectTab() {
+        guard CommandLine.arguments.contains("-decorTab"), tab != .cat, !debugTabApplied else { return }
+        DispatchQueue.main.async { tab = .cat; debugTabApplied = true }
+    }
+    #endif
 
     private func buy(_ item: DecorItem) {
         switch store.buyDecor(item.id) {

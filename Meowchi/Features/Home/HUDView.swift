@@ -10,7 +10,9 @@ struct HUDView: View {
         let state = store.state
         VStack(spacing: 8) {
             HStack(spacing: 10) {
-                PixelIcon(name: CatAppearance.textureName("idle_0", appearance: state.cat.appearanceID), size: 40)
+                CatPreview(look: state.cat.look, size: 64)
+                    .frame(width: 44, height: 40, alignment: .top)
+                    .clipped()
                     .padding(2)
                     .pixelPanel(PixelPalette.panelShade)
                 VStack(alignment: .leading, spacing: 3) {

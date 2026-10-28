@@ -9,7 +9,7 @@ final class GardenScene: SKScene {
     static let path = CGRect(x: 30, y: 20, width: 1020, height: 92)
 
     weak var store: GameStore?
-    var appearance = CatAppearance.defaultID { didSet { cat.appearance = appearance } }
+    var look = CatLook() { didSet { cat.look = look } }
     /// Called with the reward after a successful dig, for the SwiftUI layer.
     var onFind: ((FindReward) -> Void)?
 
@@ -38,6 +38,7 @@ final class GardenScene: SKScene {
         background.zPosition = -1000
         world.addChild(background)
         cat.position = CGPoint(x: 80, y: 60)
+        cat.setTailMood(.happy)
         world.addChild(cat)
         layoutWorld()
     }

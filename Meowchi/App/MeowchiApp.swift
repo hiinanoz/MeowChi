@@ -13,6 +13,11 @@ struct MeowchiApp: App {
             store.tutorialStep = nil
         }
         if CommandLine.arguments.contains("-refillStats") { store.debugRefill() }
+        // `-debugLook coat,ears,tail`, e.g. `-debugLook cocoa,folded,long`.
+        if let i = CommandLine.arguments.firstIndex(of: "-debugLook"), i + 1 < CommandLine.arguments.count {
+            let parts = CommandLine.arguments[i + 1].split(separator: ",").map(String.init)
+            if parts.count == 3 { store.setLook(CatLook(coat: parts[0], ears: parts[1], tail: parts[2])) }
+        }
         #endif
     }
 

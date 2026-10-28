@@ -223,9 +223,9 @@ final class GameStore {
 
     var needsOnboarding: Bool { state.onboardedAt == nil }
 
-    func completeOnboarding(name: String, appearance: String = CatAppearance.defaultID) {
+    func completeOnboarding(name: String, look: CatLook = CatLook()) {
         state.cat.name = CatState.sanitizedName(name, maxLength: balance.maxNameLength) ?? state.cat.name
-        if CatAppearance(rawValue: appearance) != nil { state.cat.appearanceID = appearance }
+        state.cat.look = look.sanitized
         state.onboardedAt = clock()
         tutorialStep = .feed
         save()
@@ -270,12 +270,10 @@ final class GameStore {
         return .ok
     }
 
-    @discardableResult
-    func setAppearance(_ id: String) -> ActionResult {
-        guard CatAppearance(rawValue: id) != nil else { return .unknownItem }
-        state.cat.appearanceID = id
+    /// Coat, ears and tail are free to change any time. Unknown values fall back to defaults.
+    func setLook(_ look: CatLook) {
+        state.cat.look = look.sanitized
         save()
-        return .ok
     }
 
     // MARK: Mini-games

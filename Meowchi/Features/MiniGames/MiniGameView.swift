@@ -33,7 +33,7 @@ struct MiniGameView: View {
         .foregroundStyle(PixelPalette.ink)
         .onAppear {
             scene.decor = store.state.decor
-            scene.appearance = store.state.cat.appearanceID
+            scene.look = store.state.cat.look
             scene.onScore = { score = $0 }
         }
         .onChange(of: scenePhase) { _, newPhase in

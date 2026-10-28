@@ -17,6 +17,7 @@ Talk to the user in **Turkish**; code, identifiers and docs are in English. The 
 - `CatSimulator` is pure, elapsed-time based (no timers). Offline time is capped and needs have a floor; there's no death.
 - Every tuning number lives in `Core/Balance.swift`; item values live in `Models/ItemCatalog.swift`.
 - Saves: one versioned JSON payload in SwiftData (`SaveCodec`, backup + quarantine). **New `GameState` fields must decode with `decodeIfPresent` + a default in `GameState.init(from:)`**, so existing saves keep loading.
+- The cat is 3 layers (body, ears, tail) recolored by `CatShader` (palette swap of 4 key fur colors; sampling snapped to 64×64 texels). Tail mood is independent of the body animation.
 - SpriteKit room: 360×400 logical room, 1 art px = 1 pt, whole-number scaling, `.nearest` filtering. Views using SpriteKit or store methods are `@MainActor`.
 - Every user-facing string is a semantic key in `Localization/Localizable.xcstrings` (English now; tr, es, de, ja, ko, fr in Phase 6). Never build a `LocalizedStringKey` with string interpolation of a key name; use `"prefix." + value`.
 
@@ -26,7 +27,7 @@ Talk to the user in **Turkish**; code, identifiers and docs are in English. The 
 xcodebuild test -project Meowchi.xcodeproj -scheme Meowchi -destination 'platform=iOS Simulator,name=iPhone 15' CODE_SIGNING_ALLOWED=NO
 ```
 
-DEBUG launch arguments for screenshots: `-skipOnboarding` opens straight into the room; `-openScreen shop|tasks|decor|laser|garden|play|food|clean|health` opens that screen; `-refillStats` fills all needs.
+DEBUG launch arguments for screenshots: `-skipOnboarding` opens straight into the room; `-openScreen shop|tasks|decor|laser|garden|play|food|clean|health` opens that screen; `-refillStats` fills all needs; `-debugLook coat,ears,tail`; `-decorTab cat`.
 
 ## Workflow
 

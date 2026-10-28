@@ -7,15 +7,16 @@ struct OnboardingView: View {
     @Environment(GameStore.self) private var store
     @State private var step = Step.welcome
     @State private var name = ""
-    @State private var appearance = CatAppearance.defaultID
+    @State private var look = CatLook()
     @FocusState private var nameFocused: Bool
 
     private enum Step { case welcome, name }
 
     var body: some View {
+        ScrollView {
         VStack(spacing: 20) {
-            Spacer()
-            PixelIcon(name: CatAppearance.textureName(step == .welcome ? "happy_0" : "idle_0", appearance: appearance), size: 192)
+            Spacer(minLength: 24)
+            if step == .welcome { CatPreview(look: look, size: 192, animation: .happy) }
             Group {
                 switch step {
                 case .welcome: welcome
@@ -24,8 +25,10 @@ struct OnboardingView: View {
             }
             .padding(20)
             .pixelPanel()
-            Spacer()
+            Spacer(minLength: 24)
         }
+        }
+        .scrollBounceBehavior(.basedOnSize)
         .padding(.horizontal, 24)
         .foregroundStyle(PixelPalette.ink)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -65,19 +68,9 @@ struct OnboardingView: View {
                 .onChange(of: name) { _, new in
                     if new.count > store.balance.maxNameLength { name = String(new.prefix(store.balance.maxNameLength)) }
                 }
-                .onSubmit { if valid { store.completeOnboarding(name: name, appearance: appearance) } }
-            HStack(spacing: 10) {
-                ForEach(CatAppearance.allCases) { option in
-                    Button { appearance = option.rawValue } label: {
-                        PixelIcon(name: CatAppearance.textureName("idle_0", appearance: option.rawValue), size: 44)
-                            .padding(4)
-                            .background(PixelBorder().fill(appearance == option.rawValue ? PixelPalette.warn : PixelPalette.panelShade))
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Text(option.nameKey))
-                }
-            }
-            Button("onboarding.name.button") { store.completeOnboarding(name: name, appearance: appearance) }
+                .onSubmit { if valid { store.completeOnboarding(name: name, look: look) } }
+            CatCustomizer(look: $look)
+            Button("onboarding.name.button") { store.completeOnboarding(name: name, look: look) }
                 .buttonStyle(PixelButtonStyle())
                 .disabled(!valid)
         }

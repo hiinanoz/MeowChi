@@ -34,21 +34,27 @@ AI image tools don't produce real pixel grids. Each image needs these steps:
 6. **Align**: feet on the bottom row, body centered at x = 32 in every frame. Check with onion skin.
 7. **Export** with the exact name below, drop it into the matching `.imageset` folder, and replace the PNG.
 
-## Cat (`Sprites/cat_*`), each frame 64×64, transparent, feet on the bottom row, centered at x = 32
+## Cat: three layers, each frame 64×64, feet on the bottom row, centered at x = 32
 
-| Animation | Frames (names) | Timing |
+The cat is assembled from **body + ears + tail** layers. Fur is recolored in-game by a palette-swap shader,
+so **fur must use exactly these four key colors** (everything else, like eyes, white fur and pink, is never recolored):
+
+| Key | RGB | Use |
 |---|---|---|
-| Idle / breathe | `cat_idle_0`, `cat_idle_1` | 0.45 s per frame |
-| Blink | `cat_blink` | mixed into idle |
-| Walk | `cat_walk_0`, `cat_walk_1` (final: 4–6 frames, **side view facing right**; code mirrors it for left) | 0.18 s |
-| Happy / petted | `cat_happy_0`, `cat_happy_1` | 0.25 s |
-| Sad | `cat_sad` | |
-| Eat | `cat_eat_0`, `cat_eat_1` (head down toward a bowl on the left) | 0.22 s |
-| Sleep | `cat_sleep_0`, `cat_sleep_1` (curled up, breathing) | 0.9 s |
-| Coat colors | every frame above again as `cat_gray_white_<frame>` and `cat_cream_<frame>` (e.g. `cat_cream_idle_0`) | the default ginger coat keeps the plain `cat_<frame>` names |
-| Coming in Phases 3–5 | drink, wake-up, jump, turn, groom, look around, excited, curious, annoyed, purr, play, bath | |
+| fur | 242, 153, 74 | main fur |
+| shade | 222, 120, 52 | shadow side |
+| light | 251, 188, 115 | highlight |
+| stripe | 198, 94, 28 | tabby stripes |
 
-**Highest priority for final art:** idle, blink, walk (side view), happy, sleep. These are on screen most of the time.
+| Layer | Names | Notes |
+|---|---|---|
+| Body, front | `cat_idle_0/1`, `cat_blink`, `cat_happy_0/1`, `cat_sad`, `cat_eat_0/1` | no ears, no tail |
+| Body, side walk | `cat_walk_0…3` | 4-frame gait, **facing right**, 0.15 s per frame |
+| Body, sleep | `cat_sleep_0/1` | |
+| Ears | `cat_ears_<pointy|round|folded>_<body frame>` | one per body frame; drawn behind the body |
+| Tail | `cat_tail_<short|medium|long>_<front|side>_<down|wag0|wag1|up>`, `cat_tail_<length>_sleep` | front/side tails sit behind the body; the sleep tail sits in front |
+
+Tail moods: happy = fast wag0/wag1, calm = slow wag, tired/sad = down, annoyed = up.
 
 ## Room (`Sprites/`)
 

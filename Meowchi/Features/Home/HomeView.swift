@@ -45,7 +45,7 @@ struct HomeView: View {
         .sheet(isPresented: $showTasks) { TasksView().environment(store) }
         .sheet(isPresented: $showDecor) { DecorView().environment(store) }
         .onChange(of: store.state.decor) { _, _ in scene.applyDecor() }
-        .onChange(of: store.state.cat.appearanceID) { _, _ in scene.applyDecor() }
+        .onChange(of: store.state.cat.look) { _, _ in scene.applyDecor() }
         .fullScreenCover(item: $activeGame) { MiniGameView(kind: $0).environment(store) }
         .fullScreenCover(isPresented: $showGarden) { GardenView().environment(store) }
         .padding(.horizontal, 12)

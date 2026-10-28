@@ -15,7 +15,7 @@ final class LaserChaseScene: SKScene {
     var isRunning = false
     /// Set before presenting so the play area matches the player's room.
     var decor = DecorState() { didSet { backdrop.apply(decor) } }
-    var appearance = CatAppearance.defaultID { didSet { cat.appearance = appearance } }
+    var look = CatLook() { didSet { cat.look = look } }
     private let backdrop = RoomBackdrop()
 
     private let world = SKNode()
@@ -41,6 +41,7 @@ final class LaserChaseScene: SKScene {
         isBuilt = true
         addChild(world)
         world.addChild(backdrop)
+        cat.setTailMood(.happy)
         cat.position = CGPoint(x: RoomScene.roomSize.width / 2, y: 40)
         world.addChild(cat)
         laser.zPosition = 2000

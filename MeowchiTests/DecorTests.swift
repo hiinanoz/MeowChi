@@ -47,22 +47,31 @@ final class DecorTests: XCTestCase {
         XCTAssertEqual(decor.equipped(.plant).id, "plant_basic")
     }
 
-    func testAppearanceAndTextureNames() {
+    func testLookIsSanitizedAndLegacyCoatMigrates() throws {
         let store = makeStore()
-        XCTAssertEqual(store.setAppearance("cream"), .ok)
-        XCTAssertEqual(store.state.cat.appearanceID, "cream")
-        XCTAssertEqual(store.setAppearance("plaid"), .unknownItem)
-        XCTAssertEqual(CatAppearance.textureName("idle_0", appearance: "orange_white"), "cat_idle_0")
-        XCTAssertEqual(CatAppearance.textureName("idle_0", appearance: "cream"), "cat_cream_idle_0")
-        XCTAssertEqual(CatAppearance.textureName("idle_0", appearance: "bogus"), "cat_idle_0")
+        store.setLook(CatLook(coat: "cocoa", ears: "folded", tail: "long"))
+        XCTAssertEqual(store.state.cat.look, CatLook(coat: "cocoa", ears: "folded", tail: "long"))
+        store.setLook(CatLook(coat: "plaid", ears: "antenna", tail: "huge"))
+        XCTAssertEqual(store.state.cat.look, CatLook(), "unknown values fall back to defaults")
+
+        let legacy = #"{"name":"Mochi","appearanceID":"gray_white","stats":{"hunger":50,"energy":50,"happiness":50,"cleanliness":50,"health":50},"adoptedAt":0}"#
+        let cat = try JSONDecoder().decode(CatState.self, from: Data(legacy.utf8))
+        XCTAssertEqual(cat.look.coat, "silver")
     }
 
     func testEveryReferencedSpriteExistsInTheBundle() {
-        let names = DecorCatalog.items.map(\.id) + ["window_basic", "litter_clean", "litter_dirty", "bath_tub", "fx_laser"]
-            + CatAppearance.allCases.flatMap { a in ["idle_0", "idle_1", "blink", "walk_0", "walk_1", "happy_0", "happy_1",
-                                                    "sad", "eat_0", "eat_1", "sleep_0", "sleep_1"]
-                .map { CatAppearance.textureName($0, appearance: a.rawValue) } }
-            + ItemCatalog.foods.map(\.iconName)
+        var names = DecorCatalog.items.map(\.id) + ["window_basic", "litter_clean", "litter_dirty", "bath_tub", "fx_laser",
+                                                   "garden_background"] + ItemCatalog.foods.map(\.iconName)
+        let bodyFrames = ["idle_0", "idle_1", "blink", "happy_0", "happy_1", "sad", "eat_0", "eat_1",
+                          "walk_0", "walk_1", "walk_2", "walk_3", "sleep_0", "sleep_1"]
+        names += bodyFrames.map { "cat_" + $0 }
+        for ears in EarStyle.allCases { names += bodyFrames.map { "cat_ears_\(ears.rawValue)_" + $0 } }
+        for length in TailLength.allCases {
+            names.append("cat_tail_\(length.rawValue)_sleep")
+            for family in ["front", "side"] {
+                names += ["down", "wag0", "wag1", "up"].map { "cat_tail_\(length.rawValue)_\(family)_" + $0 }
+            }
+        }
         for name in names { XCTAssertNotNil(UIImage(named: name), "missing asset \(name)") }
     }
 

@@ -12,7 +12,7 @@ ASSETS = ROOT / "Meowchi/Resources/Assets.xcassets"
 
 K = (59, 38, 40, 255)      # outline
 O = (242, 153, 74, 255)    # orange fur
-D = (214, 111, 44, 255)    # stripes
+D = (198, 94, 28, 255)     # stripes (kept far from OS so the shader can tell them apart)
 W = (255, 247, 235, 255)   # white fur
 P = (245, 160, 170, 255)   # pink
 E = (40, 28, 30, 255)      # eyes
@@ -114,27 +114,16 @@ def save_image(folder, name, canvas):
 
 # ---------- Cat (32x32, feet at bottom center) ----------
 
-def cat_sit(eyes="open", mouth="smile", tail=0, breath=0, head_dy=0, lift=(0, 0)):
-    c = Canvas(32, 32)
-    tails = [[(22, 25), (24, 24), (25, 22), (26, 20), (26, 18)],
-             [(22, 25), (24, 25), (26, 24), (27, 22), (28, 20)]]
-    pts = tails[tail]
-    for x, y in pts:
-        c.rect(x, y, 2, 2, O)
-    c.rect(pts[-1][0], pts[-1][1], 2, 2, W)
-    c.shaded_ellipse(16, 24, 7, 6 + breath * .5, O, OS)
-    c.shaded_ellipse(16, 25, 4, 4.5, W, WS)
-    c.shaded_ellipse(12.5, 29 - lift[0], 2.5, 1.6, W, WS)
-    c.shaded_ellipse(19.5, 29 - lift[1], 2.5, 1.6, W, WS)
-    hy = 12 + head_dy
-    c.tri((6, hy - 9), (6.5, hy - 1), (13.5, hy - 5), O)
-    c.tri((26, hy - 9), (25.5, hy - 1), (18.5, hy - 5), O)
-    c.shaded_ellipse(16, hy, 9.5, 7.5, O, OS, OL)
-    c.tri((7.5, hy - 7), (8, hy - 2.5), (11.5, hy - 4.5), P)
-    c.tri((24.5, hy - 7), (24, hy - 2.5), (20.5, hy - 4.5), P)
-    for x, y, w, h in ((12, hy - 6, 1, 2), (15, hy - 7, 2, 2), (19, hy - 6, 1, 2), (7, hy, 2, 1), (23, hy, 2, 1)):
-        c.rect(x, y, w, h, D)
-    c.ellipse(16, hy + 3.5, 4.5, 2.6, W)
+# The cat is three layers: body, ears and tail, each 32x32 logical with feet on the bottom row.
+# Fur uses the KEY colors O/OS/OL/D; the game recolors them with a palette-swap shader, so
+# one set of sprites serves every coat. Final art must use these exact key colors for fur.
+
+EAR_STYLES = ("pointy", "round", "folded")
+TAIL_LENGTHS = {"short": 3, "medium": 5, "long": 7}
+TAIL_POSES = ("down", "wag0", "wag1", "up")
+
+
+def face(c, hy, eyes, mouth):
     for ex in (11, 19):
         if eyes == "open":
             c.rect(ex, hy - 1, 2, 3, E); c.rect(ex, hy - 1, 1, 1, H); c.pset(ex * SCALE + 2, hy * SCALE + 3, H)
@@ -156,26 +145,173 @@ def cat_sit(eyes="open", mouth="smile", tail=0, breath=0, head_dy=0, lift=(0, 0)
         c.rect(15, hy + 4, 2, 2, P); c.set(14, hy + 4, E); c.set(17, hy + 4, E)
     elif mouth == "flat":
         c.rect(15, hy + 4, 2, 1, E)
+
+
+def body_front(eyes="open", mouth="smile", breath=0, head_dy=0):
+    c = Canvas(32, 32)
+    c.shaded_ellipse(16, 24, 7, 6 + breath * .5, O, OS)
+    c.shaded_ellipse(16, 25, 4, 4.5, W, WS)
+    c.shaded_ellipse(12.5, 29, 2.5, 1.6, W, WS)
+    c.shaded_ellipse(19.5, 29, 2.5, 1.6, W, WS)
+    hy = 12 + head_dy
+    c.shaded_ellipse(16, hy, 9.5, 7.5, O, OS, OL)
+    for x, y, w, h in ((12, hy - 6, 1, 2), (15, hy - 7, 2, 2), (19, hy - 6, 1, 2), (7, hy, 2, 1), (23, hy, 2, 1)):
+        c.rect(x, y, w, h, D)
+    c.ellipse(16, hy + 3.5, 4.5, 2.6, W)
+    face(c, hy, eyes, mouth)
     c.outline()
     return c
 
 
-def cat_sleep(breath=0):
+def body_side(frame):
+    """Walking, facing right. Diagonal gait: legs move in opposite pairs over 4 frames."""
     c = Canvas(32, 32)
-    c.rect(9, 28, 16, 2, O); c.rect(7, 28, 2, 2, W)
+    bob = .5 if frame % 2 else 0
+    for base, phase in ((8, 0), (11, 2), (19, 2), (22, 0)):
+        dx = (0, 1, 0, -1)[(frame + phase) % 4]
+        lift = 1 if dx == 1 else 0
+        c.rect(base + dx, 25, 2, 5 - lift, O if base in (8, 19) else OS)
+        c.rect(base + dx, 29 - lift, 2, 1, W)
+    c.shaded_ellipse(15, 22 - bob, 9, 5, O, OS, OL)
+    c.ellipse(15, 24.5 - bob, 6, 2.2, W)
+    for x in (11, 14, 17):
+        c.rect(x, 17 - bob, 1, 2, D)
+    hy = 15 - bob
+    c.shaded_ellipse(24, hy, 6.5, 5.5, O, OS, OL)
+    c.ellipse(26.5, hy + 2.2, 2.8, 1.8, W)
+    c.rect(26, hy - 1, 1, 2, E); c.pset(26 * SCALE, int((hy - 1) * SCALE), H)
+    c.rect(29, hy + 1, 1, 1, P)
+    c.rect(21, hy - 2, 2, 1, D)
+    c.outline()
+    return c
+
+
+def body_sleep(breath=0):
+    c = Canvas(32, 32)
     c.shaded_ellipse(17, 25, 11, 5.5 + breath * .5, O, OS, OL)
     for x in (17, 21, 25):
         c.rect(x, 20 + (1 if x == 25 else 0), 1, 2, D)
     hy = 22
-    c.tri((4, hy - 8), (4.5, hy - 1), (10.5, hy - 4), O)
-    c.tri((17, hy - 8), (16.5, hy - 1), (10.5, hy - 4), O)
     c.shaded_ellipse(10.5, hy, 7.5, 6, O, OS, OL)
-    c.tri((5.5, hy - 6), (6, hy - 2.5), (9, hy - 4), P)
     c.ellipse(10.5, hy + 3, 4, 2.2, W)
     c.rect(6, hy + 1, 3, 1, E); c.rect(12, hy + 1, 3, 1, E)
     c.rect(10, hy + 2, 1, 1, P)
     c.outline()
     return c
+
+
+def ears(style, family, hy):
+    """Ear layer, drawn behind the body so the head covers the ear base."""
+    c = Canvas(32, 32)
+    if family == "front":
+        pairs = ((16, -1), (16, 1))
+        for cx, side in pairs:
+            m = lambda x: cx + (x - cx) * side  # mirror around the head center
+            if style == "pointy":
+                c.tri((m(6), hy - 9), (m(6.5), hy - 1), (m(13.5), hy - 5), O)
+                c.tri((m(7.5), hy - 7.5), (m(8), hy - 4), (m(11), hy - 5.5), P)
+            elif style == "round":
+                c.shaded_ellipse(m(8.3), hy - 5.6, 3.4, 3.4, O, OS)
+                c.ellipse(m(8.3), hy - 6, 1.8, 1.8, P)
+            else:  # folded
+                c.shaded_ellipse(m(9.5), hy - 6.2, 3.4, 2, O, OS)
+                c.rect(int(m(8.5)) - (1 if side > 0 else 0), int(hy - 6), 2, 1, OS)
+    elif family == "side":
+        if style == "pointy":
+            c.tri((20.5, hy - 3), (21.5, hy - 9.5), (24.5, hy - 4.5), OS)
+            c.tri((23.5, hy - 4.5), (25.5, hy - 10), (27.5, hy - 3.5), O)
+            c.tri((24.6, hy - 5), (25.5, hy - 8), (26.5, hy - 4.5), P)
+        elif style == "round":
+            c.shaded_ellipse(22, hy - 4.5, 2.6, 2.6, OS, OS)
+            c.shaded_ellipse(25.5, hy - 5, 2.8, 2.8, O, OS)
+            c.ellipse(25.5, hy - 5.3, 1.4, 1.4, P)
+        else:
+            c.shaded_ellipse(25, hy - 4.6, 3, 1.6, O, OS)
+    else:  # sleep (head at x 10.5)
+        if style == "pointy":
+            c.tri((4, hy - 8), (4.5, hy - 1), (10.5, hy - 4), O)
+            c.tri((17, hy - 8), (16.5, hy - 1), (10.5, hy - 4), O)
+            c.tri((5.5, hy - 6.5), (6, hy - 3.5), (8.5, hy - 4.5), P)
+        elif style == "round":
+            for cx in (5.5, 15.5):
+                c.shaded_ellipse(cx, hy - 4.6, 3, 3, O, OS)
+            c.ellipse(5.5, hy - 5, 1.5, 1.5, P)
+        else:
+            for cx in (6.5, 14.5):
+                c.shaded_ellipse(cx, hy - 5, 3, 1.8, O, OS)
+    c.outline()
+    return c
+
+
+def tail(length, family, pose):
+    """Polyline of 2x2 blocks with a white tip. `length` = number of segments."""
+    import math
+    c = Canvas(32, 32)
+    if family == "front":
+        start = (22, 25)
+        profile = {"down": (25, 0), "wag0": (-20, -100), "wag1": (0, -60), "up": (-82, -95)}[pose]
+    elif family == "side":
+        start = (7, 20)
+        profile = {"down": (150, 105), "wag0": (240, 285), "wag1": (225, 275), "up": (265, 275)}[pose]
+    else:  # sleep: wraps along the front of the loaf, drawn in front of the body
+        start = (27, 28.5)
+        profile = (175, 215)
+    x, y = start
+    pts = [(x, y)]
+    for i in range(length):
+        a = math.radians(profile[0] + (profile[1] - profile[0]) * i / max(1, length - 1))
+        x, y = x + 2 * math.cos(a), y + 2 * math.sin(a)
+        pts.append((x, y))
+    for i, (px, py) in enumerate(pts):
+        c.rect(round(px), round(py), 2, 2, W if i == len(pts) - 1 else O)
+    c.outline()
+    return c
+
+
+FRONT_FRAMES = {
+    "idle_0": dict(), "idle_1": dict(breath=1), "blink": dict(eyes="closed"),
+    "happy_0": dict(eyes="happy", mouth="open"), "happy_1": dict(eyes="happy", breath=1),
+    "sad": dict(eyes="sad", mouth="flat"),
+    "eat_0": dict(eyes="closed", mouth="open", head_dy=3), "eat_1": dict(eyes="closed", head_dy=4),
+}
+
+
+def cat_layers():
+    """name -> canvas for every body, ear and tail sprite."""
+    out = {}
+    for name, kw in FRONT_FRAMES.items():
+        out[f"cat_{name}"] = body_front(**kw)
+        for style in EAR_STYLES:
+            out[f"cat_ears_{style}_{name}"] = ears(style, "front", 12 + kw.get("head_dy", 0))
+    for f in range(4):
+        out[f"cat_walk_{f}"] = body_side(f)
+        for style in EAR_STYLES:
+            out[f"cat_ears_{style}_walk_{f}"] = ears(style, "side", 15 - (.5 if f % 2 else 0))
+    for f in range(2):
+        out[f"cat_sleep_{f}"] = body_sleep(f)
+        for style in EAR_STYLES:
+            out[f"cat_ears_{style}_sleep_{f}"] = ears(style, "sleep", 22)
+    for length, segments in TAIL_LENGTHS.items():
+        for family in ("front", "side"):
+            for pose in TAIL_POSES:
+                out[f"cat_tail_{length}_{family}_{pose}"] = tail(segments, family, pose)
+        out[f"cat_tail_{length}_sleep"] = tail(segments, "sleep", "down")
+    return out
+
+
+def compose(*layers):
+    """Flattens layers (first = back) into one canvas, e.g. for the app icon."""
+    out = Canvas(layers[0].w, layers[0].h)
+    for layer in layers:
+        for Y in range(layer.H):
+            for X in range(layer.W):
+                if layer.p[Y][X]:
+                    out.p[Y][X] = layer.p[Y][X]
+    return out
+
+
+def cat_sit(eyes="open", mouth="smile", tail_pose="wag1"):
+    return compose(tail(5, "front", tail_pose), ears("pointy", "front", 12), body_front(eyes=eyes, mouth=mouth))
 
 
 # ---------- Room objects ----------
@@ -451,23 +587,6 @@ def garden():
     return c
 
 
-CAT_COLORWAYS = {  # appearance id: palette overrides (orange_white is the default art)
-    "gray_white": {"O": (160, 165, 182, 255), "D": (112, 117, 138, 255), "OS": (136, 141, 160, 255), "OL": (196, 200, 214, 255)},
-    "cream": {"O": (240, 214, 176, 255), "D": (204, 160, 116, 255), "OS": (220, 190, 150, 255), "OL": (250, 232, 205, 255)},
-}
-
-
-def with_palette(overrides, fn, *args, **kwargs):
-    """Recolors the cat by temporarily swapping module palette globals."""
-    g = globals()
-    saved = {k: g[k] for k in overrides}
-    g.update(overrides)
-    try:
-        return fn(*args, **kwargs)
-    finally:
-        g.update(saved)
-
-
 def main():
     ASSETS.mkdir(parents=True, exist_ok=True)
     (ASSETS / "Contents.json").write_text(json.dumps(INFO, indent=2))
@@ -475,15 +594,7 @@ def main():
         (ASSETS / folder).mkdir(parents=True, exist_ok=True)
         (ASSETS / folder / "Contents.json").write_text(json.dumps(INFO, indent=2))
     frames = {
-        "cat_idle_0": cat_sit(tail=0), "cat_idle_1": cat_sit(tail=1, breath=1),
-        "cat_blink": cat_sit(eyes="closed", tail=0),
-        "cat_walk_0": cat_sit(tail=0, lift=(2, 0)), "cat_walk_1": cat_sit(tail=1, lift=(0, 2)),
-        "cat_happy_0": cat_sit(eyes="happy", mouth="open", tail=1),
-        "cat_happy_1": cat_sit(eyes="happy", mouth="smile", tail=0, breath=1),
-        "cat_sad": cat_sit(eyes="sad", mouth="flat", tail=0),
-        "cat_eat_0": cat_sit(eyes="closed", mouth="open", head_dy=3), "cat_eat_1": cat_sit(eyes="closed", mouth="smile", head_dy=4),
-        "cat_sleep_0": cat_sleep(0), "cat_sleep_1": cat_sleep(1),
-"bowl_empty": bowl("empty"), "bowl_food": bowl("food"),
+        "bowl_empty": bowl("empty"), "bowl_food": bowl("food"),
         "bowl_water": bowl("water"), "bed_basic": bed(), "scratching_post": scratching_post(),
         "bed_cloud": bed_variant((120, 170, 230, 255), (200, 225, 250, 255)),
         "bed_royal": bed_variant((150, 100, 190, 255), (250, 210, 110, 255)),
@@ -500,20 +611,7 @@ def main():
     frames.update({name: floor(style) for name, style in FLOORS.items()})
     frames.update({name: rug(*spec) for name, spec in RUGS.items()})
     frames["garden_background"] = garden()
-    cat_specs = {
-        "idle_0": lambda: cat_sit(tail=0), "idle_1": lambda: cat_sit(tail=1, breath=1),
-        "blink": lambda: cat_sit(eyes="closed", tail=0),
-        "walk_0": lambda: cat_sit(tail=0, lift=(2, 0)), "walk_1": lambda: cat_sit(tail=1, lift=(0, 2)),
-        "happy_0": lambda: cat_sit(eyes="happy", mouth="open", tail=1),
-        "happy_1": lambda: cat_sit(eyes="happy", mouth="smile", tail=0, breath=1),
-        "sad": lambda: cat_sit(eyes="sad", mouth="flat", tail=0),
-        "eat_0": lambda: cat_sit(eyes="closed", mouth="open", head_dy=3),
-        "eat_1": lambda: cat_sit(eyes="closed", mouth="smile", head_dy=4),
-        "sleep_0": lambda: cat_sleep(0), "sleep_1": lambda: cat_sleep(1),
-    }
-    for appearance, palette in CAT_COLORWAYS.items():
-        for frame_name, make in cat_specs.items():
-            frames[f"cat_{appearance}_{frame_name}"] = with_palette(palette, make)
+    frames.update(cat_layers())
     for name, canvas in frames.items():
         save_image("Sprites", name, canvas)
     for name, rows in ICONS.items():
@@ -521,7 +619,7 @@ def main():
         save_image("Icons", name, small([r.ljust(width, ".") for r in rows], ICON_PAL))
     # App icon (opaque, placeholder)
     icon = ASSETS / "AppIcon.appiconset"; icon.mkdir(parents=True, exist_ok=True)
-    write_png(icon / "icon.png", cat_sit(eyes="happy", mouth="open", tail=1), scale=1024 // (32 * SCALE),
+    write_png(icon / "icon.png", cat_sit(eyes="happy", mouth="open"), scale=1024 // (32 * SCALE),
               background=(255, 214, 170, 255))  # 1024px
     (icon / "Contents.json").write_text(json.dumps({"images": [{"filename": "icon.png", "idiom": "universal",
                                                     "platform": "ios", "size": "1024x1024"}], **INFO}, indent=2))

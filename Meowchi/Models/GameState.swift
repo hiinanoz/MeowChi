@@ -35,11 +35,41 @@ struct GameState: Codable, Equatable {
 
 struct CatState: Codable, Equatable {
     var name: String
-    var appearanceID = "orange_white"
+    var look = CatLook()
     var personality = Personality.playful
     var stats: CatStats
     var isSleeping = false
     var adoptedAt: Date
+
+    private enum CodingKeys: String, CodingKey { case name, look, personality, stats, isSleeping, adoptedAt }
+    /// Pre-customization saves stored only a coat id.
+    private enum LegacyKeys: String, CodingKey { case appearanceID }
+
+    init(name: String, look: CatLook = CatLook(), personality: Personality = .playful, stats: CatStats,
+         isSleeping: Bool = false, adoptedAt: Date) {
+        self.name = name
+        self.look = look
+        self.personality = personality
+        self.stats = stats
+        self.isSleeping = isSleeping
+        self.adoptedAt = adoptedAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        name = try c.decode(String.self, forKey: .name)
+        personality = try c.decodeIfPresent(Personality.self, forKey: .personality) ?? .playful
+        stats = try c.decode(CatStats.self, forKey: .stats)
+        isSleeping = try c.decodeIfPresent(Bool.self, forKey: .isSleeping) ?? false
+        adoptedAt = try c.decode(Date.self, forKey: .adoptedAt)
+        if let look = try c.decodeIfPresent(CatLook.self, forKey: .look) {
+            self.look = look
+        } else {
+            let legacy = try decoder.container(keyedBy: LegacyKeys.self)
+            let coat = try legacy.decodeIfPresent(String.self, forKey: .appearanceID)
+            self.look = CatLook(coat: ["gray_white": "silver", "cream": "cream"][coat ?? ""] ?? CatCoat.ginger.rawValue)
+        }
+    }
 
     /// Trims whitespace, limits length; returns nil if nothing usable is left.
     static func sanitizedName(_ raw: String, maxLength: Int) -> String? {

@@ -20,7 +20,7 @@ struct LoginRewardView: View {
                         Text("login.day \(i + 1)").font(PixelFont.body(10))
                         PixelIcon(name: reward.item.map { ItemCatalog.food($0)?.iconName ?? "icon_coin" } ?? "icon_coin", size: 22)
                         Text(verbatim: "+\(reward.coins)").font(PixelFont.body(11))
-                        if done { Text("tasks.claimed").font(PixelFont.body(8)).foregroundStyle(PixelPalette.good) }
+                        if done { Text("tasks.claimed").font(PixelFont.body(8)).foregroundStyle(PixelPalette.goodText) }
                     }
                     .frame(maxWidth: .infinity).padding(.vertical, 8)
                     .background(PixelBorder().fill(i == today ? PixelPalette.warn : PixelPalette.panelShade))

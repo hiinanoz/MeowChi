@@ -24,7 +24,7 @@ struct WalkPickerView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(location.titleKey).font(PixelFont.body(14))
                             if unlocked {
-                                Text("walk.ready").font(PixelFont.body(10)).foregroundStyle(PixelPalette.good)
+                                Text("walk.ready").font(PixelFont.body(10)).foregroundStyle(PixelPalette.goodText)
                             } else {
                                 Text("decor.locked \(store.balance.walkLocations[location]?.unlockLevel ?? 1)")
                                     .font(PixelFont.body(10)).foregroundStyle(PixelPalette.accentShade)

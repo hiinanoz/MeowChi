@@ -3,7 +3,7 @@ import SwiftUI
 /// "Ready" or the time left until a cooldown ends.
 @MainActor
 func readiness(_ date: Date?) -> Text {
-    guard let date, date > .now else { return Text("care.ready").foregroundColor(PixelPalette.good) }
+    guard let date, date > .now else { return Text("care.ready").foregroundColor(PixelPalette.goodText) }
     return Text(date, style: .relative)
 }
 
@@ -63,7 +63,7 @@ struct FoodPanel: View {
             Button { onWater() } label: {
                 PanelRow(icon: "icon_cleanliness", title: "water.change",
                          detail: Text(store.state.care.water / 100, format: .percent.precision(.fractionLength(0)))
-                            .foregroundColor(store.isWaterLow ? PixelPalette.bad : PixelPalette.ink))
+                            .foregroundColor(store.isWaterLow ? PixelPalette.badText : PixelPalette.ink))
             }
             .buttonStyle(.plain)
             if owned.isEmpty {
@@ -98,13 +98,13 @@ struct CleanPanel: View {
             Button { onNails() } label: {
                 PanelRow(icon: "icon_brush", title: "nails.title",
                          detail: Text(store.canTrimNails ? "nails.long" : "nails.neat")
-                            .foregroundColor(store.canTrimNails ? PixelPalette.bad : PixelPalette.good))
+                            .foregroundColor(store.canTrimNails ? PixelPalette.badText : PixelPalette.goodText))
             }
             .buttonStyle(.plain)
             Button { onLitter() } label: {
                 PanelRow(icon: "icon_cleanliness", title: "clean.litter",
                          detail: Text(store.state.care.litter / 100, format: .percent.precision(.fractionLength(0)))
-                            .foregroundStyle(store.isLitterDirty ? PixelPalette.bad : PixelPalette.ink))
+                            .foregroundStyle(store.isLitterDirty ? PixelPalette.badText : PixelPalette.ink))
             }
             .buttonStyle(.plain)
         }

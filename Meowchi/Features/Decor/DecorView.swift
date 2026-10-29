@@ -25,7 +25,7 @@ struct DecorView: View {
                 PixelIcon(name: "icon_coin", size: 18)
                 Text(store.state.coins, format: .number).font(PixelFont.body(15)).monospacedDigit()
                 Spacer()
-                if let notice { Text(notice).font(PixelFont.body(11)).foregroundStyle(PixelPalette.bad) }
+                if let notice { Text(notice).font(PixelFont.body(11)).foregroundStyle(PixelPalette.badText) }
             }
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
@@ -69,7 +69,7 @@ struct DecorView: View {
             Text(item.nameKey).font(PixelFont.body(10)).lineLimit(2).multilineTextAlignment(.center)
             Group {
                 if equipped {
-                    Text("decor.inUse").font(PixelFont.body(10)).foregroundStyle(PixelPalette.good)
+                    Text("decor.inUse").font(PixelFont.body(10)).foregroundStyle(PixelPalette.goodText)
                 } else if owned {
                     Button("decor.use") { notice = nil; store.equipDecor(item.id) }
                         .buttonStyle(PixelButtonStyle(fill: PixelPalette.xp))

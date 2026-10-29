@@ -63,6 +63,8 @@ struct RootView: View {
         .animation(.easeInOut(duration: 0.3), value: atHome)
         .onChange(of: store.needsOnboarding) { _, needs in if !needs { atHome = true } }
         .preferredColorScheme(.dark)
+        // The pixel layout stays readable up to the first accessibility size.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
             .alert("save.error.title", isPresented: Binding(get: { store.loadIssue != nil },
                                                             set: { if !$0 { store.loadIssue = nil } })) {
                 Button("common.ok", role: .cancel) {}

@@ -47,7 +47,9 @@ final class LaserChaseScene: SKScene {
         laser.zPosition = 2000
         laser.isHidden = true
         world.addChild(laser)
-        laser.run(.repeatForever(.sequence([.fadeAlpha(to: 0.6, duration: 0.15), .fadeAlpha(to: 1, duration: 0.15)])))
+        if !Motion.reduced {
+            laser.run(.repeatForever(.sequence([.fadeAlpha(to: 0.6, duration: 0.15), .fadeAlpha(to: 1, duration: 0.15)])))
+        }
         layoutWorld()
     }
 

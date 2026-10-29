@@ -7,12 +7,16 @@ enum PixelPalette {
     static let panelShade = Color(red: 0.91, green: 0.80, blue: 0.70)
     static let frame = Color(red: 0.17, green: 0.13, blue: 0.20)
     static let accent = Color(red: 0.95, green: 0.60, blue: 0.29)
-    static let accentShade = Color(red: 0.80, green: 0.42, blue: 0.17)
+    /// Dark enough for small text on the cream panels (contrast >= 4.5:1).
+    static let accentShade = Color(red: 0.60, green: 0.29, blue: 0.10)
     static let barTrack = Color(red: 0.78, green: 0.70, blue: 0.64)
     static let good = Color(red: 0.42, green: 0.78, blue: 0.40)
     static let warn = Color(red: 0.98, green: 0.75, blue: 0.25)
     static let bad = Color(red: 0.92, green: 0.33, blue: 0.33)
     static let xp = Color(red: 0.45, green: 0.62, blue: 0.95)
+    /// Text versions of the status colors, darkened to pass WCAG AA on `panel`.
+    static let goodText = Color(red: 0.13, green: 0.43, blue: 0.16)
+    static let badText = Color(red: 0.68, green: 0.13, blue: 0.13)
 
     static func level(_ value: Double) -> Color {
         value >= 60 ? good : value >= 30 ? warn : bad
@@ -20,8 +24,26 @@ enum PixelPalette {
 }
 
 enum PixelFont {
-    // System monospaced keeps CJK glyphs working. A bitmap font can replace this in the polish phase.
-    static func body(_ size: CGFloat = 13) -> Font { .system(size: size, weight: .heavy, design: .monospaced) }
+    /// Monospaced bold that scales with Dynamic Type (relative to `.body`). CJK text falls back to the system font.
+    static func body(_ size: CGFloat = 13) -> Font { .custom("Menlo-Bold", size: size, relativeTo: .body) }
+}
+
+/// Motion that respects the system "Reduce Motion" setting (SpriteKit can't read the SwiftUI environment).
+enum Motion {
+    static var reduced: Bool { UIAccessibility.isReduceMotionEnabled }
+}
+
+extension AnyTransition {
+    static var panel: AnyTransition { Motion.reduced ? .opacity : .move(edge: .bottom).combined(with: .opacity) }
+    static var banner: AnyTransition { Motion.reduced ? .opacity : .move(edge: .top).combined(with: .opacity) }
+}
+
+extension View {
+    /// Grows the tappable area to at least 44x44 pt (HIG) without changing the layout.
+    func hitTarget(_ visual: CGFloat = 28) -> some View {
+        let pad = max(0, (44 - visual) / 2)
+        return padding(pad).contentShape(Rectangle()).padding(-pad)
+    }
 }
 
 /// Rectangle with stepped "pixel" corners.
@@ -108,6 +130,7 @@ struct BackButton: View {
         Button(action: action) {
             HStack(spacing: 4) {
                 PixelIcon(name: "icon_back", size: 14)
+                    .accessibilityHidden(true)
                 Text(title).font(PixelFont.body(12))
             }
             .foregroundStyle(PixelPalette.ink)

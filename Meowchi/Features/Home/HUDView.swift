@@ -54,6 +54,7 @@ struct HUDView: View {
                             .pixelPanel(PixelPalette.panelShade)
                     }
                     .buttonStyle(.plain)
+                    .hitTarget()
                     .accessibilityLabel(Text("menu.mainMenu"))
                     Button { onCollection() } label: {
                         PixelIcon(name: "icon_collection", size: 14)
@@ -61,6 +62,7 @@ struct HUDView: View {
                             .pixelPanel(PixelPalette.panelShade)
                     }
                     .buttonStyle(.plain)
+                    .hitTarget()
                     .accessibilityLabel(Text("collection.title"))
                     Button { onSettings() } label: {
                         PixelIcon(name: "icon_settings", size: 14)
@@ -68,6 +70,7 @@ struct HUDView: View {
                             .pixelPanel(PixelPalette.panelShade)
                     }
                     .buttonStyle(.plain)
+                    .hitTarget()
                     .accessibilityLabel(Text("settings.title"))
                     Button { onTasks() } label: {
                         HStack(spacing: 4) {
@@ -79,6 +82,7 @@ struct HUDView: View {
                         .pixelPanel(PixelPalette.panelShade)
                     }
                     .buttonStyle(.plain)
+                    .hitTarget()
                     .accessibilityLabel(Text("tasks.title"))
                     }
                 }
@@ -103,6 +107,12 @@ private struct StatChip: View {
     var body: some View {
         VStack(spacing: 3) {
             PixelIcon(name: kind.iconName, size: 16)
+                .overlay(alignment: .topTrailing) {
+                    // Not color alone: a critical need also gets a "!" marker.
+                    if value < Balance.standard.attentionThreshold {
+                        PixelIcon(name: "fx_alert", size: 10).offset(x: 8, y: -4)
+                    }
+                }
             PixelBar(value: value, color: PixelPalette.level(value), segments: 5)
             Text(percent, format: .percent).font(PixelFont.body(9)).monospacedDigit()
         }

@@ -13,7 +13,7 @@ struct ShopView: View {
                 PixelIcon(name: "icon_coin", size: 18)
                 Text(store.state.coins, format: .number).font(PixelFont.body(16)).monospacedDigit()
                 Spacer()
-                if let notice { Text(notice).font(PixelFont.body(11)).foregroundStyle(PixelPalette.bad) }
+                if let notice { Text(notice).font(PixelFont.body(11)).foregroundStyle(PixelPalette.badText) }
             }
             ForEach(ItemCatalog.foods) { food in
                 HStack(spacing: 10) {

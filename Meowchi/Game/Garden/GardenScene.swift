@@ -62,7 +62,9 @@ final class GardenScene: SKScene {
             node.position = point(for: find)
             node.zPosition = 1000 - node.position.y
             node.setScale(2)
-            node.run(.repeatForever(.sequence([.scale(to: 2.6, duration: 0.5), .scale(to: 2, duration: 0.5)])))
+            if !Motion.reduced {
+                node.run(.repeatForever(.sequence([.scale(to: 2.6, duration: 0.5), .scale(to: 2, duration: 0.5)])))
+            }
             world.addChild(node)
             findNodes[i] = node
         }

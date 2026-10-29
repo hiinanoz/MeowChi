@@ -78,7 +78,7 @@ struct MiniGameView: View {
             card {
                 Text(kind.hintKey).font(PixelFont.body(13)).multilineTextAlignment(.center)
                 Text("game.energyCost \(Int(kind.config(store.balance).energyCost))").font(PixelFont.body(11))
-                if let notice { Text(notice).font(PixelFont.body(11)).foregroundStyle(PixelPalette.bad) }
+                if let notice { Text(notice).font(PixelFont.body(11)).foregroundStyle(PixelPalette.badText) }
                 Button("game.start") { start() }.buttonStyle(PixelButtonStyle(fill: PixelPalette.good))
             }
         case .playing:

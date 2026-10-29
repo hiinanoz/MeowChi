@@ -48,7 +48,7 @@ struct TasksView: View {
             }
             Spacer()
             if task.claimed {
-                Text("tasks.claimed").font(PixelFont.body(10)).foregroundStyle(PixelPalette.good)
+                Text("tasks.claimed").font(PixelFont.body(10)).foregroundStyle(PixelPalette.goodText)
             } else {
                 Button { if store.claimTask(task.id) == .ok { AudioManager.shared.play(.coin) } } label: {
                     HStack(spacing: 4) {

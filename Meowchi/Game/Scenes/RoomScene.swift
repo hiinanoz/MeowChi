@@ -449,7 +449,9 @@ final class RoomScene: SKScene {
                 attentionBubble.position = CGPoint(x: 18, y: 62)
                 attentionBubble.zPosition = 10
                 cat.addChild(attentionBubble)
-                attentionBubble.run(.repeatForever(.sequence([.moveBy(x: 0, y: 3, duration: 0.6), .moveBy(x: 0, y: -3, duration: 0.6)])))
+                if !Motion.reduced {
+                    attentionBubble.run(.repeatForever(.sequence([.moveBy(x: 0, y: 3, duration: 0.6), .moveBy(x: 0, y: -3, duration: 0.6)])))
+                }
             }
             attentionBubble.texture = SpriteLibrary.texture(name)
             attentionBubble.size = attentionBubble.texture?.size() ?? .zero
@@ -544,6 +546,7 @@ final class RoomScene: SKScene {
         node.position = CGPoint(x: cat.position.x.rounded() + dx, y: cat.position.y.rounded() + offsetY)
         node.zPosition = 2100
         world.addChild(node)
-        node.run(.sequence([.group([.moveBy(x: 0, y: 24, duration: 1), .fadeOut(withDuration: 1)]), .removeFromParent()]))
+        let rise: CGFloat = Motion.reduced ? 0 : 24
+        node.run(.sequence([.group([.moveBy(x: 0, y: rise, duration: 1), .fadeOut(withDuration: 1)]), .removeFromParent()]))
     }
 }

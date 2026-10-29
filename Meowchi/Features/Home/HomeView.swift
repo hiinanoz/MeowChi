@@ -38,7 +38,7 @@ struct HomeView: View {
                 .overlay(alignment: .top) { noticeBanner }
                 .overlay { if flash { Color.white.allowsHitTesting(false).transition(.opacity) } }
                 .overlay(alignment: .topLeading) {
-                    Button(action: takePhoto) {
+                    Button(action: { takePhoto() }) {
                         PixelIcon(name: "icon_camera", size: 22).padding(6).pixelPanel()
                     }
                     .buttonStyle(.plain)
@@ -60,7 +60,7 @@ struct HomeView: View {
                             .overlay(alignment: .topTrailing) {
                                 if panel != nil {
                                     Button { withAnimation(.easeOut(duration: 0.2)) { panel = nil } } label: {
-                                        PixelIcon(name: "icon_close", size: 12).padding(10)
+                                        PixelIcon(name: "icon_close", size: 14).padding(15)
                                     }
                                     .buttonStyle(.plain)
                                     .accessibilityLabel(Text("common.close"))
@@ -184,7 +184,7 @@ struct HomeView: View {
                 .padding(.horizontal, 10).padding(.vertical, 6)
                 .pixelPanel()
                 .padding(.top, 8)
-                .transition(.move(edge: .top).combined(with: .opacity))
+                .transition(.banner)
         }
     }
 
@@ -196,7 +196,7 @@ struct HomeView: View {
                           AudioManager.shared.play(.tap)
                           scene.refreshWater(drink: true)
                       } })
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .transition(.panel)
         case .clean:
             CleanPanel(
                 onBath: { run(store.bathe(), noReward: "notice.alreadyClean") { scene.playBath() } },
@@ -209,17 +209,17 @@ struct HomeView: View {
                 },
                 onLitter: { run(store.cleanLitter(), noReward: "notice.litterClean") { scene.refreshLitter(sparkle: true) } }
             )
-            .transition(.move(edge: .bottom).combined(with: .opacity))
+            .transition(.panel)
         case .play:
             PlayPanel(onCozy: { startActivity { showCozy = true } },
                       onTV: { chooseChannel = true },
                       onFriend: inviteFriend,
                       onLaser: { startActivity { activeGame = .laserChase } },
                       onGarden: { startActivity { showWalkPicker = true } })
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .transition(.panel)
         case .health:
             HealthPanel { run(store.visitVet(), noReward: "notice.healthy") { scene.playVet() } }
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .transition(.panel)
         case nil:
             EmptyView()
         }
@@ -268,8 +268,10 @@ struct HomeView: View {
         guard let image = scene.snapshot(), PhotoAlbum.save(image) != nil else { return }
         store.recordPhoto()
         AudioManager.shared.play(.tap)
-        withAnimation(.easeOut(duration: 0.08)) { flash = true }
-        withAnimation(.easeIn(duration: 0.4).delay(0.08)) { flash = false }
+        if !Motion.reduced {
+            withAnimation(.easeOut(duration: 0.08)) { flash = true }
+            withAnimation(.easeIn(duration: 0.4).delay(0.08)) { flash = false }
+        }
         show("notice.photoSaved")
     }
 

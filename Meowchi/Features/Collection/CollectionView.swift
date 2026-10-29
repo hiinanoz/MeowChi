@@ -65,7 +65,7 @@ struct CollectionView: View {
             Text(badge.detailKey).font(PixelFont.body(8)).multilineTextAlignment(.center).lineLimit(2)
                 .foregroundStyle(PixelPalette.accentShade)
             if unlocked {
-                Text("tasks.claimed").font(PixelFont.body(9)).foregroundStyle(PixelPalette.good)
+                Text("tasks.claimed").font(PixelFont.body(9)).foregroundStyle(PixelPalette.goodText)
             } else {
                 Text(verbatim: "\(progress)/\(badge.target)").font(PixelFont.body(9)).monospacedDigit()
             }

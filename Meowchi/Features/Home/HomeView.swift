@@ -21,6 +21,7 @@ struct HomeView: View {
     @State private var chooseChannel = false
     @State private var showLogin = false
     @State private var showCollection = false
+    @State private var showMenu = false
     @State private var flash = false
     @State private var activeGame: MiniGameKind?
     @State private var walkLocation: WalkLocation?
@@ -29,9 +30,7 @@ struct HomeView: View {
     var body: some View {
         VStack(spacing: 8) {
             HUDView(onShop: { panel = nil; showShop = true }, onTasks: { panel = nil; showTasks = true },
-                    onSettings: { panel = nil; showSettings = true },
-                    onMainMenu: { panel = nil; setBrushing(false); onMainMenu() },
-                    onCollection: { panel = nil; showCollection = true })
+                    onMenu: { panel = nil; showMenu = true })
             SpriteView(scene: scene, preferredFramesPerSecond: 60, options: [.ignoresSiblingOrder])
                 .clipShape(PixelBorder(step: 4))
                 .overlay(PixelBorder(step: 4).stroke(PixelPalette.ink, lineWidth: 2))
@@ -44,14 +43,6 @@ struct HomeView: View {
                     .buttonStyle(.plain)
                     .padding(8)
                     .accessibilityLabel(Text("collection.takePhoto"))
-                }
-                .overlay(alignment: .topTrailing) {
-                    Button { panel = nil; showDecor = true } label: {
-                        PixelIcon(name: "icon_decor", size: 22).padding(6).pixelPanel()
-                    }
-                    .buttonStyle(.plain)
-                    .padding(8)
-                    .accessibilityLabel(Text("decor.title"))
                 }
                 .overlay(alignment: .bottom) {
                     VStack(spacing: 0) {
@@ -80,6 +71,20 @@ struct HomeView: View {
         .fullScreenCover(isPresented: $showCozy) { CozyView().environment(store) }
         .sheet(isPresented: $showLogin) { LoginRewardView().environment(store) }
         .sheet(isPresented: $showCollection) { CollectionView().environment(store) }
+        .sheet(isPresented: $showMenu) {
+            GameMenuView { destination in
+                switch destination {
+                case .shop: showShop = true
+                case .decor: showDecor = true
+                case .collection: showCollection = true
+                case .tasks: showTasks = true
+                case .checkIn: showLogin = true
+                case .settings: showSettings = true
+                case .mainMenu: setBrushing(false); onMainMenu()
+                }
+            }
+            .environment(store)
+        }
         .onChange(of: store.lastUnlockedBadge) { _, badge in
             guard badge != nil else { return }
             AudioManager.shared.play(.levelUp)
@@ -91,6 +96,11 @@ struct HomeView: View {
             #if DEBUG
             if CommandLine.arguments.contains("-openScreen") { return }
             #endif
+            if store.showWelcomeBack {
+                store.showWelcomeBack = false
+                show("notice.welcomeBack \(store.state.cat.name)")
+                try? await Task.sleep(for: .seconds(2.5))
+            }
             if store.canClaimLogin, store.tutorialStep == nil { showLogin = true }
         }
         .confirmationDialog("tv.watch", isPresented: $chooseChannel, titleVisibility: .visible) {
@@ -131,6 +141,7 @@ struct HomeView: View {
                 case "nails": showNails = true
                 case "login": showLogin = true
                 case "collection": showCollection = true
+                case "menu": showMenu = true
                 case "cozy": showCozy = true
                 case "tv": DispatchQueue.main.asyncAfter(deadline: .now() + 1) { watch("fish") }
                 case "friend": DispatchQueue.main.asyncAfter(deadline: .now() + 1) { inviteFriend() }
@@ -163,6 +174,7 @@ struct HomeView: View {
                 WidgetBridge.update(from: store)
             }
         }
+        .onChange(of: panel) { _, open in scene.setPanelOpen(open != nil) }
         .onChange(of: store.levelUpCount) { _, _ in
             AudioManager.shared.play(.levelUp)
             show("notice.levelUp")

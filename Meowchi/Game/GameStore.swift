@@ -31,6 +31,8 @@ final class GameStore {
     /// Increments on every level up so views can react.
     private(set) var levelUpCount = 0
     var tutorialStep: TutorialStep?
+    /// True once per launch when the player was away for a while (friendly greeting, never guilt).
+    var showWelcomeBack = false
     /// The most recently unlocked badge, for a celebration banner.
     private(set) var lastUnlockedBadge: Badge?
 
@@ -54,7 +56,12 @@ final class GameStore {
         self.calendar = calendar
         let now = clock()
         do {
-            state = try saveStore.load() ?? .newGame(now: now, balance: balance)
+            let loaded = try saveStore.load()
+            state = loaded ?? .newGame(now: now, balance: balance)
+            if let loaded, loaded.onboardedAt != nil,
+               now.timeIntervalSince(loaded.lastSimulatedAt) >= balance.welcomeBackHours * 3600 {
+                showWelcomeBack = true
+            }
         } catch {
             state = .newGame(now: now, balance: balance)
             loadIssue = error as? SaveStoreError ?? .corrupted

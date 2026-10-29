@@ -14,6 +14,11 @@ enum CarePanel: Equatable {
 
 @MainActor
 struct PlayPanel: View {
+    private func sectionTitle(_ key: LocalizedStringKey) -> some View {
+        Text(key).font(PixelFont.body(10)).foregroundStyle(PixelPalette.accentShade)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
     @Environment(GameStore.self) private var store
     let onCozy: @MainActor () -> Void
     let onTV: @MainActor () -> Void
@@ -23,12 +28,9 @@ struct PlayPanel: View {
 
     var body: some View {
         PanelContainer(title: "action.play") {
+            sectionTitle("play.together")
             Button { onCozy() } label: {
                 PanelRow(icon: "icon_happiness", title: "cozy.title", detail: Text("cozy.detail"))
-            }
-            .buttonStyle(.plain)
-            Button { onFriend() } label: {
-                PanelRow(icon: "icon_play", title: "friend.invite", detail: readiness(store.friendReadyAt))
             }
             .buttonStyle(.plain)
             if store.hasTV {
@@ -36,7 +38,14 @@ struct PlayPanel: View {
                     PanelRow(icon: "icon_play", title: "tv.watch", detail: readiness(store.tvReadyAt))
                 }
                 .buttonStyle(.plain)
+                .opacity(store.tvReadyAt == nil ? 1 : 0.55)
             }
+            Button { onFriend() } label: {
+                PanelRow(icon: "icon_play", title: "friend.invite", detail: readiness(store.friendReadyAt))
+            }
+            .buttonStyle(.plain)
+            .opacity(store.friendReadyAt == nil ? 1 : 0.55)
+            sectionTitle("play.games")
             Button { onLaser() } label: {
                 PanelRow(icon: "icon_play", title: MiniGameKind.laserChase.titleKey,
                          detail: Text("game.energyCost \(Int(store.balance.laserChase.energyCost))"))

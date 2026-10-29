@@ -21,7 +21,7 @@ struct MainMenuView: View {
             CatPreview(look: store.state.cat.look, size: 192, animation: .happy)
             Text(verbatim: store.state.cat.name).font(PixelFont.body(16)).foregroundStyle(PixelPalette.panel)
             VStack(spacing: 12) {
-                menuButton("menu.goHome", icon: "icon_happiness", fill: PixelPalette.good) { onGoHome() }
+                menuButton("menu.continue", icon: "icon_happiness", fill: PixelPalette.good) { onGoHome() }
                 menuButton("collection.title", icon: "icon_collection", fill: PixelPalette.panelShade) { showCollection = true }
                 menuButton("settings.title", icon: "icon_settings", fill: PixelPalette.panelShade) { showSettings = true }
             }

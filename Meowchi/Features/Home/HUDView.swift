@@ -5,9 +5,7 @@ struct HUDView: View {
     @Environment(GameStore.self) private var store
     var onShop: @MainActor () -> Void = {}
     var onTasks: @MainActor () -> Void = {}
-    var onSettings: @MainActor () -> Void = {}
-    var onMainMenu: @MainActor () -> Void = {}
-    var onCollection: @MainActor () -> Void = {}
+    var onMenu: @MainActor () -> Void = {}
 
     var body: some View {
         let state = store.state
@@ -20,9 +18,9 @@ struct HUDView: View {
                     .pixelPanel(PixelPalette.panelShade)
                 VStack(alignment: .leading, spacing: 3) {
                     HStack {
-                        Text(verbatim: state.cat.name).font(PixelFont.body(16))
+                        Text(verbatim: state.cat.name).font(PixelFont.body(16)).lineLimit(1).minimumScaleFactor(0.6)
                         Text(store.mood.titleKey)
-                            .font(PixelFont.body(11))
+                            .font(PixelFont.body(11)).lineLimit(1).minimumScaleFactor(0.7)
                             .foregroundStyle(PixelPalette.accentShade)
                     }
                     HStack(spacing: 6) {
@@ -35,48 +33,34 @@ struct HUDView: View {
                 }
                 Spacer(minLength: 0)
                 VStack(alignment: .trailing, spacing: 6) {
-                    Button { onShop() } label: {
-                        HStack(spacing: 4) {
-                            PixelIcon(name: "icon_coin", size: 16)
-                            Text(state.coins, format: .number).font(PixelFont.body(14)).monospacedDigit()
-                            PixelIcon(name: "icon_shop", size: 14)
-                        }
-                        .padding(.horizontal, 8).padding(.vertical, 5)
-                        .pixelPanel(PixelPalette.panelShade)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(Text("hud.coins \(state.coins)"))
-                    .accessibilityHint(Text("shop.title"))
                     HStack(spacing: 6) {
-                    Button { onMainMenu() } label: {
-                        PixelIcon(name: "icon_menu", size: 14)
-                            .padding(.horizontal, 6).padding(.vertical, 4)
+                        Button { onShop() } label: {
+                            HStack(spacing: 4) {
+                                PixelIcon(name: "icon_coin", size: 16)
+                                Text(state.coins, format: .number).font(PixelFont.body(14)).monospacedDigit()
+                                    .lineLimit(1).minimumScaleFactor(0.6)
+                            }
+                            .padding(.horizontal, 8).padding(.vertical, 5)
                             .pixelPanel(PixelPalette.panelShade)
+                        }
+                        .buttonStyle(.plain)
+                        .hitTarget()
+                        .accessibilityLabel(Text("hud.coins \(state.coins)"))
+                        .accessibilityHint(Text("shop.title"))
+                        Button { onMenu() } label: {
+                            PixelIcon(name: "icon_menu", size: 18)
+                                .padding(7)
+                                .pixelPanel(PixelPalette.warn)
+                        }
+                        .buttonStyle(.plain)
+                        .hitTarget(32)
+                        .accessibilityLabel(Text("menu.title"))
                     }
-                    .buttonStyle(.plain)
-                    .hitTarget()
-                    .accessibilityLabel(Text("menu.mainMenu"))
-                    Button { onCollection() } label: {
-                        PixelIcon(name: "icon_collection", size: 14)
-                            .padding(.horizontal, 6).padding(.vertical, 4)
-                            .pixelPanel(PixelPalette.panelShade)
-                    }
-                    .buttonStyle(.plain)
-                    .hitTarget()
-                    .accessibilityLabel(Text("collection.title"))
-                    Button { onSettings() } label: {
-                        PixelIcon(name: "icon_settings", size: 14)
-                            .padding(.horizontal, 6).padding(.vertical, 4)
-                            .pixelPanel(PixelPalette.panelShade)
-                    }
-                    .buttonStyle(.plain)
-                    .hitTarget()
-                    .accessibilityLabel(Text("settings.title"))
                     Button { onTasks() } label: {
                         HStack(spacing: 4) {
                             PixelIcon(name: "icon_tasks", size: 14)
                             Text(verbatim: "\(state.daily.tasks.filter(\.claimed).count)/\(state.daily.tasks.count)")
-                                .font(PixelFont.body(11)).monospacedDigit()
+                                .font(PixelFont.body(11)).monospacedDigit().lineLimit(1).fixedSize()
                         }
                         .padding(.horizontal, 8).padding(.vertical, 4)
                         .pixelPanel(PixelPalette.panelShade)
@@ -84,7 +68,6 @@ struct HUDView: View {
                     .buttonStyle(.plain)
                     .hitTarget()
                     .accessibilityLabel(Text("tasks.title"))
-                    }
                 }
             }
             HStack(spacing: 6) {

@@ -121,6 +121,14 @@
 			path = Badges.swift;
 			sourceTree = "<group>";
 		};
+		1571E9B08768718BDB4DB99F = {
+			isa = PBXGroup;
+			children = (
+				8B831F0EC5FB38C6FB5CECDE,
+			);
+			path = Menu;
+			sourceTree = "<group>";
+		};
 		1F0052988AD48929DD91A0D5 = {
 			isa = PBXBuildFile;
 			fileRef = C1F94725A8C0A27827E1BA6A;
@@ -213,6 +221,12 @@
 			isa = PBXFileReference;
 			lastKnownFileType = file;
 			path = music_upbeat.caf;
+			sourceTree = "<group>";
+		};
+		2A27E758A808E9B8A7F61D1B = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = SheetScaffold.swift;
 			sourceTree = "<group>";
 		};
 		2ABDAA1F2FC7BA27B6D5E174 = {
@@ -316,6 +330,10 @@
 			isa = PBXBuildFile;
 			fileRef = 1F5A5FFEEA0CBBC80A53F194;
 		};
+		3BF1E917546E403FA10C4B95 = {
+			isa = PBXBuildFile;
+			fileRef = 8B831F0EC5FB38C6FB5CECDE;
+		};
 		3CD5F876D3396D6125FF6250 = {
 			isa = PBXBuildFile;
 			fileRef = FE5C46E160C6D42D40175B51;
@@ -418,6 +436,7 @@
 				B2FA4A830BFFBD21DE322421,
 				11AF12A87622A613DAE4C415,
 				DDB282E4EC83CC60ECA79E43,
+				1571E9B08768718BDB4DB99F,
 				8C8BFF97D4427BB7DA313615,
 				2ABDAA1F2FC7BA27B6D5E174,
 				72A6551B898407A06B1A2A43,
@@ -437,6 +456,7 @@
 			children = (
 				5274747BC7D6552F40B2B1A7,
 				4F1F491039760DF3DC099379,
+				2A27E758A808E9B8A7F61D1B,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -861,6 +881,12 @@
 			isa = PBXFileReference;
 			lastKnownFileType = file;
 			path = sfx_purr.caf;
+			sourceTree = "<group>";
+		};
+		8B831F0EC5FB38C6FB5CECDE = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = GameMenuView.swift;
 			sourceTree = "<group>";
 		};
 		8BDC1CC176DF273F185B6FA5 = {
@@ -1313,6 +1339,10 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		E1DB29610A671C21B6C556EA = {
+			isa = PBXBuildFile;
+			fileRef = 2A27E758A808E9B8A7F61D1B;
+		};
 		E4C7E6B95CA148D360358147 = {
 			isa = PBXGroup;
 			children = (
@@ -1486,11 +1516,13 @@
 				D6C4B81BC28233E2FF4E74C3,
 				31402007750C9E62EFE4F6C8,
 				44C3E8508EBE83BD81E74BC2,
+				3BF1E917546E403FA10C4B95,
 				3E3AD8FEE8CBC8695D914923,
 				F36E3D0720E665059BFE0599,
 				8D64F533E338D56D8B52CC69,
 				71EC139CFF6C64BFBCCF827D,
 				772F9DDC1B2C2F1F7B100B44,
+				E1DB29610A671C21B6C556EA,
 				6811F60E3E123DA7324FFE5D,
 				EAD3E36F3E51714F22E4E748,
 				4D6AEE8206C6E53667815C96,

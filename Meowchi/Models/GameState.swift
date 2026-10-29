@@ -200,6 +200,9 @@ struct GameSettings: Codable, Equatable {
     var sfxVolume = 0.8
     var musicVolume = 0.5
     var musicTrack = MusicTrack.calm.rawValue
+    /// Skip the title screen on launch.
+    var openHomeOnLaunch = false
+    var remindersEnabled = false
 
     init() {}
 
@@ -210,6 +213,8 @@ struct GameSettings: Codable, Equatable {
         sfxVolume = min(1, max(0, try c.decodeIfPresent(Double.self, forKey: .sfxVolume) ?? 0.8))
         musicVolume = min(1, max(0, try c.decodeIfPresent(Double.self, forKey: .musicVolume) ?? 0.5))
         musicTrack = try c.decodeIfPresent(String.self, forKey: .musicTrack) ?? MusicTrack.calm.rawValue
+        openHomeOnLaunch = try c.decodeIfPresent(Bool.self, forKey: .openHomeOnLaunch) ?? false
+        remindersEnabled = try c.decodeIfPresent(Bool.self, forKey: .remindersEnabled) ?? false
     }
 }
 

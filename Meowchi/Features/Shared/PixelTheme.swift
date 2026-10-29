@@ -141,7 +141,29 @@ struct BackButton: View {
     }
 }
 
-/// Screen header: back button on the left, centered title, optional trailing content.
+/// Sheet header (HIG): centered title and a close button top-trailing. Sheets also swipe down to close.
+struct PixelSheetHeader: View {
+    let title: LocalizedStringKey
+    let onClose: () -> Void
+
+    var body: some View {
+        ZStack {
+            Text(title).font(PixelFont.body(16)).lineLimit(1).minimumScaleFactor(0.7).padding(.horizontal, 50)
+            HStack {
+                Spacer()
+                Button(action: onClose) {
+                    PixelIcon(name: "icon_close", size: 14).padding(8).pixelPanel(PixelPalette.panelShade)
+                }
+                .buttonStyle(.plain)
+                .hitTarget(30)
+                .accessibilityLabel(Text("common.close"))
+            }
+        }
+        .foregroundStyle(PixelPalette.ink)
+    }
+}
+
+/// Screen header for full-screen and pushed pages: back button on the left, centered title, optional trailing content.
 struct PixelHeader<Trailing: View>: View {
     let title: LocalizedStringKey
     let onBack: () -> Void

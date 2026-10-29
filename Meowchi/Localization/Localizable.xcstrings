@@ -1024,6 +1024,50 @@
         }
       }
     },
+    "decor.group.cat": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your cat"
+          }
+        }
+      }
+    },
+    "decor.group.floor": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Floor"
+          }
+        }
+      }
+    },
+    "decor.group.furniture": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Furniture & fun"
+          }
+        }
+      }
+    },
+    "decor.group.walls": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walls & window"
+          }
+        }
+      }
+    },
     "decor.inUse": {
       "extractionState": "manual",
       "localizations": {
@@ -1949,6 +1993,17 @@
         }
       }
     },
+    "menu.continue": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
+          }
+        }
+      }
+    },
     "menu.goHome": {
       "extractionState": "manual",
       "localizations": {
@@ -1978,6 +2033,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "A cozy pixel cat life"
+          }
+        }
+      }
+    },
+    "menu.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menu"
           }
         }
       }
@@ -2345,6 +2411,17 @@
         }
       }
     },
+    "notice.welcomeBack %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Welcome back! %@ is happy to see you."
+          }
+        }
+      }
+    },
     "onboarding.name.button": {
       "extractionState": "manual",
       "localizations": {
@@ -2411,6 +2488,50 @@
         }
       }
     },
+    "play.games": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Games & walks"
+          }
+        }
+      }
+    },
+    "play.together": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time together"
+          }
+        }
+      }
+    },
+    "purchase.buy %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buy for %lld coins"
+          }
+        }
+      }
+    },
+    "purchase.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buy this item?"
+          }
+        }
+      }
+    },
     "save.error.message": {
       "extractionState": "manual",
       "localizations": {
@@ -2440,6 +2561,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Music"
+          }
+        }
+      }
+    },
+    "settings.openHome": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open straight to home"
           }
         }
       }

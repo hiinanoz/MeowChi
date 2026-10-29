@@ -42,6 +42,9 @@ struct Balance {
     var tvEnergy = -3.0
     var tvXP = 3
 
+    /// After this long away, the room greets the player with a short welcome-back card.
+    var welcomeBackHours = 8.0
+
     // MARK: Health
     var healthRecoveryPerHour = 1.0
     var healthDecayPerHour = 1.5

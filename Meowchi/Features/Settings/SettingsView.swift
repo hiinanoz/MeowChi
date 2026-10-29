@@ -32,6 +32,9 @@ struct SettingsView: View {
                 Toggle(isOn: binding(\.soundEnabled)) { Text("settings.sound").font(PixelFont.body(13)) }
                 volume(binding(\.sfxVolume), enabled: settings.soundEnabled)
             }
+            section {
+                Toggle(isOn: binding(\.openHomeOnLaunch)) { Text("settings.openHome").font(PixelFont.body(13)) }
+            }
             Text("settings.silentHint").font(PixelFont.body(10)).foregroundStyle(PixelPalette.accentShade)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }

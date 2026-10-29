@@ -60,6 +60,8 @@ final class RoomScene: SKScene {
     private var lastUpdate: TimeInterval = 0
     private var nextDecisionAt: TimeInterval = 0
     private var nextLightingCheck: TimeInterval = 0
+    /// While a care panel covers the lower room, the cat stays near the back wall so it remains visible.
+    private var keepNearBack = false
     /// Touch tracking for tap vs. stroke petting.
     private var touchStartedOnCat = false
     private var strokeTravel: CGFloat = 0
@@ -182,8 +184,17 @@ final class RoomScene: SKScene {
     }
 
     private func randomFloorPoint() -> CGPoint {
-        CGPoint(x: .random(in: Self.walkArea.minX...Self.walkArea.maxX).rounded(),
-                y: .random(in: Self.walkArea.minY...Self.walkArea.maxY).rounded())
+        let minY = keepNearBack ? Self.walkArea.maxY - 16 : Self.walkArea.minY
+        return CGPoint(x: .random(in: Self.walkArea.minX...Self.walkArea.maxX).rounded(),
+                       y: .random(in: minY...Self.walkArea.maxY).rounded())
+    }
+
+    func setPanelOpen(_ open: Bool) {
+        keepNearBack = open
+        guard open, !cat.isScripted, store?.state.cat.isSleeping == false,
+              cat.position.y < Self.walkArea.maxY - 24 else { return }
+        cat.walk(to: CGPoint(x: cat.position.x, y: Self.walkArea.maxY - 4))
+        nextDecisionAt = lastUpdate + 4
     }
 
     // MARK: Touch

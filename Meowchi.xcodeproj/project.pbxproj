@@ -268,7 +268,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.meowchi.game.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.othinks.Meowchi.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Meowchi.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Meowchi";
@@ -1099,7 +1099,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.meowchi.game.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.othinks.Meowchi.tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Meowchi.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Meowchi";
@@ -1133,7 +1133,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.meowchi.game.widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.othinks.Meowchi.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1230,7 +1230,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.meowchi.game;
+				PRODUCT_BUNDLE_IDENTIFIER = com.othinks.Meowchi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				CODE_SIGN_ENTITLEMENTS = Meowchi/Meowchi.entitlements;
@@ -1436,7 +1436,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.meowchi.game.widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.othinks.Meowchi.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1501,7 +1501,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.meowchi.game;
+				PRODUCT_BUNDLE_IDENTIFIER = com.othinks.Meowchi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				CODE_SIGN_ENTITLEMENTS = Meowchi/Meowchi.entitlements;

@@ -47,11 +47,11 @@ MeowchiTests/           XCTest: simulator, store, care, gameplay, decor, setting
 ## 4. To-do list (in recommended order)
 
 ### A. Blocked on the user
-1. **Developer portal setup**: Team ID `24RD5ZN5HX` is set (project-level `DEVELOPMENT_TEAM` in `Tools/generate_project.py`). Still to do in the portal: register `com.meowchi.game`, `com.meowchi.game.widget` and the App Group `group.com.meowchi.game`, then create the App Store Connect record.
+1. **Developer portal setup**: Team ID `24RD5ZN5HX` is set (project-level `DEVELOPMENT_TEAM` in `Tools/generate_project.py`). Still to do in the portal: register `com.othinks.Meowchi`, `com.othinks.Meowchi.widget` and the App Group `group.com.othinks.Meowchi`, then create the App Store Connect record.
 
 ### B. Phase 6: release prep (cloud-friendly items marked ☁︎)
 2. ☁︎ **Translations** for tr, es, de, ja, ko, fr into both `.xcstrings` files: about 290 app keys + 3 widget keys, plurals for `hud.coins %lld`. Keep the tone cozy and non-guilt; review Japanese and Korean naturalness. Re-check long German and French text on the Mac.
-3. ☁︎ **App Store metadata**: name, subtitle, keywords, description and "What's New" in 7 languages; privacy answers ("Data Not Collected"); age rating notes. Support URL https://www.hii.othink.com, contact drinanoz@gmail.com.
+3. ☁︎ **App Store metadata**: name, subtitle, keywords, description and "What's New" in 7 languages; privacy answers ("Data Not Collected"); age rating notes. Support URL https://hii.othinks.com, contact mobile@othinks.com.
 4. ☁︎ **Privacy policy page** (static HTML/Markdown for the website): offline, no account, no tracking, local notifications only when opted in.
 5. **Xcode Cloud** (App Store Connect web): a workflow on `main` that archives with a current Xcode and uploads to TestFlight. The user's Mac can't run newer Xcode, so this is the release path.
 6. **Final app icon and launch look**, once the final art exists.
@@ -77,7 +77,7 @@ python3 Tools/generate_project.py
 xcodebuild test -project Meowchi.xcodeproj -scheme Meowchi -destination 'platform=iOS Simulator,name=iPhone 15' CODE_SIGNING_ALLOWED=NO
 ```
 
-Screenshots without tapping use DEBUG launch flags (see `CLAUDE.md`), e.g. `xcrun simctl launch <device> com.meowchi.game -skipOnboarding -openScreen decor -decorTab cat`.
+Screenshots without tapping use DEBUG launch flags (see `CLAUDE.md`), e.g. `xcrun simctl launch <device> com.othinks.Meowchi -skipOnboarding -openScreen decor -decorTab cat`.
 
 ## 6. Working agreement
 

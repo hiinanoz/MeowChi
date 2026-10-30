@@ -12,7 +12,7 @@ APP, TESTS, WIDGET = "Meowchi", "MeowchiTests", "MeowchiWidget"
 # App files that the widget extension also compiles (shared data model, no game logic).
 WIDGET_SHARED_SOURCES = ["Meowchi/Services/Widget/WidgetSnapshot.swift"]
 TEAM_ID = "24RD5ZN5HX"  # Apple Developer Team (signing, App Group)
-BUNDLE_ID = "com.meowchi.game"
+BUNDLE_ID = "com.othinks.Meowchi"
 DEPLOYMENT_TARGET = "17.0"
 DEVICE_FAMILY = "1,2"  # iPhone and iPad
 MARKETING_VERSION, BUILD = "0.1.0", "1"

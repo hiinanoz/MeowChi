@@ -70,7 +70,7 @@ struct RootView: View {
             .alert("save.error.title", isPresented: Binding(get: { store.loadIssue != nil },
                                                             set: { if !$0 { store.loadIssue = nil } })) {
                 Button("common.ok", role: .cancel) {}
-                Button("save.error.help") { openURL(URL(string: "https://www.hii.othink.com")!) }
+                Button("save.error.help") { openURL(URL(string: "https://hii.othinks.com")!) }
             } message: {
                 Text("save.error.message")
             }

@@ -63,12 +63,12 @@ Each phase is its own branch → PR into `main`. Build + tests must pass before 
 2. **Art (high).** The current sprites are code-generated placeholders. Final art must follow `docs/ASSETS.md` and keep the same asset names.
 3. **Font.** A system monospaced font for now, so Japanese and Korean text work. A pixel font needs a license and CJK fallback.
 4. **SwiftData on iOS 17.0–17.x** has known quirks. That's why the whole state is saved as one JSON payload, so it doesn't depend on complex relationships.
-5. **Bundle ID** is `com.meowchi.game` (same pattern as `com.catgridcollection.nonogram`). Register it in the Developer portal before the first upload; it can't change after the App Store record exists.
+5. **Bundle ID** is `com.othinks.Meowchi` (same pattern as `com.catgridcollection.nonogram`). Register it in the Developer portal before the first upload; it can't change after the App Store record exists.
 
 ## App Store info
 
-- Developer website / support URL: https://www.hii.othink.com
-- Support e-mail: drinanoz@gmail.com
+- Developer website / support URL: https://hii.othinks.com
+- Support e-mail: mobile@othinks.com
 - Privacy: offline, no account, no tracking, no data collected (→ "Data Not Collected" label). The privacy policy page is a Phase 6 task.
 
 ## Planning docs

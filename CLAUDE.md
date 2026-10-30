@@ -13,11 +13,11 @@ Start with `docs/HANDOFF.md` (status, code map, ordered to-do list).
 - Navigation (HIG): launch → `MainMenuView` (or straight home via a setting) → `HomeView`. The HUD's Menu button opens `GameMenuView` for everything that isn't cat care. Sheets use `SheetScaffold` (centered title + close button); full-screen covers and pushed pages (`isPushed: true`) use `PixelHeader` (Back). Decorate is a `NavigationStack`.
 - Accessibility: `PixelFont` scales with Dynamic Type; use `PixelPalette.goodText/badText/accentShade` for small text; `.hitTarget()` for small buttons; check `Motion.reduced` before decorative motion; banners go through `show(_:)` which also announces to VoiceOver.
 - iPad: `HomeView` stacks in portrait and goes side-by-side in regular-width landscape.
-- Widget: `MeowchiWidget/` extension (generated target). It shares only `Services/Widget/WidgetSnapshot.swift`; the app writes a forecast to the App Group `group.com.meowchi.game`. Signing with a Team is required for the App Group to work.
+- Widget: `MeowchiWidget/` extension (generated target). It shares only `Services/Widget/WidgetSnapshot.swift`; the app writes a forecast to the App Group `group.com.othinks.Meowchi`. Signing with a Team is required for the App Group to work.
 - A failing XCTest assertion can hang for minutes on this Mac (symbolication). If a run stalls on one test, run that test alone with `-only-testing:` and log values.
 - Audio: `Tools/gen_audio.py` synthesizes `Resources/Audio/*.caf` (music ALAC for gapless looping, SFX PCM). `AudioManager` uses the `.ambient` session.
 - Placeholder art comes from `Tools/gen_sprites.py`. Final art will replace those PNGs under the same names (see `docs/ASSETS.md`). Don't run the generator once real art is in.
-- Bundle ID `com.meowchi.game`. Support site https://www.hii.othink.com, contact drinanoz@gmail.com.
+- Bundle ID `com.othinks.Meowchi`. Support site https://hii.othinks.com, contact mobile@othinks.com.
 
 ## Architecture rules
 

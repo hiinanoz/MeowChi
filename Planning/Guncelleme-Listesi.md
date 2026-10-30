@@ -9,3 +9,4 @@ iş akışında) hatırlatma olarak görünür. Biten madde `[x]` yapılır.
 - [ ] **Son pixel art ve uygulama simgesi.** Yer tutucu PNG'ler aynı adlarla değişecek (docs/ASSETS.md).
 - [ ] **Yarn Ball ve Toy Mouse mini oyunları.**
 - [ ] **Kedi büyümesi** (docs/GROWTH_PLAN.md) ve **kişilikler**.
+- [ ] **Web sayfalarındaki ayar adları.** Uygulama çevrilince docs/_src altındaki menü adlarını (ör. "Gentle reminders") çevirilerle eşleştir, `python3 Tools/build_docs.py` çalıştır.

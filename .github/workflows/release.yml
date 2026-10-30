@@ -53,7 +53,7 @@ jobs:
           # Her yükleme benzersiz ve artan bir numara ister: bu iş akışının çalıştırma sayısı
           BUILD=$((100 + GITHUB_RUN_NUMBER))
           echo "BUILD_NUMBER=$BUILD" >> "$GITHUB_ENV"
-          echo "Sürüm: $(grep MARKETING_VERSION project.yml | head -1 | tr -d ' ') · Derleme: $BUILD"
+          echo "Sürüm: $(grep -E '^ +MARKETING_VERSION:' project.yml | head -1 | tr -d ' ') · Derleme: $BUILD"
 
       - name: Sırları kontrol et
         run: |
@@ -114,6 +114,14 @@ jobs:
             -authenticationKeyIssuerID "$ASC_ISSUER_ID" > export.log 2>&1 || { grep -E "error" export.log | head -40; tail -60 export.log; exit 1; }
           tail -15 export.log
           echo "::notice::Derleme $BUILD_NUMBER App Store Connect'e yüklendi. İşlenmesi 10-30 dakika sürer; sonra TestFlight'ta görünür."
+
+      - name: Hata ayrıntısı (dağıtım günlükleri)
+        if: failure()
+        run: |
+          find "$TMPDIR" /var/folders -name "*.xcdistributionlogs" -maxdepth 6 2>/dev/null | while read d; do
+            grep -h -i -E "error|fail|denied|forbidden|unauthori|role|permission|status code|NSLocalizedDescription" "$d"/*.log 2>/dev/null \
+              | grep -v -i "privatekey\|BEGIN" | sort -u | head -60
+          done
 
       - name: Anahtarı sil
         if: always()

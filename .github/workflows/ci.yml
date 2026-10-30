@@ -1,0 +1,116 @@
+name: CI
+
+# Testler ve yayın derlemesi aynı derleyiciyle: en yeni Xcode 26 (TestFlight'a giden sürüm).
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: En yeni Xcode 26'yı seç
+        run: |
+          ls -d /Applications/Xcode*.app
+          XCODE=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)
+          if [ -z "$XCODE" ]; then echo "::error::Bu çalıştırıcıda Xcode 26 yok"; exit 1; fi
+          sudo xcode-select -s "$XCODE"
+          xcodebuild -version
+          swift --version
+
+      - name: Çeviri dosyalarını doğrula
+        run: python3 Tools/validate_strings.py
+
+      - name: Xcode projesini üret
+        run: ./ProjeyiAc.command
+
+      - name: Uygulamayı derle ve test et
+        run: |
+          xcrun simctl list runtimes
+          # En yeni iOS simülatöründeki ilk iPhone
+          DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          data = json.load(sys.stdin)["devices"]
+          def version(runtime):
+              parts = runtime.split(".")[-1].split("-")[1:]
+              return tuple(int(p) for p in parts if p.isdigit())
+          runtimes = sorted((r for r in data if ".iOS-" in r), key=version, reverse=True)
+          for runtime in runtimes:
+              for device in data[runtime]:
+                  if device["name"].startswith("iPhone"):
+                      print(device["udid"]); sys.exit()
+          ')
+          if [ -n "$DEVICE_ID" ]; then
+            echo "Simülatör: $DEVICE_ID"
+            ACTION=test
+            DESTINATION="id=$DEVICE_ID"
+          else
+            echo "::warning::iOS simülatörü yok; testler çalışmadan yalnızca derleniyor"
+            ACTION=build-for-testing
+            DESTINATION="generic/platform=iOS Simulator"
+          fi
+
+          STATUS=0
+          xcodebuild $ACTION \
+            -project Meowchi.xcodeproj \
+            -scheme Meowchi \
+            -destination "$DESTINATION" \
+            CODE_SIGNING_ALLOWED=NO \
+            > xcodebuild.log 2>&1 || STATUS=$?
+
+          grep -E "error:|Test Case .* (passed|failed)|Executed|\*\* .* \*\*|crash|EXC_" xcodebuild.log || true
+          echo "DEVICE_ID=$DEVICE_ID" >> "$GITHUB_ENV"
+          if [ $STATUS -ne 0 ]; then
+            echo "::error::xcodebuild başarısız (çıkış kodu $STATUS)"
+            grep -B2 -A6 -E "Undefined symbol|ld: |duplicate symbol" xcodebuild.log | head -120 || true
+            tail -40 xcodebuild.log
+          fi
+          exit $STATUS
+
+
+  # App Store'a yükleme için Xcode 26 / iOS 26 SDK zorunlu (Nisan 2026'dan beri).
+  # Aynı kod bu derleyiciyle de Release olarak derlenmeli.
+  release-build:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: En yeni Xcode 26'yı seç
+        run: |
+          ls -d /Applications/Xcode*.app
+          XCODE=$(ls -d /Applications/Xcode_26*.app | sort -V | tail -1)
+          if [ -z "$XCODE" ]; then echo "::error::Bu çalıştırıcıda Xcode 26 yok"; exit 1; fi
+          sudo xcode-select -s "$XCODE"
+          xcodebuild -version
+
+      - name: Xcode projesini üret
+        run: ./ProjeyiAc.command
+
+      - name: Cihaz için Release derlemesi (imzasız)
+        run: |
+          STATUS=0
+          xcodebuild build \
+            -project Meowchi.xcodeproj \
+            -scheme Meowchi \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            CODE_SIGNING_ALLOWED=NO \
+            > release.log 2>&1 || STATUS=$?
+          grep -E "error:|warning: .*deprecated|\*\* .* \*\*" release.log | head -80 || true
+          if [ $STATUS -ne 0 ]; then tail -60 release.log; fi
+          exit $STATUS
+
+      - name: Derlenen uygulamanın Info.plist'i
+        run: |
+          APP=$(find ~/Library/Developer/Xcode/DerivedData -path "*Release-iphoneos/Meowchi.app" -maxdepth 6 | head -1)
+          plutil -p "$APP/Info.plist" | grep -E "CFBundle(ShortVersionString|Version|Localizations)|MinimumOSVersion|DTSDKName|DTXcode" -A9 | head -40
+          ls "$APP" | head -40

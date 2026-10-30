@@ -10,3 +10,6 @@ __pycache__/
 *.cer
 *.certSigningRequest
 .env
+Meowchi.xcodeproj/
+Meowchi/Info.plist
+build/

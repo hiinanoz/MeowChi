@@ -25,7 +25,7 @@ xcodebuild test -project Meowchi.xcodeproj -scheme Meowchi \
 The Xcode project is **generated**. After you add, move or delete a file under `Meowchi/` or `MeowchiTests/`, run:
 
 ```bash
-python3 Tools/generate_project.py
+./ProjeyiAc.command   # brew install xcodegen, then xcodegen generate
 ```
 
 Placeholder sprites are made by `python3 Tools/gen_sprites.py`. Don't run it once real art has replaced the placeholders.

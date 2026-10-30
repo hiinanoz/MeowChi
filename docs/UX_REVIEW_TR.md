@@ -1,6 +1,6 @@
 # Meowchi: UX ve akış değerlendirmesi (Apple HIG'e göre)
 
-Durum: tüm özellikler eklendikten sonra (Faz 5e) yapılan inceleme. Öncelik sırası: **P1** yayın öncesi şart, **P2** güçlü öneri, **P3** sonrası için.
+Durum: tüm özellikler eklendikten sonra (Faz 5e) yapılan inceleme. **Faz 5f'de 6.1 dışındaki tüm maddeler uygulandı** (aşağıdaki "Uygulama durumu" bölümüne bakın). Öncelik sırası: **P1** yayın öncesi şart, **P2** güçlü öneri, **P3** sonrası için.
 
 ## 1. Gezinme ve bilgi mimarisi
 
@@ -60,3 +60,31 @@ Durum: tüm özellikler eklendikten sonra (Faz 5e) yapılan inceleme. Öncelik s
 1. 1.1 Menü sadeleştirme, 1.2 dokunma alanları, 3.1 Dinamik Yazı, 3.2 VoiceOver eylemleri, 3.3 kontrast, 2.2 Hareketi azalt
 2. 1.3 Kapat/Geri ayrımı ve NavigationStack, 1.5 yarım paneller, 1.4 "Devam et", 4.1–4.2
 3. Geçiş animasyonları (2.1), ilk kez ipuçları (5.1), iPad
+
+## Uygulama durumu (Faz 5f)
+
+| Madde | Durum |
+|---|---|
+| 1.1 Menü sadeleştirme | ✅ HUD'da coin, görevler ve Menü; geri kalan her şey Menü sayfasında |
+| 1.2 Dokunma alanları | ✅ `.hitTarget()` ile 44 pt |
+| 1.3 Kapat / Geri | ✅ Sheet'lerde ✕ ve kaydırma; tam ekranda ve iç sayfalarda Geri; Dekor `NavigationStack` |
+| 1.4 Devam et | ✅ "Devam et", "açılışta doğrudan eve git" ayarı, 8 saatten sonra "hoş geldin" bandı |
+| 1.5 Paneller | ✅ Panel açıkken kedi arka tarafa yürüyor ve görünür kalıyor |
+| 1.6 Oyna paneli | ✅ İki gruba ayrıldı; bekleme süresindeki satırlar soluk |
+| 2.1 Geçişler | ✅ Odadan oyuna kararan "kapı" geçişi (panelden ekrana geometri animasyonu yerine) |
+| 2.2 Hareketi azalt | ✅ Sallanma, flaş, parıltı ve kayan geçişler kapatıldı |
+| 2.3 Shader ısıtma | ✅ Açılışta görünmez önden çizim |
+| 2.4 Haptik | ✅ `sensoryFeedback`: seviye, rozet, satın alma |
+| 3.1 Dinamik Yazı | ✅ accessibility1 boyutuna kadar |
+| 3.2 VoiceOver | ✅ Oda tek bir öğe: isim ve ruh hali; sev, tara, fotoğraf çek ve tırmalama eylemleri |
+| 3.3 Kontrast | ✅ Küçük yazılar için koyu tonlar |
+| 3.4 Kritik işaret | ✅ "!" işareti |
+| 4.1 Pahalı alım onayı | ✅ 200 coin ve üstü |
+| 4.2 Sesli bildirim | ✅ Bantlar VoiceOver ile okunuyor; önemli olanlar 3,5 sn kalıyor |
+| 4.3 Kayıt hatası | ✅ Sakin metin ve "Yardım al" bağlantısı |
+| 4.4 Fotoğraflar | ✅ ShareLink yeterli bulundu; ek izin istenmiyor |
+| 5.1 İlk kez ipuçları | ✅ Cozy, gezinti, tırnak, dekor, koleksiyon, TV |
+| 5.2 Hatırlatıcılar | ✅ İsteğe bağlı; ilk ödülden sonra bir kez soruluyor; günde en fazla 1, gece yok |
+| 6.1 İmza ve App Group | ⏳ Team ID gerekiyor |
+| 6.2 iPad | ✅ Dikeyde üst üste (2×), yatayda yan yana |
+| 6.3 Uzun metin testi | ✅ Çift uzunlukta metinle kontrol edildi; taşan butonlar ve satırlar düzeltildi |

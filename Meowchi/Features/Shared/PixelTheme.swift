@@ -92,6 +92,8 @@ struct PixelButtonStyle: ButtonStyle {
         let pressed = configuration.isPressed
         configuration.label
             .font(PixelFont.body(13))
+            .lineLimit(1)
+            .minimumScaleFactor(0.6) // long translations shrink instead of truncating
             .foregroundStyle(PixelPalette.ink)
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity)

@@ -25,6 +25,7 @@ struct HUDView: View {
                     }
                     HStack(spacing: 6) {
                         Text("hud.level \(state.progression.level)").font(PixelFont.body(11))
+                            .lineLimit(1).minimumScaleFactor(0.6).fixedSize(horizontal: false, vertical: true)
                         PixelBar(value: Double(state.progression.xp) / Double(store.balance.xpRequired(forLevel: state.progression.level)) * 100,
                                  color: PixelPalette.xp, segments: 12)
                             .frame(maxWidth: 110)

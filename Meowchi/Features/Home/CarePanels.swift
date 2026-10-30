@@ -184,9 +184,10 @@ struct PanelRow: View {
     var body: some View {
         HStack(spacing: 10) {
             PixelIcon(name: icon, size: 20)
-            Text(title).font(PixelFont.body(13))
+            Text(title).font(PixelFont.body(13)).lineLimit(2).minimumScaleFactor(0.8)
             Spacer(minLength: 4)
             detail?.font(PixelFont.body(12)).monospacedDigit()
+                .lineLimit(2).multilineTextAlignment(.trailing).minimumScaleFactor(0.7)
         }
         .padding(.horizontal, 8).padding(.vertical, 6)
         .background(PixelBorder().fill(PixelPalette.panelShade))

@@ -73,5 +73,7 @@ Each phase is its own branch → PR into `main`. Build + tests must pass before 
 
 ## Planning docs
 
+- [Handoff for cloud sessions](HANDOFF.md): status, rules and the ordered to-do list
+
 - [Cat growth plan](GROWTH_PLAN.md) (not implemented yet)
 - [UX review against Apple HIG (Turkish)](UX_REVIEW_TR.md)

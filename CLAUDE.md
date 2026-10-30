@@ -3,6 +3,8 @@
 Cozy pixel-art virtual-cat game for iOS (SwiftUI + SpriteKit + SwiftData, offline, no dependencies).
 Talk to the user in **Turkish**; code, identifiers and docs are in English. The user wants low token use, careful planning and no invented results.
 
+Start with `docs/HANDOFF.md` (status, code map, ordered to-do list).
+
 ## Must-know constraints
 
 - **Toolchain: Xcode 15.2 / iOS 17 SDK / Swift 5.9** on the user's Mac. Don't use iOS 18+ APIs, Swift 6 language mode, Swift Testing, or Xcode 16 synchronized folders. Deployment target iOS 17.0, iPhone + iPad (`DEVICE_FAMILY` in the generator).

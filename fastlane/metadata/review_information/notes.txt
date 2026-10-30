@@ -1,0 +1,14 @@
+Thank you for reviewing Meowchi: My Pixel Cat.
+
+Meowchi is a cozy, fully offline virtual-pet game. There is no account, no login, no server, no remote configuration, no ads and no in-app purchases. All content is bundled and works identically for everyone.
+
+HOW TO REACH EVERY FEATURE
+1. On first launch, tap "Meet your kitten", type a name and tap "Adopt".
+2. The room is the home screen. The buttons under the room are Feed, Clean (bath, nail trim, litter), Play, Sleep/Wake and Health.
+3. Play opens Cozy time, TV, a friend visit, the Laser Chase mini-game and Walks (park, beach, forest, garden). Activities use the cat's energy, which refills when the cat rests or sleeps.
+4. The "Menu" button in the top bar opens Shop, Decorate, Tasks, Collection (photos and badges), Daily check-in and Settings.
+5. Settings has music, sound effects and optional local reminders (local notifications only, asked for permission when turned on).
+6. A Home Screen widget shows the cat's status.
+
+PRIVACY
+No data is collected. The privacy policy and support pages are linked on the App Store page.

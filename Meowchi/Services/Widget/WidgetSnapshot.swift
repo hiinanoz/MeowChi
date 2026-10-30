@@ -23,7 +23,7 @@ struct WidgetSnapshot: Codable, Equatable {
     var name: String
     var points: [Point]
 
-    static let appGroup = "group.com.meowchi.game"
+    static let appGroup = "group.com.othinks.Meowchi"
     private static let dataFile = "widget-snapshot.json"
     private static let imageFile = "widget-cat.png"
 

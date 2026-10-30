@@ -1,0 +1,90 @@
+name: App Store metinlerini yükle
+
+# Elle başlatılır: GitHub → Actions → "App Store metinlerini yükle" → Run workflow.
+# fastlane/metadata/<dil>/ altındaki ad, alt başlık, açıklama, anahtar kelimeler, tanıtım
+# metni ve bağlantıları App Store Connect'teki --app_version sürümüne ("Yenilikler" dahil) 7 dilde yazar.
+# Derleme yüklemez, incelemeye göndermez. Sırlar: ASC_KEY_ID, ASC_ISSUER_ID, ASC_PRIVATE_KEY.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "App Store sürümü (ör. 1.0.0)"
+        type: string
+        required: true
+      screenshots:
+        description: "Ekran görüntülerini de yükle (fastlane/screenshots varsa)"
+        type: boolean
+        default: false
+      attach_build:
+        description: "Sürümün en son derlemesini sürüme bağla (incelemeye göndermez)"
+        type: boolean
+        default: false
+
+jobs:
+  deliver:
+    runs-on: macos-15
+    timeout-minutes: 75
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+      APP_BUNDLE_ID: ${{ vars.APP_BUNDLE_ID || 'com.othinks.Meowchi' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Metin sınırlarını kontrol et
+        run: python3 Tools/validate_metadata.py
+
+      - name: API anahtarı
+        run: |
+          python3 - <<'PY'
+          import json, os
+          json.dump({
+              "key_id": os.environ["ASC_KEY_ID"],
+              "issuer_id": os.environ["ASC_ISSUER_ID"],
+              "key": os.environ["ASC_PRIVATE_KEY"],
+              "in_house": False,
+          }, open(os.path.expanduser("~/asc_key.json"), "w"))
+          PY
+
+      - name: Ekran görüntülerini store-screenshots dalından al
+        if: inputs.screenshots
+        run: |
+          git fetch --depth 1 origin store-screenshots
+          mkdir -p fastlane/screenshots
+          git --work-tree=fastlane/screenshots checkout FETCH_HEAD -- .
+          git reset -q
+          rm -rf fastlane/screenshots/_preview fastlane/screenshots/_diagnostics
+          find fastlane/screenshots -name "*.png" | sort | head -60
+
+      - name: fastlane deliver
+        run: |
+          # The first version has no "What's New" field in App Store Connect.
+          case "${{ inputs.version }}" in 1.0|1.0.0) rm -f fastlane/metadata/*/release_notes.txt ;; esac
+          fastlane --version | tail -1
+          SHOTS=true
+          if [ "${{ inputs.screenshots }}" = "true" ] && [ -d fastlane/screenshots ]; then SHOTS=false; fi
+          fastlane deliver \
+            --api_key_path ~/asc_key.json \
+            --app_identifier "${{ vars.APP_BUNDLE_ID || 'com.othinks.Meowchi' }}" \
+            --platform ios \
+            --app_version "${{ inputs.version }}" \
+            --metadata_path fastlane/metadata \
+            --screenshots_path fastlane/screenshots \
+            --skip_binary_upload true \
+            --skip_screenshots $SHOTS \
+            --overwrite_screenshots true \
+            --run_precheck_before_submit false \
+            --submit_for_review false \
+            --automatic_release false \
+            --force true
+
+      - name: Son derlemeyi sürüme bağla
+        if: inputs.attach_build
+        run: |
+          python3 -m pip install --quiet --break-system-packages pyjwt cryptography
+          python3 Tools/asc_attach_build.py "${{ inputs.version }}"
+
+      - name: Anahtarı sil
+        if: always()
+        run: rm -f ~/asc_key.json

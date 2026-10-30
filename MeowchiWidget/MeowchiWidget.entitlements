@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.meowchi.game</string>
+		<string>group.com.othinks.Meowchi</string>
 	</array>
 </dict>
 </plist>

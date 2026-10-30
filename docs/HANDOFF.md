@@ -47,7 +47,7 @@ MeowchiTests/           XCTest: simulator, store, care, gameplay, decor, setting
 ## 4. To-do list (in recommended order)
 
 ### A. Blocked on the user
-1. **Developer portal setup**: Team ID `24RD5ZN5HX` is set (`DEVELOPMENT_TEAM` in `project.yml`). Still to do in the portal: register `com.othinks.Meowchi`, `com.othinks.Meowchi.widget` and the App Group `group.com.othinks.Meowchi`, then create the App Store Connect record.
+1. **Developer portal**: done. `com.othinks.Meowchi`, `com.othinks.Meowchi.widget` and `group.com.othinks.Meowchi` are registered and linked (by hand: API-key signing cannot manage App Groups). First TestFlight build: 1.0 (106), uploaded by `release.yml` on 2026-10-30.
 
 ### B. Phase 6: release prep (cloud-friendly items marked ☁︎)
 2. ☁︎ **Translations** for tr, es, de, ja, ko, fr into both `.xcstrings` files: about 290 app keys + 3 widget keys, plurals for `hud.coins %lld`. Keep the tone cozy and non-guilt; review Japanese and Korean naturalness. Re-check long German and French text on the Mac.

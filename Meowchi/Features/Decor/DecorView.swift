@@ -45,6 +45,7 @@ struct DecorView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+            .firstTimeTip("decor", "tip.decor")
             .navigationDestination(for: Tab.self) { tab in
                 DecorItemsView(tab: tab).toolbar(.hidden, for: .navigationBar)
             }

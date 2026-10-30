@@ -34,6 +34,11 @@ struct SettingsView: View {
             }
             section {
                 Toggle(isOn: binding(\.openHomeOnLaunch)) { Text("settings.openHome").font(PixelFont.body(13)) }
+                Toggle(isOn: Binding(get: { store.state.settings.remindersEnabled }, set: { setReminders($0) })) {
+                    Text("settings.reminders").font(PixelFont.body(13))
+                }
+                Text("reminders.explain").font(PixelFont.body(10)).foregroundStyle(PixelPalette.accentShade)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
             Text("settings.silentHint").font(PixelFont.body(10)).foregroundStyle(PixelPalette.accentShade)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -45,6 +50,16 @@ struct SettingsView: View {
             AudioManager.shared.context = .home
         }
         .onDisappear { AudioManager.shared.context = previousContext }
+    }
+
+    /// Turning reminders on asks for permission; if it's refused the switch stays off.
+    private func setReminders(_ on: Bool) {
+        Task {
+            var settings = store.state.settings
+            settings.remindersAsked = true
+            settings.remindersEnabled = on ? await Reminders.requestPermission() : false
+            store.updateSettings(settings)
+        }
     }
 
     private func binding<T>(_ keyPath: WritableKeyPath<GameSettings, T>) -> Binding<T> {

@@ -36,6 +36,7 @@ struct GardenView: View {
         .padding(.vertical, 6)
         .background(PixelPalette.frame.ignoresSafeArea())
         .foregroundStyle(PixelPalette.ink)
+        .firstTimeTip("walk", "tip.walk")
         .onAppear(perform: begin)
         .onChange(of: scenePhase) { _, newPhase in
             // Finds are paid when collected, so ending the walk here loses nothing.

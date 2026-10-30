@@ -129,6 +129,12 @@
 			path = Menu;
 			sourceTree = "<group>";
 		};
+		1B3F243FA058DEE1E0168713 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = Reminders.swift;
+			sourceTree = "<group>";
+		};
 		1F0052988AD48929DD91A0D5 = {
 			isa = PBXBuildFile;
 			fileRef = C1F94725A8C0A27827E1BA6A;
@@ -215,6 +221,12 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = ShopView.swift;
+			sourceTree = "<group>";
+		};
+		29938F240C17D86777443F25 = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = FirstTimeTip.swift;
 			sourceTree = "<group>";
 		};
 		29F5E4BB4E0E06CED42969DF = {
@@ -455,6 +467,7 @@
 			isa = PBXGroup;
 			children = (
 				5274747BC7D6552F40B2B1A7,
+				29938F240C17D86777443F25,
 				4F1F491039760DF3DC099379,
 				778835DEC44E4A1B754437FB,
 				2A27E758A808E9B8A7F61D1B,
@@ -521,6 +534,10 @@
 			lastKnownFileType = sourcecode.swift;
 			path = CatPreview.swift;
 			sourceTree = "<group>";
+		};
+		52BBF293601AF798DD45E83F = {
+			isa = PBXBuildFile;
+			fileRef = 1B3F243FA058DEE1E0168713;
 		};
 		539E514A0E514143D2981EC0 = {
 			isa = PBXBuildFile;
@@ -1015,6 +1032,14 @@
 			path = Localizable.xcstrings;
 			sourceTree = "<group>";
 		};
+		9BF60ECBA9B056CE0EE3BB0B = {
+			isa = PBXGroup;
+			children = (
+				1B3F243FA058DEE1E0168713,
+			);
+			path = Notifications;
+			sourceTree = "<group>";
+		};
 		9BF8CA865509CCDB7D16519C = {
 			isa = PBXBuildFile;
 			fileRef = 580544F59D745C748B7384E1;
@@ -1440,6 +1465,7 @@
 			isa = PBXGroup;
 			children = (
 				4DCAC55E3E1981C00BA1291F,
+				9BF60ECBA9B056CE0EE3BB0B,
 				ED3163498D0A3A0B7D741E45,
 				FC4EA7268D2C84E382BE4893,
 			);
@@ -1532,6 +1558,7 @@
 				F36E3D0720E665059BFE0599,
 				8D64F533E338D56D8B52CC69,
 				71EC139CFF6C64BFBCCF827D,
+				FCC10772773F4C1BDF132AAB,
 				772F9DDC1B2C2F1F7B100B44,
 				7A6A4FF0E1F5EC6604CB7DC9,
 				E1DB29610A671C21B6C556EA,
@@ -1557,6 +1584,7 @@
 				FE2DB1CE5903E7B8B9031C70,
 				B1C979E584FACB39F807F225,
 				F3D87BFB49906450FA0611BB,
+				52BBF293601AF798DD45E83F,
 				1F0052988AD48929DD91A0D5,
 				E7FD3C5D9876A5535EA89FB4,
 				6ABA1F81FA8E37AA56935681,
@@ -1575,6 +1603,10 @@
 		FC6A31311E245F9D418EE423 = {
 			isa = PBXBuildFile;
 			fileRef = 40CA8C37F01E9974835E98C2;
+		};
+		FCC10772773F4C1BDF132AAB = {
+			isa = PBXBuildFile;
+			fileRef = 29938F240C17D86777443F25;
 		};
 		FD48FF84FBAC52D587DABA7D = {
 			isa = PBXGroup;

@@ -26,6 +26,7 @@ struct CozyView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .background(PixelPalette.frame.ignoresSafeArea())
+        .firstTimeTip("cozy", "tip.cozy")
         .onAppear {
             scene.store = store
             scene.look = store.state.cat.look

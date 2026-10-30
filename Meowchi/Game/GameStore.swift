@@ -595,6 +595,15 @@ final class GameStore {
         }
     }
 
+    // MARK: Tips
+
+    func hasSeenTip(_ id: String) -> Bool { state.seenTips.contains(id) }
+
+    func markTipSeen(_ id: String) {
+        guard state.seenTips.insert(id).inserted else { return }
+        save()
+    }
+
     // MARK: Collection
 
     func recordPhoto() {

@@ -2422,6 +2422,17 @@
         }
       }
     },
+    "notify.care %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ would love a little attention when you have a moment."
+          }
+        }
+      }
+    },
     "onboarding.name.button": {
       "extractionState": "manual",
       "localizations": {
@@ -2532,6 +2543,50 @@
         }
       }
     },
+    "reminders.ask": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Want a gentle reminder when your cat needs you?"
+          }
+        }
+      }
+    },
+    "reminders.explain": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At most one a day, only when your cat could use some care, and never at night."
+          }
+        }
+      }
+    },
+    "reminders.no": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No thanks"
+          }
+        }
+      }
+    },
+    "reminders.yes": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yes, please"
+          }
+        }
+      }
+    },
     "save.error.help": {
       "extractionState": "manual",
       "localizations": {
@@ -2583,6 +2638,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Open straight to home"
+          }
+        }
+      }
+    },
+    "settings.reminders": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gentle reminders"
           }
         }
       }
@@ -2902,6 +2968,83 @@
           "stringUnit": {
             "state": "translated",
             "value": "Daily tasks"
+          }
+        }
+      }
+    },
+    "tip.collection": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Badges unlock on their own as you play. Photos come from the camera in the room."
+          }
+        }
+      }
+    },
+    "tip.cozy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stroke slowly across your cat. Each long stroke counts."
+          }
+        }
+      }
+    },
+    "tip.decor": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick a group, then a slot. Free items are always yours."
+          }
+        }
+      }
+    },
+    "tip.gotIt": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Got it"
+          }
+        }
+      }
+    },
+    "tip.nails": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap each claw once. Nails grow back in a few days."
+          }
+        }
+      }
+    },
+    "tip.tv": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your cat loves TV. Come back in a while for another show."
+          }
+        }
+      }
+    },
+    "tip.walk": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap the path to walk. Sparkles hide coins and snacks."
           }
         }
       }

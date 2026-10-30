@@ -26,6 +26,8 @@ struct GameState: Codable, Equatable {
     var lifetime: [String: Int] = [:]
     /// Unlocked badge ids with the unlock date.
     var badges: [String: Date] = [:]
+    /// First-time feature tips the player has dismissed.
+    var seenTips: Set<String> = []
 
     static func newGame(now: Date, balance: Balance) -> GameState {
         GameState(
@@ -122,6 +124,7 @@ extension GameState {
         wardrobe = try c.decodeIfPresent(Set<String>.self, forKey: .wardrobe) ?? []
         lifetime = try c.decodeIfPresent([String: Int].self, forKey: .lifetime) ?? [:]
         badges = try c.decodeIfPresent([String: Date].self, forKey: .badges) ?? [:]
+        seenTips = try c.decodeIfPresent(Set<String>.self, forKey: .seenTips) ?? []
     }
 }
 
@@ -203,6 +206,8 @@ struct GameSettings: Codable, Equatable {
     /// Skip the title screen on launch.
     var openHomeOnLaunch = false
     var remindersEnabled = false
+    /// The reminder opt-in card has been shown (asked once, never nagged).
+    var remindersAsked = false
 
     init() {}
 
@@ -215,6 +220,7 @@ struct GameSettings: Codable, Equatable {
         musicTrack = try c.decodeIfPresent(String.self, forKey: .musicTrack) ?? MusicTrack.calm.rawValue
         openHomeOnLaunch = try c.decodeIfPresent(Bool.self, forKey: .openHomeOnLaunch) ?? false
         remindersEnabled = try c.decodeIfPresent(Bool.self, forKey: .remindersEnabled) ?? false
+        remindersAsked = try c.decodeIfPresent(Bool.self, forKey: .remindersAsked) ?? false
     }
 }
 

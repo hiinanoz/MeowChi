@@ -4,6 +4,16 @@ import SwiftUI
 @MainActor
 struct LoginRewardView: View {
     @Environment(GameStore.self) private var store
+
+    /// Asked once, right after the first reward, with a clear explanation (HIG: ask in context).
+    private func answerReminders(_ yes: Bool) {
+        Task {
+            var settings = store.state.settings
+            settings.remindersAsked = true
+            settings.remindersEnabled = yes ? await Reminders.requestPermission() : false
+            store.updateSettings(settings)
+        }
+    }
     @Environment(\.dismiss) private var dismiss
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 4)
 
@@ -32,6 +42,18 @@ struct LoginRewardView: View {
                     if store.claimLogin() != nil { AudioManager.shared.play(.coin) }
                 }
                 .buttonStyle(PixelButtonStyle(fill: PixelPalette.good))
+            } else if !store.state.settings.remindersAsked {
+                VStack(spacing: 8) {
+                    Text("reminders.ask").font(PixelFont.body(12)).multilineTextAlignment(.center)
+                    Text("reminders.explain").font(PixelFont.body(10)).multilineTextAlignment(.center)
+                        .foregroundStyle(PixelPalette.accentShade)
+                    HStack(spacing: 8) {
+                        Button("reminders.no") { answerReminders(false) }.buttonStyle(PixelButtonStyle(fill: PixelPalette.panel))
+                        Button("reminders.yes") { answerReminders(true) }.buttonStyle(PixelButtonStyle(fill: PixelPalette.good))
+                    }
+                }
+                .padding(10)
+                .background(PixelBorder().fill(PixelPalette.panelShade))
             } else {
                 Text("login.comeBack").font(PixelFont.body(11)).foregroundStyle(PixelPalette.accentShade)
             }

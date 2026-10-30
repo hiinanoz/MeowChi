@@ -37,6 +37,7 @@ struct CollectionView: View {
                 }
             }
         }
+        .firstTimeTip("collection", "tip.collection")
         .onAppear { photos = PhotoAlbum.all() }
         .sheet(item: $selected) { url in
             PhotoDetailView(url: url) {

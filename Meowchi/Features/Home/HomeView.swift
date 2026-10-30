@@ -178,6 +178,7 @@ struct HomeView: View {
                 store.save()
                 AudioManager.shared.pauseMusic()
                 WidgetBridge.update(from: store)
+                Reminders.reschedule(from: store)
             }
         }
         .onChange(of: panel) { _, open in scene.setPanelOpen(open != nil) }
@@ -294,7 +295,13 @@ struct HomeView: View {
     }
 
     private func watch(_ channel: String) {
-        run(store.watchTV(), noReward: nil) { scene.playTV(channel: channel) }
+        run(store.watchTV(), noReward: nil) {
+            scene.playTV(channel: channel)
+            if !store.hasSeenTip("tv") {
+                store.markTipSeen("tv")
+                show("tip.tv", important: true)
+            }
+        }
     }
 
     private func inviteFriend() {

@@ -235,3 +235,43 @@ final class WidgetTests: XCTestCase {
         XCTAssertNotEqual(image.pngData(), ginger, "a different coat changes the picture")
     }
 }
+
+@MainActor
+final class ReminderTests: XCTestCase {
+    private let calendar: Calendar = {
+        var c = Calendar(identifier: .gregorian)
+        c.timeZone = TimeZone(identifier: "Europe/Istanbul")!
+        return c
+    }()
+
+    private func at(_ hour: Int, day: Int = 21) -> Date {
+        calendar.date(from: DateComponents(year: 2026, month: 10, day: day, hour: hour))!
+    }
+
+    private func snapshot(lowAt date: Date) -> WidgetSnapshot {
+        let ok = WidgetSnapshot.Point(date: at(8), hunger: 80, energy: 80, happiness: 80, cleanliness: 80, health: 100, sleeping: false)
+        var low = ok
+        low.date = date
+        low.hunger = 10
+        return WidgetSnapshot(name: "Mochi", points: [ok, low])
+    }
+
+    func testReminderAvoidsQuietHours() {
+        XCTAssertEqual(Reminders.nextReminderDate(snapshot(lowAt: at(15)), now: at(8), calendar: calendar), at(15))
+        XCTAssertEqual(Reminders.nextReminderDate(snapshot(lowAt: at(23)), now: at(8), calendar: calendar), at(9, day: 22))
+        XCTAssertEqual(Reminders.nextReminderDate(snapshot(lowAt: at(3, day: 22)), now: at(8), calendar: calendar), at(9, day: 22))
+    }
+
+    func testNoReminderWhenAllIsWell() {
+        let fine = WidgetSnapshot(name: "Mochi", points: [
+            WidgetSnapshot.Point(date: at(12), hunger: 80, energy: 80, happiness: 80, cleanliness: 80, health: 100, sleeping: false)])
+        XCTAssertNil(Reminders.nextReminderDate(fine, now: at(8), calendar: calendar))
+    }
+
+    func testTipsAreRememberedOnce() {
+        let store = GameStore(saveStore: InMemorySaveStore())
+        XCTAssertFalse(store.hasSeenTip("tv"))
+        store.markTipSeen("tv")
+        XCTAssertTrue(store.hasSeenTip("tv"))
+    }
+}

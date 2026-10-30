@@ -41,6 +41,7 @@ struct NailTrimView: View {
                 Button("common.done") { dismiss() }.buttonStyle(PixelButtonStyle(fill: PixelPalette.good))
             }
         }
+        .firstTimeTip("nails", "tip.nails")
     }
 
     private func snip(_ index: Int) {

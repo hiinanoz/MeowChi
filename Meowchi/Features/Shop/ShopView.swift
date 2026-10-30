@@ -6,6 +6,7 @@ struct ShopView: View {
     @Environment(GameStore.self) private var store
     @Environment(\.dismiss) private var dismiss
     @State private var notice: LocalizedStringKey?
+    @State private var purchases = 0
 
     var body: some View {
         SheetScaffold(title: "shop.title", onClose: { dismiss() }) {
@@ -39,11 +40,12 @@ struct ShopView: View {
                 .background(PixelBorder().fill(PixelPalette.panelShade))
             }
         }
+        .sensoryFeedback(.impact(weight: .light), trigger: purchases)
     }
 
     private func buy(_ food: FoodItem) {
         let result = store.buy(food.id)
-        if result == .ok { AudioManager.shared.play(.buy) }
+        if result == .ok { AudioManager.shared.play(.buy); purchases += 1 }
         notice = result == .insufficientCoins ? "notice.noCoins" : nil
     }
 }

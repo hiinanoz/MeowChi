@@ -2532,13 +2532,24 @@
         }
       }
     },
+    "save.error.help": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get help"
+          }
+        }
+      }
+    },
     "save.error.message": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your previous save was damaged. It has been kept aside safely and a new game was started."
+            "value": "A fresh game has started. Your old save is kept safely on this device, and we can help you get it back."
           }
         }
       }
@@ -2549,7 +2560,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Save couldn't be loaded"
+            "value": "We couldn't open your last save"
           }
         }
       }

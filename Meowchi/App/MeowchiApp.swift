@@ -39,6 +39,7 @@ struct MeowchiApp: App {
 @MainActor
 struct RootView: View {
     @Environment(GameStore.self) private var store
+    @Environment(\.openURL) private var openURL
     /// Launch shows the main menu; "Go home" enters the room. Onboarding drops straight into the room.
     @State private var atHome: Bool?
 
@@ -62,12 +63,14 @@ struct RootView: View {
         .animation(.easeInOut(duration: 0.4), value: store.needsOnboarding)
         .animation(.easeInOut(duration: 0.3), value: atHome)
         .onChange(of: store.needsOnboarding) { _, needs in if !needs { atHome = true } }
+        .background(ShaderPrewarm())
         .preferredColorScheme(.dark)
         // The pixel layout stays readable up to the first accessibility size.
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
             .alert("save.error.title", isPresented: Binding(get: { store.loadIssue != nil },
                                                             set: { if !$0 { store.loadIssue = nil } })) {
                 Button("common.ok", role: .cancel) {}
+                Button("save.error.help") { openURL(URL(string: "https://www.hii.othink.com")!) }
             } message: {
                 Text("save.error.message")
             }

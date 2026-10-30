@@ -8,7 +8,10 @@ struct HomeView: View {
     @Environment(GameStore.self) private var store
     @Environment(\.scenePhase) private var scenePhase
     @State private var scene = RoomScene(size: CGSize(width: 390, height: 500))
-    @State private var notice: LocalizedStringKey?
+    @State private var notice: LocalizedStringResource?
+    @State private var noticeID = 0
+    /// Black "door" shown while switching between the room and an immersive screen.
+    @State private var curtain = false
 
     @State private var panel: CarePanel?
     @State private var isBrushing = false
@@ -68,7 +71,10 @@ struct HomeView: View {
         .sheet(isPresented: $showDecor) { DecorView().environment(store) }
         .sheet(isPresented: $showSettings) { SettingsView().environment(store) }
         .sheet(isPresented: $showNails) { NailTrimView().environment(store) }
-        .fullScreenCover(isPresented: $showCozy) { CozyView().environment(store) }
+        .fullScreenCover(isPresented: $showCozy, onDismiss: liftCurtain) { CozyView().environment(store) }
+        .overlay { if curtain { Color.black.ignoresSafeArea().allowsHitTesting(false).transition(.opacity) } }
+        .sensoryFeedback(.success, trigger: store.levelUpCount)
+        .sensoryFeedback(.success, trigger: store.state.badges.count)
         .sheet(isPresented: $showLogin) { LoginRewardView().environment(store) }
         .sheet(isPresented: $showCollection) { CollectionView().environment(store) }
         .sheet(isPresented: $showMenu) {
@@ -88,7 +94,7 @@ struct HomeView: View {
         .onChange(of: store.lastUnlockedBadge) { _, badge in
             guard badge != nil else { return }
             AudioManager.shared.play(.levelUp)
-            show("notice.badge")
+            show("notice.badge", important: true)
         }
         .task {
             // Greet with the daily check-in once the room has settled (not during onboarding hints).
@@ -98,7 +104,7 @@ struct HomeView: View {
             #endif
             if store.showWelcomeBack {
                 store.showWelcomeBack = false
-                show("notice.welcomeBack \(store.state.cat.name)")
+                show("notice.welcomeBack \(store.state.cat.name)", important: true)
                 try? await Task.sleep(for: .seconds(2.5))
             }
             if store.canClaimLogin, store.tutorialStep == nil { showLogin = true }
@@ -111,17 +117,17 @@ struct HomeView: View {
         .onChange(of: store.isWaterLow) { _, _ in scene.refreshWater() }
         .onChange(of: store.state.decor) { _, _ in scene.applyDecor() }
         .onChange(of: store.state.cat.look) { _, _ in scene.applyDecor() }
-        .fullScreenCover(item: $activeGame, onDismiss: { AudioManager.shared.context = .home }) {
+        .fullScreenCover(item: $activeGame, onDismiss: liftCurtain) {
             MiniGameView(kind: $0).environment(store).onAppear { AudioManager.shared.context = .game }
         }
         .sheet(isPresented: $showWalkPicker) {
             WalkPickerView { location in
                 showWalkPicker = false
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { walkLocation = location }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { presentImmersive { walkLocation = location } }
             }
             .environment(store)
         }
-        .fullScreenCover(item: $walkLocation, onDismiss: { AudioManager.shared.context = .home }) { location in
+        .fullScreenCover(item: $walkLocation, onDismiss: liftCurtain) { location in
             GardenView(location: location).environment(store).onAppear { AudioManager.shared.context = .game }
         }
         .padding(.horizontal, 12)
@@ -177,7 +183,7 @@ struct HomeView: View {
         .onChange(of: panel) { _, open in scene.setPanelOpen(open != nil) }
         .onChange(of: store.levelUpCount) { _, _ in
             AudioManager.shared.play(.levelUp)
-            show("notice.levelUp")
+            show("notice.levelUp", important: true)
         }
         .task {
             // Foreground refresh. Offline time is handled by elapsed-time simulation, not timers.
@@ -223,10 +229,10 @@ struct HomeView: View {
             )
             .transition(.panel)
         case .play:
-            PlayPanel(onCozy: { startActivity { showCozy = true } },
+            PlayPanel(onCozy: { startActivity { presentImmersive { showCozy = true } } },
                       onTV: { chooseChannel = true },
                       onFriend: inviteFriend,
-                      onLaser: { startActivity { activeGame = .laserChase } },
+                      onLaser: { startActivity { presentImmersive { activeGame = .laserChase } } },
                       onGarden: { startActivity { showWalkPicker = true } })
                 .transition(.panel)
         case .health:
@@ -254,7 +260,7 @@ struct HomeView: View {
     }
 
     /// Runs an action result: success closes the panel and plays the scene part; anything else shows why.
-    private func run(_ result: ActionResult, noReward: LocalizedStringKey?, onSuccess: () -> Void) {
+    private func run(_ result: ActionResult, noReward: LocalizedStringResource?, onSuccess: () -> Void) {
         switch result {
         case .ok:
             panel = nil
@@ -312,12 +318,32 @@ struct HomeView: View {
         if store.setSleeping(!store.state.cat.isSleeping) == .busy { show("notice.busy") }
     }
 
-    private func show(_ key: LocalizedStringKey) {
-        withAnimation { notice = key }
+    /// Shows a banner and reads it out for VoiceOver. Important news stays a little longer.
+    private func show(_ text: LocalizedStringResource, important: Bool = false) {
+        noticeID += 1
+        let id = noticeID
+        withAnimation { notice = text }
+        AccessibilityNotification.Announcement(String(localized: text)).post()
         Task {
-            try? await Task.sleep(for: .seconds(2))
-            withAnimation { notice = nil }
+            try? await Task.sleep(for: .seconds(important ? 3.5 : 2))
+            if noticeID == id { withAnimation { notice = nil } }
         }
+    }
+
+    /// Fades the room to black, then presents the immersive screen without its slide (a "door" transition).
+    private func presentImmersive(_ present: @escaping () -> Void) {
+        guard !Motion.reduced else { return present() }
+        withAnimation(.easeIn(duration: 0.25)) { curtain = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction) { present() }
+        }
+    }
+
+    private func liftCurtain() {
+        AudioManager.shared.context = .home
+        withAnimation(.easeOut(duration: 0.35)) { curtain = false }
     }
 }
 

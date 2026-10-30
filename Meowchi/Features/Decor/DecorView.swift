@@ -113,6 +113,7 @@ struct DecorItemsView: View {
             }
             Button("common.cancel", role: .cancel) {}
         }
+        .sensoryFeedback(.impact(weight: .light), trigger: store.state.coins)
     }
 
     /// Big purchases ask first (HIG: confirm costly actions).

@@ -456,6 +456,7 @@
 			children = (
 				5274747BC7D6552F40B2B1A7,
 				4F1F491039760DF3DC099379,
+				778835DEC44E4A1B754437FB,
 				2A27E758A808E9B8A7F61D1B,
 			);
 			path = Shared;
@@ -743,11 +744,21 @@
 			isa = PBXBuildFile;
 			fileRef = 4F1F491039760DF3DC099379;
 		};
+		778835DEC44E4A1B754437FB = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = ShaderPrewarm.swift;
+			sourceTree = "<group>";
+		};
 		78614B87F7D046494071D5B8 = {
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.swift;
 			path = CozyView.swift;
 			sourceTree = "<group>";
+		};
+		7A6A4FF0E1F5EC6604CB7DC9 = {
+			isa = PBXBuildFile;
+			fileRef = 778835DEC44E4A1B754437FB;
 		};
 		7B3171749DEA097B2D9242BA = {
 			isa = PBXFileReference;
@@ -1522,6 +1533,7 @@
 				8D64F533E338D56D8B52CC69,
 				71EC139CFF6C64BFBCCF827D,
 				772F9DDC1B2C2F1F7B100B44,
+				7A6A4FF0E1F5EC6604CB7DC9,
 				E1DB29610A671C21B6C556EA,
 				6811F60E3E123DA7324FFE5D,
 				EAD3E36F3E51714F22E4E748,

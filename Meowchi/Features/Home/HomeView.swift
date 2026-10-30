@@ -31,110 +31,45 @@ struct HomeView: View {
     @State private var showWalkPicker = false
 
     var body: some View {
-        VStack(spacing: 8) {
-            HUDView(onShop: { panel = nil; showShop = true }, onTasks: { panel = nil; showTasks = true },
-                    onMenu: { panel = nil; showMenu = true })
-            SpriteView(scene: scene, preferredFramesPerSecond: 60, options: [.ignoresSiblingOrder])
-                .clipShape(PixelBorder(step: 4))
-                .overlay(PixelBorder(step: 4).stroke(PixelPalette.ink, lineWidth: 2))
-                .overlay(alignment: .top) { noticeBanner }
-                .accessibilityElement()
-                .accessibilityLabel(Text(verbatim: store.state.cat.name) + Text(verbatim: ", ") + Text(store.mood.titleKey))
-                .accessibilityHint(Text("a11y.room.hint"))
-                .accessibilityAction(named: Text(isBrushing ? "a11y.brush" : "a11y.pet")) { scene.accessibilityPet() }
-                .accessibilityAction(named: Text("collection.takePhoto")) { takePhoto() }
-                .accessibilityAction(named: Text("a11y.scratch")) { scene.goScratch() }
-                .overlay { if flash { Color.white.allowsHitTesting(false).transition(.opacity) } }
-                .overlay(alignment: .topLeading) {
-                    Button(action: { takePhoto() }) {
-                        PixelIcon(name: "icon_camera", size: 22).padding(6).pixelPanel()
+        presentations(layoutBody)
+    }
+
+    private var layoutBody: some View {
+        GeometryReader { geo in
+            layoutContent
+                .onAppear { updateLayout(geo.size) }
+                .onChange(of: geo.size) { _, size in updateLayout(size) }
+        }
+    }
+
+    private var layoutContent: some View {
+        Group {
+            if wide {
+                // iPad / wide windows: big room on the left, controls in a side column.
+                HStack(alignment: .top, spacing: 12) {
+                    roomView
+                    VStack(spacing: 10) {
+                        hud
+                        if isBrushing { brushBanner }
+                        ScrollView { panelStack }
+                        Spacer(minLength: 0)
+                        ActionBar(panel: $panel, onToggleSleep: toggleSleep)
                     }
-                    .buttonStyle(.plain)
-                    .padding(8)
-                    .accessibilityLabel(Text("collection.takePhoto"))
+                    .frame(width: 380)
                 }
-                .overlay(alignment: .bottom) {
-                    VStack(spacing: 0) {
-                        if isBrushing { brushBanner } else { TutorialBanner() }
-                        panelView
-                            .overlay(alignment: .topTrailing) {
-                                if panel != nil {
-                                    Button { withAnimation(.easeOut(duration: 0.2)) { panel = nil } } label: {
-                                        PixelIcon(name: "icon_close", size: 14).padding(15)
-                                    }
-                                    .buttonStyle(.plain)
-                                    .accessibilityLabel(Text("common.close"))
-                                }
-                            }
-                            .padding(8)
+            } else {
+                VStack(spacing: 8) {
+                    hud
+                    roomView.overlay(alignment: .bottom) {
+                        VStack(spacing: 0) {
+                            if isBrushing { brushBanner } else { TutorialBanner() }
+                            panelStack.padding(8)
+                        }
+                        .animation(.easeOut(duration: 0.2), value: panel)
                     }
-                    .animation(.easeOut(duration: 0.2), value: panel)
-                }
-            ActionBar(panel: $panel, onToggleSleep: toggleSleep)
-        }
-        .sheet(isPresented: $showShop) { ShopView().environment(store) }
-        .sheet(isPresented: $showTasks) { TasksView().environment(store) }
-        .sheet(isPresented: $showDecor) { DecorView().environment(store) }
-        .sheet(isPresented: $showSettings) { SettingsView().environment(store) }
-        .sheet(isPresented: $showNails) { NailTrimView().environment(store) }
-        .fullScreenCover(isPresented: $showCozy, onDismiss: liftCurtain) { CozyView().environment(store) }
-        .overlay { if curtain { Color.black.ignoresSafeArea().allowsHitTesting(false).transition(.opacity) } }
-        .sensoryFeedback(.success, trigger: store.levelUpCount)
-        .sensoryFeedback(.success, trigger: store.state.badges.count)
-        .sheet(isPresented: $showLogin) { LoginRewardView().environment(store) }
-        .sheet(isPresented: $showCollection) { CollectionView().environment(store) }
-        .sheet(isPresented: $showMenu) {
-            GameMenuView { destination in
-                switch destination {
-                case .shop: showShop = true
-                case .decor: showDecor = true
-                case .collection: showCollection = true
-                case .tasks: showTasks = true
-                case .checkIn: showLogin = true
-                case .settings: showSettings = true
-                case .mainMenu: setBrushing(false); onMainMenu()
+                    ActionBar(panel: $panel, onToggleSleep: toggleSleep)
                 }
             }
-            .environment(store)
-        }
-        .onChange(of: store.lastUnlockedBadge) { _, badge in
-            guard badge != nil else { return }
-            AudioManager.shared.play(.levelUp)
-            show("notice.badge", important: true)
-        }
-        .task {
-            // Greet with the daily check-in once the room has settled (not during onboarding hints).
-            try? await Task.sleep(for: .seconds(0.8))
-            #if DEBUG
-            if CommandLine.arguments.contains("-openScreen") { return }
-            #endif
-            if store.showWelcomeBack {
-                store.showWelcomeBack = false
-                show("notice.welcomeBack \(store.state.cat.name)", important: true)
-                try? await Task.sleep(for: .seconds(2.5))
-            }
-            if store.canClaimLogin, store.tutorialStep == nil { showLogin = true }
-        }
-        .confirmationDialog("tv.watch", isPresented: $chooseChannel, titleVisibility: .visible) {
-            Button("tv.fish") { watch("fish") }
-            Button("tv.birds") { watch("birds") }
-            Button("common.cancel", role: .cancel) {}
-        }
-        .onChange(of: store.isWaterLow) { _, _ in scene.refreshWater() }
-        .onChange(of: store.state.decor) { _, _ in scene.applyDecor() }
-        .onChange(of: store.state.cat.look) { _, _ in scene.applyDecor() }
-        .fullScreenCover(item: $activeGame, onDismiss: liftCurtain) {
-            MiniGameView(kind: $0).environment(store).onAppear { AudioManager.shared.context = .game }
-        }
-        .sheet(isPresented: $showWalkPicker) {
-            WalkPickerView { location in
-                showWalkPicker = false
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { presentImmersive { walkLocation = location } }
-            }
-            .environment(store)
-        }
-        .fullScreenCover(item: $walkLocation, onDismiss: liftCurtain) { location in
-            GardenView(location: location).environment(store).onAppear { AudioManager.shared.context = .game }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
@@ -199,6 +134,126 @@ struct HomeView: View {
                 store.tick()
             }
         }
+    }
+
+    /// Sheets, covers and dialogs, split out so the type checker stays fast.
+    private func presentations<V: View>(_ content: V) -> some View {
+        content
+        .sheet(isPresented: $showShop) { ShopView().environment(store) }
+        .sheet(isPresented: $showTasks) { TasksView().environment(store) }
+        .sheet(isPresented: $showDecor) { DecorView().environment(store) }
+        .sheet(isPresented: $showSettings) { SettingsView().environment(store) }
+        .sheet(isPresented: $showNails) { NailTrimView().environment(store) }
+        .fullScreenCover(isPresented: $showCozy, onDismiss: liftCurtain) { CozyView().environment(store) }
+        .overlay { if curtain { Color.black.ignoresSafeArea().allowsHitTesting(false).transition(.opacity) } }
+        .sensoryFeedback(.success, trigger: store.levelUpCount)
+        .sensoryFeedback(.success, trigger: store.state.badges.count)
+        .sheet(isPresented: $showLogin) { LoginRewardView().environment(store) }
+        .sheet(isPresented: $showCollection) { CollectionView().environment(store) }
+        .sheet(isPresented: $showMenu) {
+            GameMenuView { destination in
+                switch destination {
+                case .shop: showShop = true
+                case .decor: showDecor = true
+                case .collection: showCollection = true
+                case .tasks: showTasks = true
+                case .checkIn: showLogin = true
+                case .settings: showSettings = true
+                case .mainMenu: setBrushing(false); onMainMenu()
+                }
+            }
+            .environment(store)
+        }
+        .onChange(of: store.lastUnlockedBadge) { _, badge in
+            guard badge != nil else { return }
+            AudioManager.shared.play(.levelUp)
+            show("notice.badge", important: true)
+        }
+        .task {
+            // Greet with the daily check-in once the room has settled (not during onboarding hints).
+            try? await Task.sleep(for: .seconds(0.8))
+            #if DEBUG
+            if CommandLine.arguments.contains("-openScreen") { return }
+            #endif
+            if store.showWelcomeBack {
+                store.showWelcomeBack = false
+                show("notice.welcomeBack \(store.state.cat.name)", important: true)
+                try? await Task.sleep(for: .seconds(2.5))
+            }
+            if store.canClaimLogin, store.tutorialStep == nil { showLogin = true }
+        }
+        .confirmationDialog("tv.watch", isPresented: $chooseChannel, titleVisibility: .visible) {
+            Button("tv.fish") { watch("fish") }
+            Button("tv.birds") { watch("birds") }
+            Button("common.cancel", role: .cancel) {}
+        }
+        .onChange(of: store.isWaterLow) { _, _ in scene.refreshWater() }
+        .onChange(of: store.state.decor) { _, _ in scene.applyDecor() }
+        .onChange(of: store.state.cat.look) { _, _ in scene.applyDecor() }
+        .fullScreenCover(item: $activeGame, onDismiss: liftCurtain) {
+            MiniGameView(kind: $0).environment(store).onAppear { AudioManager.shared.context = .game }
+        }
+        .sheet(isPresented: $showWalkPicker) {
+            WalkPickerView { location in
+                showWalkPicker = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { presentImmersive { walkLocation = location } }
+            }
+            .environment(store)
+        }
+        .fullScreenCover(item: $walkLocation, onDismiss: liftCurtain) { location in
+            GardenView(location: location).environment(store).onAppear { AudioManager.shared.context = .game }
+        }
+    }
+
+    @Environment(\.horizontalSizeClass) private var sizeClass
+
+    /// Side-by-side layout for regular-width landscape (iPad). Portrait iPads stack, which gives the room a 2x scale.
+    @State private var wide = false
+
+    private func updateLayout(_ size: CGSize) {
+        wide = sizeClass == .regular && size.width > size.height
+    }
+
+    private var hud: some View {
+        HUDView(onShop: { panel = nil; showShop = true }, onTasks: { panel = nil; showTasks = true },
+                    onMenu: { panel = nil; showMenu = true })
+    }
+
+    private var roomView: some View {
+        SpriteView(scene: scene, preferredFramesPerSecond: 60, options: [.ignoresSiblingOrder])
+                .clipShape(PixelBorder(step: 4))
+                .overlay(PixelBorder(step: 4).stroke(PixelPalette.ink, lineWidth: 2))
+                .overlay(alignment: .top) { noticeBanner }
+                .accessibilityElement()
+                .accessibilityLabel(Text(verbatim: store.state.cat.name) + Text(verbatim: ", ") + Text(store.mood.titleKey))
+                .accessibilityHint(Text("a11y.room.hint"))
+                .accessibilityAction(named: Text(isBrushing ? "a11y.brush" : "a11y.pet")) { scene.accessibilityPet() }
+                .accessibilityAction(named: Text("collection.takePhoto")) { takePhoto() }
+                .accessibilityAction(named: Text("a11y.scratch")) { scene.goScratch() }
+                .overlay { if flash { Color.white.allowsHitTesting(false).transition(.opacity) } }
+                .overlay(alignment: .topLeading) {
+                    Button(action: { takePhoto() }) {
+                        PixelIcon(name: "icon_camera", size: 22).padding(6).pixelPanel()
+                    }
+                    .buttonStyle(.plain)
+                    .padding(8)
+                    .accessibilityLabel(Text("collection.takePhoto"))
+                }
+            .overlay(alignment: .bottom) { if wide { TutorialBanner() } }
+    }
+
+    /// The open care panel with its close button.
+    private var panelStack: some View {
+        panelView
+            .overlay(alignment: .topTrailing) {
+                if panel != nil {
+                    Button { withAnimation(.easeOut(duration: 0.2)) { panel = nil } } label: {
+                        PixelIcon(name: "icon_close", size: 14).padding(15)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text("common.close"))
+                }
+            }
     }
 
     @ViewBuilder private var noticeBanner: some View {

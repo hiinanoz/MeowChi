@@ -13,7 +13,7 @@ APP, TESTS, WIDGET = "Meowchi", "MeowchiTests", "MeowchiWidget"
 WIDGET_SHARED_SOURCES = ["Meowchi/Services/Widget/WidgetSnapshot.swift"]
 BUNDLE_ID = "com.meowchi.game"
 DEPLOYMENT_TARGET = "17.0"
-DEVICE_FAMILY = "1"  # 1 = iPhone. Use "1,2" when iPad support lands.
+DEVICE_FAMILY = "1,2"  # iPhone and iPad
 MARKETING_VERSION, BUILD = "0.1.0", "1"
 REGIONS = ["en", "Base", "tr", "es", "de", "ja", "ko", "fr"]
 

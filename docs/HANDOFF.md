@@ -47,7 +47,7 @@ MeowchiTests/           XCTest: simulator, store, care, gameplay, decor, setting
 ## 4. To-do list (in recommended order)
 
 ### A. Blocked on the user
-1. **Apple Developer Team ID**: set `DEVELOPMENT_TEAM` in `Tools/generate_project.py` for all three targets. Needed for the App Group (`group.com.meowchi.game`, which the widget data relies on), device builds and uploads. Also register the bundle IDs `com.meowchi.game` and `com.meowchi.game.widget` and the App Group in the developer portal.
+1. **Developer portal setup**: Team ID `24RD5ZN5HX` is set (project-level `DEVELOPMENT_TEAM` in `Tools/generate_project.py`). Still to do in the portal: register `com.meowchi.game`, `com.meowchi.game.widget` and the App Group `group.com.meowchi.game`, then create the App Store Connect record.
 
 ### B. Phase 6: release prep (cloud-friendly items marked ☁︎)
 2. ☁︎ **Translations** for tr, es, de, ja, ko, fr into both `.xcstrings` files: about 290 app keys + 3 widget keys, plurals for `hud.coins %lld`. Keep the tone cozy and non-guilt; review Japanese and Korean naturalness. Re-check long German and French text on the Mac.

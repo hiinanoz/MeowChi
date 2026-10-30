@@ -11,6 +11,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 APP, TESTS, WIDGET = "Meowchi", "MeowchiTests", "MeowchiWidget"
 # App files that the widget extension also compiles (shared data model, no game logic).
 WIDGET_SHARED_SOURCES = ["Meowchi/Services/Widget/WidgetSnapshot.swift"]
+TEAM_ID = "24RD5ZN5HX"  # Apple Developer Team (signing, App Group)
 BUNDLE_ID = "com.meowchi.game"
 DEPLOYMENT_TARGET = "17.0"
 DEVICE_FAMILY = "1,2"  # iPhone and iPad
@@ -78,7 +79,7 @@ PROJECT_BASE = {
     "COPY_PHASE_STRIP": "NO", "ENABLE_STRICT_OBJC_MSGSEND": "YES", "ENABLE_USER_SCRIPT_SANDBOXING": "YES",
     "GCC_C_LANGUAGE_STANDARD": "gnu17", "IPHONEOS_DEPLOYMENT_TARGET": DEPLOYMENT_TARGET,
     "LOCALIZATION_PREFERS_STRING_CATALOGS": "YES", "MTL_FAST_MATH": "YES", "SDKROOT": "iphoneos",
-    "SWIFT_VERSION": "5.0", "TARGETED_DEVICE_FAMILY": DEVICE_FAMILY,
+    "SWIFT_VERSION": "5.0", "TARGETED_DEVICE_FAMILY": DEVICE_FAMILY, "DEVELOPMENT_TEAM": TEAM_ID,
 }
 PROJECT_DEBUG = {**PROJECT_BASE, "DEBUG_INFORMATION_FORMAT": "dwarf", "ENABLE_TESTABILITY": "YES",
                  "GCC_OPTIMIZATION_LEVEL": "0", "GCC_PREPROCESSOR_DEFINITIONS": ["DEBUG=1", "$(inherited)"],

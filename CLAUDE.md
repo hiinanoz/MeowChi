@@ -19,7 +19,7 @@ Start with `docs/HANDOFF.md` (status, code map, ordered to-do list).
 - A failing XCTest assertion can hang for minutes on this Mac (symbolication). If a run stalls on one test, run that test alone with `-only-testing:` and log values.
 - Audio: `Tools/gen_audio.py` synthesizes `Resources/Audio/*.caf` (music ALAC for gapless looping, SFX PCM). `AudioManager` uses the `.ambient` session.
 - Placeholder art comes from `Tools/gen_sprites.py`. Final art will replace those PNGs under the same names (see `docs/ASSETS.md`). Don't run the generator once real art is in.
-- Bundle ID `com.othinks.Meowchi`. Support site https://hii.othinks.com, contact mobile@othinks.com.
+- Bundle ID `com.othinks.Meowchi`. Site https://hii.othinks.com/meowchi (support: /meowchi/support, privacy: /meowchi/privacy; WordPress pages embed docs/privacy.html and docs/support.html from GitHub Pages on main), contact mobile@othinks.com.
 
 ## Architecture rules
 

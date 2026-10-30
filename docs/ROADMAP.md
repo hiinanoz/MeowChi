@@ -67,7 +67,7 @@ Each phase is its own branch → PR into `main`. Build + tests must pass before 
 
 ## App Store info
 
-- Developer website / support URL: https://hii.othinks.com
+- Marketing URL: https://hii.othinks.com/meowchi · Support URL: https://hii.othinks.com/meowchi/support · Privacy: https://hii.othinks.com/meowchi/privacy
 - Support e-mail: mobile@othinks.com
 - Privacy: offline, no account, no tracking, no data collected (→ "Data Not Collected" label). The privacy policy page is a Phase 6 task.
 

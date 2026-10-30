@@ -51,7 +51,7 @@ MeowchiTests/           XCTest: simulator, store, care, gameplay, decor, setting
 
 ### B. Phase 6: release prep (cloud-friendly items marked ☁︎)
 2. ☁︎ **Translations** for tr, es, de, ja, ko, fr into both `.xcstrings` files: about 290 app keys + 3 widget keys, plurals for `hud.coins %lld`. Keep the tone cozy and non-guilt; review Japanese and Korean naturalness. Re-check long German and French text on the Mac.
-3. ☁︎ **App Store metadata**: name, subtitle, keywords, description and "What's New" in 7 languages; privacy answers ("Data Not Collected"); age rating notes. Support URL https://hii.othinks.com, contact mobile@othinks.com.
+3. ☁︎ **App Store metadata**: name, subtitle, keywords, description and "What's New" in 7 languages; privacy answers ("Data Not Collected"); age rating notes. Done in `fastlane/metadata` (support https://hii.othinks.com/meowchi/support, marketing https://hii.othinks.com/meowchi), contact mobile@othinks.com.
 4. ☁︎ **Privacy policy page** (static HTML/Markdown for the website): offline, no account, no tracking, local notifications only when opted in.
 5. **Release path: GitHub Actions** (`.github/workflows/release.yml`, manual "App Store'a yükle"). Needs repo secrets APPLE_TEAM_ID, ASC_KEY_ID, ASC_ISSUER_ID, ASC_PRIVATE_KEY and `main` as the default branch. Still to add: metadata.yml, screenshots.yml, ASC status/attach scripts, docs/ privacy+support pages.
 6. **Final app icon and launch look**, once the final art exists.

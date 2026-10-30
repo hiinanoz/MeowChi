@@ -38,6 +38,12 @@ struct HomeView: View {
                 .clipShape(PixelBorder(step: 4))
                 .overlay(PixelBorder(step: 4).stroke(PixelPalette.ink, lineWidth: 2))
                 .overlay(alignment: .top) { noticeBanner }
+                .accessibilityElement()
+                .accessibilityLabel(Text(verbatim: store.state.cat.name) + Text(verbatim: ", ") + Text(store.mood.titleKey))
+                .accessibilityHint(Text("a11y.room.hint"))
+                .accessibilityAction(named: Text(isBrushing ? "a11y.brush" : "a11y.pet")) { scene.accessibilityPet() }
+                .accessibilityAction(named: Text("collection.takePhoto")) { takePhoto() }
+                .accessibilityAction(named: Text("a11y.scratch")) { scene.goScratch() }
                 .overlay { if flash { Color.white.allowsHitTesting(false).transition(.opacity) } }
                 .overlay(alignment: .topLeading) {
                     Button(action: { takePhoto() }) {

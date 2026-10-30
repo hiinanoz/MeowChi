@@ -1,6 +1,50 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "a11y.brush": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brush your cat"
+          }
+        }
+      }
+    },
+    "a11y.pet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pet your cat"
+          }
+        }
+      }
+    },
+    "a11y.room.hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Swipe up or down for actions, like petting your cat."
+          }
+        }
+      }
+    },
+    "a11y.scratch": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send to the scratching post"
+          }
+        }
+      }
+    },
     "accessory.bow": {
       "extractionState": "manual",
       "localizations": {

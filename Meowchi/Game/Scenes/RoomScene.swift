@@ -337,6 +337,13 @@ final class RoomScene: SKScene {
 
     private var postFrame: CGRect { furniture[.post]?.frame.insetBy(dx: -8, dy: -8) ?? .null }
 
+    // MARK: Accessibility (VoiceOver actions on the room)
+
+    func accessibilityPet() {
+        guard let store else { return }
+        if isBrushing { handleBrush(store.brush()) } else { handlePet(store.pet(.stroke), stroke: true) }
+    }
+
     /// Walk to the post and scratch it for a few seconds. Purely cosmetic if the reward is on cooldown.
     func goScratch() {
         guard let store, !cat.isScripted, !store.state.cat.isSleeping else { return }

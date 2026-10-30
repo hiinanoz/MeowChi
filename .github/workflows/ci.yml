@@ -29,6 +29,9 @@ jobs:
       - name: Çeviri dosyalarını doğrula
         run: python3 Tools/validate_strings.py
 
+      - name: App Store metinlerini doğrula
+        run: python3 Tools/validate_metadata.py
+
       - name: Xcode projesini üret
         run: ./ProjeyiAc.command
 

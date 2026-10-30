@@ -118,9 +118,17 @@ jobs:
       - name: Hata ayrıntısı (dağıtım günlükleri)
         if: failure()
         run: |
-          find "$TMPDIR" /var/folders -name "*.xcdistributionlogs" -maxdepth 6 2>/dev/null | while read d; do
-            grep -h -i -E "error|fail|denied|forbidden|unauthori|role|permission|status code|NSLocalizedDescription" "$d"/*.log 2>/dev/null \
-              | grep -v -i "privatekey\|BEGIN" | sort -u | head -60
+          ls -la ~/private_keys || true
+          # Key file shape only (no content): line count, header/footer present, CR characters
+          if [ -n "$ASC_KEY_PATH" ] && [ -f "$ASC_KEY_PATH" ]; then
+            echo "satır: $(wc -l < "$ASC_KEY_PATH")  CR: $(tr -cd '\r' < "$ASC_KEY_PATH" | wc -c)"
+            head -1 "$ASC_KEY_PATH" | grep -q "BEGIN PRIVATE KEY" && echo "başlık var" || echo "BAŞLIK YOK"
+            tail -1 "$ASC_KEY_PATH" | grep -q "END PRIVATE KEY" && echo "son satır var" || echo "SON SATIR YOK"
+          fi
+          for d in $(find /var/folders "$TMPDIR" -maxdepth 6 -name "*.xcdistributionlogs" 2>/dev/null | sort -u); do
+            ls "$d"
+            grep -h -E "https://|statusCode|HTTP/|401|403|Authentication|bearer|token" "$d"/*.log 2>/dev/null \
+              | grep -v -i "privatekey\|BEGIN\|eyJ" | cut -c1-300 | sort -u | head -80
           done
 
       - name: Anahtarı sil

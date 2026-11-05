@@ -1,5 +1,18 @@
+import AppIntents
 import SwiftUI
 import WidgetKit
+
+/// The widget's "Pet" button. Runs in the widget extension: it records the tap for the app and
+/// WidgetKit reloads the timeline right after, so the heart appears at once.
+struct PetCatIntent: AppIntent {
+    static var title: LocalizedStringResource = "widget.pet"
+    static var isDiscoverable = false
+
+    func perform() async throws -> some IntentResult {
+        WidgetActions.recordPet()
+        return .result()
+    }
+}
 
 /// Home-screen widget: the cat's picture and needs, from the forecast the app writes.
 struct CatEntry: TimelineEntry {
@@ -7,6 +20,10 @@ struct CatEntry: TimelineEntry {
     let name: String
     let point: WidgetSnapshot.Point?
     let image: UIImage?
+    var lastPetAt: Date?
+
+    /// A heart shows for a short while after a pet from the widget.
+    var showsHeart: Bool { lastPetAt.map { date.timeIntervalSince($0) < 15 * 60 && date >= $0 } ?? false }
 }
 
 struct CatProvider: TimelineProvider {
@@ -22,15 +39,23 @@ struct CatProvider: TimelineProvider {
         guard let loaded = WidgetSnapshot.load() else {
             return completion(Timeline(entries: [Self.empty], policy: .after(.now.addingTimeInterval(3600))))
         }
-        let entries = loaded.snapshot.points.filter { $0.date >= .now.addingTimeInterval(-3600) }.map {
-            CatEntry(date: $0.date, name: loaded.snapshot.name, point: $0, image: loaded.image)
+        let lastPet = WidgetActions.load().lastPetAt
+        var entries = loaded.snapshot.points.filter { $0.date >= .now.addingTimeInterval(-3600) }.map {
+            CatEntry(date: $0.date, name: loaded.snapshot.name, point: $0, image: loaded.image, lastPetAt: lastPet)
+        }
+        // Right after a pet: an entry now (with the heart) and one when the heart fades.
+        if let lastPet, Date.now.timeIntervalSince(lastPet) < 15 * 60 {
+            entries.append(entry(at: .now))
+            entries.append(entry(at: lastPet.addingTimeInterval(15 * 60)))
+            entries.sort { $0.date < $1.date }
         }
         completion(Timeline(entries: entries.isEmpty ? [entry(at: .now)] : entries, policy: .atEnd))
     }
 
     private func entry(at date: Date) -> CatEntry {
         guard let loaded = WidgetSnapshot.load() else { return Self.empty }
-        return CatEntry(date: date, name: loaded.snapshot.name, point: loaded.snapshot.point(at: date), image: loaded.image)
+        return CatEntry(date: date, name: loaded.snapshot.name, point: loaded.snapshot.point(at: date), image: loaded.image,
+                        lastPetAt: WidgetActions.load().lastPetAt)
     }
 }
 
@@ -53,11 +78,23 @@ struct CatWidgetView: View {
         HStack(spacing: 10) {
             VStack(spacing: 4) {
                 catImage
-                Text(verbatim: entry.name).font(.system(size: 13, weight: .heavy, design: .monospaced)).lineLimit(1)
+                if entry.image != nil {
+                    Button(intent: PetCatIntent()) {
+                        Text(entry.showsHeart ? LocalizedStringKey("widget.purr") : LocalizedStringKey("widget.pet"))
+                            .font(.system(size: 12, weight: .heavy, design: .monospaced)).lineLimit(1)
+                            .contentTransition(.opacity)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 8).padding(.vertical, 3)
+                    .background(Capsule().fill(Color.white.opacity(0.7)))
+                } else {
+                    Text(verbatim: entry.name).font(.system(size: 13, weight: .heavy, design: .monospaced)).lineLimit(1)
+                }
             }
             if family == .systemMedium {
                 if let point = entry.point {
                     VStack(alignment: .leading, spacing: 5) {
+                        Text(verbatim: entry.name).font(.system(size: 13, weight: .heavy, design: .monospaced)).lineLimit(1)
                         bar("icon_hunger", point.hunger)
                         bar("icon_energy", point.energy)
                         bar("icon_happiness", point.happiness)
@@ -75,10 +112,24 @@ struct CatWidgetView: View {
 
     @ViewBuilder private var catImage: some View {
         if let image = entry.image {
-            Image(uiImage: image).interpolation(.none).resizable().frame(width: 96, height: 96)
+            Image(uiImage: image).interpolation(.none).resizable().frame(width: 84, height: 84)
                 .overlay(alignment: .topTrailing) { needBadge }
+                .overlay(alignment: .top) { reaction }
         } else {
             Image("icon_happiness").interpolation(.none).resizable().frame(width: 48, height: 48)
+        }
+    }
+
+    /// A heart after a pet from the widget, or "zzz" while the cat sleeps. Slides in between timeline entries.
+    @ViewBuilder private var reaction: some View {
+        if entry.showsHeart {
+            Image("fx_heart").interpolation(.none).resizable().frame(width: 28, height: 24)
+                .offset(y: -6)
+                .transition(.push(from: .bottom))
+        } else if entry.point?.sleeping == true {
+            Image("fx_zzz").interpolation(.none).resizable().frame(width: 20, height: 20)
+                .offset(x: 24, y: -4)
+                .transition(.opacity)
         }
     }
 

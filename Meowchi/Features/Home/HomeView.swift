@@ -116,6 +116,8 @@ struct HomeView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 store.tick()
+                // A "Pet" tap on the home-screen widget becomes a real pet (normal cooldowns apply).
+                if WidgetActions.takePendingPets() > 0, store.pet() == .ok { WidgetBridge.update(from: store) }
                 AudioManager.shared.resumeMusic()
             } else if phase == .background {
                 store.save()

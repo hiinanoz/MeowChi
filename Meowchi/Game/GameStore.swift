@@ -71,6 +71,14 @@ final class GameStore {
     }
 
     static func makeDefault() -> GameStore {
+        #if DEBUG
+        // App Store screenshots (`-screenshots`): sample progress in memory, the real save is never touched.
+        if CommandLine.arguments.contains("-screenshots") {
+            let store = GameStore(saveStore: InMemorySaveStore())
+            store.debugSampleProgress()
+            return store
+        }
+        #endif
         do {
             let container = try ModelContainer(for: SaveRecord.self)
             return GameStore(saveStore: SwiftDataSaveStore(container: container))
@@ -666,6 +674,21 @@ final class GameStore {
             state.wardrobe.insert(item.rawValue)
             if item.slot == .head ? state.cat.look.head != item.rawValue : state.cat.look.neck != item.rawValue { wear(item) }
         }
+    }
+
+    /// Screenshot helper: an adopted, well-cared-for cat with some progress, decor and badges.
+    func debugSampleProgress() {
+        if needsOnboarding { completeOnboarding(name: String(localized: "cat.defaultName")) }
+        tutorialStep = nil
+        state.progression.level = 7
+        state.coins = 1250
+        for food in ["food.wet", "food.fish", "food.treat"] { state.inventory[food, default: 0] += 5 }
+        state.lifetime = [TaskEvent.fed.rawValue: 60, TaskEvent.petted.rawValue: 120, TaskEvent.played.rawValue: 12,
+                          TaskEvent.walked.rawValue: 8, TaskEvent.bathed.rawValue: 5, "photos": 6]
+        debugEquip(["bed_cloud", "rug_leaf", "plant_basic", "frame_sun", "view_sakura", "post_tower", "toy_yarn", "tv_retro"])
+        debugWear(["bow"])
+        state.seenTips = ["cozy", "walk", "collection", "nails", "decor", "tv"]
+        debugRefill()
     }
 
     func debugRefill() {

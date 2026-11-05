@@ -86,15 +86,30 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         SWIFT_EMIT_LOC_STRINGS: NO
 
+  MeowchiUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: MeowchiUITests
+    dependencies:
+      - target: Meowchi
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.othinks.Meowchi.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_EMIT_LOC_STRINGS: NO
+        TEST_TARGET_NAME: Meowchi
+
 schemes:
   Meowchi:
     build:
       targets:
         Meowchi: all
         MeowchiTests: [test]
+        MeowchiUITests: [test]
     test:
       config: Debug
-      targets: [MeowchiTests]
+      targets: [MeowchiTests, MeowchiUITests]
     run:
       config: Debug
     archive:

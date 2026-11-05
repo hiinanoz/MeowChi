@@ -173,7 +173,7 @@ struct HomeView: View {
             // Greet with the daily check-in once the room has settled (not during onboarding hints).
             try? await Task.sleep(for: .seconds(0.8))
             #if DEBUG
-            if CommandLine.arguments.contains("-openScreen") { return }
+            if CommandLine.arguments.contains("-openScreen") || CommandLine.arguments.contains("-screenshots") { return }
             #endif
             if store.showWelcomeBack {
                 store.showWelcomeBack = false

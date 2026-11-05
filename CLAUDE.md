@@ -29,7 +29,7 @@ Start with `docs/HANDOFF.md` (status, code map, ordered to-do list).
 - Saves: one versioned JSON payload in SwiftData (`SaveCodec`, backup + quarantine). **New `GameState` fields must decode with `decodeIfPresent` + a default in `GameState.init(from:)`**, so existing saves keep loading.
 - The cat is 3 layers (body, ears, tail) recolored by `CatShader` (palette swap of 4 key fur colors; sampling snapped to 64×64 texels). Tail mood is independent of the body animation.
 - SpriteKit room: 360×400 logical room, 1 art px = 1 pt, whole-number scaling, `.nearest` filtering. Views using SpriteKit or store methods are `@MainActor`.
-- Every user-facing string is a semantic key in `Localization/Localizable.xcstrings` (English now; tr, es, de, ja, ko, fr in Phase 6). Never build a `LocalizedStringKey` with string interpolation of a key name; use `"prefix." + value`.
+- Every user-facing string is a semantic key in `Localization/Localizable.xcstrings` (en, tr, es, de, ja, ko, fr; CI runs validate_strings.py --strict, so every new key needs all 7 languages). Never build a `LocalizedStringKey` with string interpolation of a key name; use `"prefix." + value`.
 
 ## Verify (on the Mac)
 

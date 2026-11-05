@@ -27,7 +27,7 @@ jobs:
           swift --version
 
       - name: Çeviri dosyalarını doğrula
-        run: python3 Tools/validate_strings.py
+        run: python3 Tools/validate_strings.py --strict
 
       - name: App Store metinlerini doğrula
         run: python3 Tools/validate_metadata.py

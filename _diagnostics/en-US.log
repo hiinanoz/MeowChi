@@ -1,0 +1,85 @@
+Command line invocation:
+    /Applications/Xcode_26.3.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project Meowchi.xcodeproj -scheme Meowchi -destination id=A79AB685-CC5B-4589-9565-0DF10B54130F -derivedDataPath build/dd "-only-testing:MeowchiUITests/ScreenshotTests" -resultBundlePath results/en-US.xcresult
+
+2026-11-05 13:53:26.411 xcodebuild[10246:32828] warning:  The file reference for "../Meowchi/Services/Widget/WidgetSnapshot.swift" is a member of multiple groups ("Widget" and "Shared"); this indicates a malformed project.  Only the membership in one of the groups will be preserved (but membership in targets will be unaffected).  If you want a reference to the same file in more than one group, please add another reference to the same path.
+Writing result bundle at path:
+	/Users/runner/work/MeowChi/MeowChi/results/en-US.xcresult
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:A79AB685-CC5B-4589-9565-0DF10B54130F, OS:26.2, name:iPhone 17 Pro Max }
+{ platform:iOS Simulator, arch:x86_64, id:A79AB685-CC5B-4589-9565-0DF10B54130F, OS:26.2, name:iPhone 17 Pro Max }
+2026-11-05 13:54:07.440377+0000 MeowchiUITests-Runner[11164:35651] [Default] Running tests...
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'Selected tests' started at 2026-11-05 13:54:16.779.
+Test Suite 'MeowchiUITests.xctest' started at 2026-11-05 13:54:16.781.
+Test Suite 'ScreenshotTests' started at 2026-11-05 13:54:16.781.
+Test Case '-[MeowchiUITests.ScreenshotTests testCaptureStoreScreenshots]' started.
+    t =     0.00s Start Test at 2026-11-05 13:54:16.785
+    t =     0.87s Set Up
+    t =     0.88s Open com.othinks.Meowchi
+    t =     0.88s     Launch com.othinks.Meowchi
+    t =    14.14s         Setting up automation session
+    t =    19.85s         Wait for com.othinks.Meowchi to idle
+    t =    24.83s Wait for com.othinks.Meowchi to become Running Foreground
+    t =    29.20s Added attachment named 'en_01_home'
+    t =    29.20s Terminate com.othinks.Meowchi:12115
+    t =    40.27s Open com.othinks.Meowchi
+    t =    40.27s     Launch com.othinks.Meowchi
+    t =    42.04s         Setting up automation session
+    t =    45.15s         Wait for com.othinks.Meowchi to idle
+    t =    47.62s Wait for com.othinks.Meowchi to become Running Foreground
+    t =    51.85s Added attachment named 'en_02_food'
+    t =    51.85s Terminate com.othinks.Meowchi:13049
+    t =    52.95s Open com.othinks.Meowchi
+    t =    52.95s     Launch com.othinks.Meowchi
+    t =    53.93s         Setting up automation session
+    t =    56.53s         Wait for com.othinks.Meowchi to idle
+    t =    59.29s Wait for com.othinks.Meowchi to become Running Foreground
+    t =    63.54s Added attachment named 'en_03_decor'
+    t =    63.54s Terminate com.othinks.Meowchi:13563
+    t =    64.61s Open com.othinks.Meowchi
+    t =    64.61s     Launch com.othinks.Meowchi
+    t =    65.50s         Setting up automation session
+    t =    68.34s         Wait for com.othinks.Meowchi to idle
+    t =    70.83s Wait for com.othinks.Meowchi to become Running Foreground
+    t =    75.06s Added attachment named 'en_04_laser'
+    t =    75.06s Terminate com.othinks.Meowchi:13712
+    t =    76.10s Open com.othinks.Meowchi
+    t =    76.10s     Launch com.othinks.Meowchi
+    t =    76.79s         Setting up automation session
+    t =    79.20s         Wait for com.othinks.Meowchi to idle
+    t =    81.54s Wait for com.othinks.Meowchi to become Running Foreground
+    t =    85.78s Added attachment named 'en_05_garden'
+    t =    85.78s Terminate com.othinks.Meowchi:14181
+    t =    86.84s Open com.othinks.Meowchi
+    t =    86.84s     Launch com.othinks.Meowchi
+    t =    87.57s         Setting up automation session
+    t =    89.59s         Wait for com.othinks.Meowchi to idle
+    t =    91.82s Wait for com.othinks.Meowchi to become Running Foreground
+    t =    96.03s Added attachment named 'en_06_shop'
+    t =    96.03s Terminate com.othinks.Meowchi:14416
+    t =    97.04s Open com.othinks.Meowchi
+    t =    97.04s     Launch com.othinks.Meowchi
+    t =    97.70s         Setting up automation session
+    t =    99.58s         Wait for com.othinks.Meowchi to idle
+    t =   102.14s Wait for com.othinks.Meowchi to become Running Foreground
+    t =   106.42s Added attachment named 'en_07_collection'
+    t =   106.42s Terminate com.othinks.Meowchi:14959
+    t =   107.49s Tear Down
+Test Case '-[MeowchiUITests.ScreenshotTests testCaptureStoreScreenshots]' passed (107.868 seconds).
+Test Suite 'ScreenshotTests' passed at 2026-11-05 13:56:04.653.
+	 Executed 1 test, with 0 failures (0 unexpected) in 107.868 (107.872) seconds
+Test Suite 'MeowchiUITests.xctest' passed at 2026-11-05 13:56:04.654.
+	 Executed 1 test, with 0 failures (0 unexpected) in 107.868 (107.873) seconds
+Test Suite 'Selected tests' passed at 2026-11-05 13:56:04.655.
+	 Executed 1 test, with 0 failures (0 unexpected) in 107.868 (107.876) seconds
+2026-11-05 13:56:05.707 xcodebuild[10246:32828] [MT] IDETestOperationsObserverDebug: 148.856 elapsed -- Testing started completed.
+2026-11-05 13:56:05.707 xcodebuild[10246:32828] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-05 13:56:05.707 xcodebuild[10246:32828] [MT] IDETestOperationsObserverDebug: 148.856 sec, +148.856 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/runner/work/MeowChi/MeowChi/results/en-US.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started

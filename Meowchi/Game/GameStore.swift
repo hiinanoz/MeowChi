@@ -30,6 +30,8 @@ final class GameStore {
     var loadIssue: SaveStoreError?
     /// Increments on every level up so views can react.
     private(set) var levelUpCount = 0
+    /// Bumped when the cat reaches a new life stage (the room shows a celebration banner).
+    private(set) var stageUpCount = 0
     var tutorialStep: TutorialStep?
     /// True once per launch when the player was away for a while (friendly greeting, never guilt).
     var showWelcomeBack = false
@@ -113,8 +115,10 @@ final class GameStore {
             state.daily = .generate(dayKey: today, count: balance.dailyTaskCount)
         }
         if today > state.login.dayKey {
+            let before = stage
             state.login.dayKey = today
             state.login.days += 1
+            if stage > before, state.onboardedAt != nil { stageUpCount += 1 }
         }
     }
 
@@ -366,9 +370,12 @@ final class GameStore {
 
     var needsOnboarding: Bool { state.onboardedAt == nil }
 
+    var stage: CatStage { CatStage(careDays: state.login.days, balance: balance) }
+
     func completeOnboarding(name: String, look: CatLook = CatLook()) {
         state.cat.name = CatState.sanitizedName(name, maxLength: balance.maxNameLength) ?? state.cat.name
         state.cat.look = CatLook(coat: look.coat, ears: look.ears, tail: look.tail).sanitized
+        state.cat.personality = Personality.allCases.randomElement() ?? .playful
         state.onboardedAt = clock()
         tutorialStep = .feed
         save()
@@ -648,7 +655,7 @@ final class GameStore {
 
     private func grantXP(_ amount: Int) {
         guard amount > 0 else { return }
-        state.progression.xp += amount
+        state.progression.xp += Int((Double(amount) * balance.xpMultiplier(stage)).rounded())
         while state.progression.xp >= balance.xpRequired(forLevel: state.progression.level) {
             state.progression.xp -= balance.xpRequired(forLevel: state.progression.level)
             state.progression.level += 1

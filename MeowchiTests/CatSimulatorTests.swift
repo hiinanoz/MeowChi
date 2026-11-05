@@ -11,7 +11,9 @@ final class CatSimulatorTests: XCTestCase {
         var state = newState()
         CatSimulator.advance(&state, to: start.addingTimeInterval(2 * 3600), balance: balance)
         XCTAssertEqual(state.cat.stats.hunger, balance.startingStats.hunger - 2 * balance.hungerDecayPerHour, accuracy: 0.001)
-        XCTAssertEqual(state.cat.stats.energy, balance.startingStats.energy - 2 * balance.energyDecayPerHour, accuracy: 0.001)
+        // A new game is a kitten (0 care days): energy drains a little faster.
+        let energyRate = balance.energyDecayPerHour * balance.energyDecayMultiplier(.kitten)
+        XCTAssertEqual(state.cat.stats.energy, balance.startingStats.energy - 2 * energyRate, accuracy: 0.001)
         XCTAssertEqual(state.lastSimulatedAt, start.addingTimeInterval(2 * 3600))
     }
 

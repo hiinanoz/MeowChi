@@ -12,15 +12,17 @@ enum CatSimulator {
             return
         }
         var remaining = min(elapsed, balance.maxSimulatedHours * 3600)
+        let stage = CatStage(careDays: state.login.days, balance: balance)
         while remaining > 0 {
             let step = min(remaining, balance.simulationStepSeconds)
-            applyStep(&state.cat, care: &state.care, hours: step / 3600, balance: balance)
+            applyStep(&state.cat, care: &state.care, hours: step / 3600, balance: balance, stage: stage)
             remaining -= step
         }
         state.lastSimulatedAt = now
     }
 
-    static func applyStep(_ cat: inout CatState, care: inout CareState, hours h: Double, balance b: Balance) {
+    static func applyStep(_ cat: inout CatState, care: inout CareState, hours h: Double, balance b: Balance,
+                          stage: CatStage = .junior) {
         var s = cat.stats
         let floor = b.decayFloor
         care.litter = min(100, care.litter + b.litterFillPerHour * h)
@@ -30,13 +32,13 @@ enum CatSimulator {
             s.energy += b.energyRestorePerHourSleeping * h
             s.hunger = decay(s.hunger, by: b.hungerDecayPerHourSleeping * h, floor: floor)
         } else {
-            s.energy = decay(s.energy, by: b.energyDecayPerHour * h, floor: floor)
+            s.energy = decay(s.energy, by: b.energyDecayPerHour * b.energyDecayMultiplier(stage) * h, floor: floor)
             s.hunger = decay(s.hunger, by: b.hungerDecayPerHour * h, floor: floor)
         }
         s.cleanliness = decay(s.cleanliness, by: (b.cleanlinessDecayPerHour + litterPenalty) * h, floor: floor)
 
         let neglected = min(s.hunger, s.cleanliness, s.energy) < b.neglectThreshold
-        let happinessLoss = b.happinessDecayPerHour + (neglected ? b.happinessNeglectPenaltyPerHour : 0)
+        let happinessLoss = b.happinessDecayPerHour * b.happinessDecayMultiplier(stage) + (neglected ? b.happinessNeglectPenaltyPerHour : 0)
             + (care.water < b.waterLowThreshold ? b.lowWaterHappinessPenaltyPerHour : 0)
         s.happiness = decay(s.happiness, by: happinessLoss * h, floor: floor)
 

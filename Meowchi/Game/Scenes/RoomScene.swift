@@ -172,9 +172,13 @@ final class RoomScene: SKScene {
         case .happy, .neutral: walkChance = 0.5
         }
         cat.setTailMood(TailMood(mood))
-        if mood != .sleepy, mood != .sick, Double.random(in: 0...1) < store?.balance.scratchChance ?? 0 {
+        // Personality shifts how often the cat wanders and scratches (Balance.personality*Multiplier).
+        let personality = store?.state.cat.personality ?? .playful
+        let walkFactor = store?.balance.personalityWalkMultiplier[personality] ?? 1
+        let scratchFactor = store?.balance.personalityScratchMultiplier[personality] ?? 1
+        if mood != .sleepy, mood != .sick, Double.random(in: 0...1) < (store?.balance.scratchChance ?? 0) * scratchFactor {
             goScratch()
-        } else if Double.random(in: 0...1) < walkChance {
+        } else if Double.random(in: 0...1) < walkChance * walkFactor {
             cat.walk(to: randomFloorPoint())
         } else {
             cat.play([.sad, .hungry, .sick].contains(mood) ? .sad : .idle)

@@ -127,6 +127,10 @@ struct HomeView: View {
             AudioManager.shared.play(.levelUp)
             show("notice.levelUp", important: true)
         }
+        .onChange(of: store.stageUpCount) { _, _ in
+            AudioManager.shared.play(.levelUp)
+            show("notice.grownUp \(store.state.cat.name)", important: true)
+        }
         .task {
             // Foreground refresh. Offline time is handled by elapsed-time simulation, not timers.
             while !Task.isCancelled {

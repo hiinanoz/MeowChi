@@ -1,4 +1,9 @@
-# Cat growth: plan (not implemented yet)
+# Cat growth: plan
+
+**Status:** logic implemented (`Models/CatStage.swift`, stage modifiers in `Balance`, `CatSimulator.applyStep(stage:)`,
+XP bonus in `GameStore.grantXP`, banner via `stageUpCount`, stage and personality shown in the Health panel).
+**Not yet:** stage-specific body art and the celebration scene (waiting for final art); the "wise cat" badge was
+dropped because the 30-day "Devoted" badge already marks adulthood.
 
 ## Goal
 

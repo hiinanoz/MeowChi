@@ -137,6 +137,13 @@ struct HealthPanel: View {
             Text(tipKey(for: stats))
                 .font(PixelFont.body(11))
                 .frame(maxWidth: .infinity, alignment: .leading)
+            HStack(spacing: 4) {
+                Text(LocalizedStringKey(store.stage.nameKey))
+                Text(verbatim: "·")
+                Text(LocalizedStringKey("personality." + store.state.cat.personality.rawValue))
+            }
+            .font(PixelFont.body(10)).foregroundStyle(PixelPalette.accentShade)
+            .frame(maxWidth: .infinity, alignment: .leading)
             Button { onVet() } label: {
                 HStack(spacing: 6) {
                     PixelIcon(name: "icon_health", size: 16)

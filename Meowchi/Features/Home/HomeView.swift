@@ -93,6 +93,8 @@ struct HomeView: View {
                 case "tv": DispatchQueue.main.asyncAfter(deadline: .now() + 1) { watch("fish") }
                 case "friend": DispatchQueue.main.asyncAfter(deadline: .now() + 1) { inviteFriend() }
                 case "laser": activeGame = .laserChase
+                case "yarn": activeGame = .yarnBall
+                case "mouse": activeGame = .toyMouse
                 case "garden": walkLocation = .garden
                 case "walks": showWalkPicker = true
                 case "beach": walkLocation = .beach
@@ -298,7 +300,7 @@ struct HomeView: View {
             PlayPanel(onCozy: { startActivity { presentImmersive { showCozy = true } } },
                       onTV: { chooseChannel = true },
                       onFriend: inviteFriend,
-                      onLaser: { startActivity { presentImmersive { activeGame = .laserChase } } },
+                      onGame: { kind in startActivity { presentImmersive { activeGame = kind } } },
                       onGarden: { startActivity { showWalkPicker = true } })
                 .transition(.panel)
         case .health:

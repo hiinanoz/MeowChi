@@ -7897,6 +7897,194 @@
         }
       }
     },
+    "game.toyMouse.hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Aufziehmaus flitzt von allein herum. Tippe auf den Boden, um deine Katze hinterherzuschicken!"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The wind-up mouse runs around on its own. Tap the floor to send your cat after it!"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El ratón de cuerda corre solo por ahí. ¡Toca el suelo para mandar a tu gato tras él!"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La souris mécanique court toute seule. Touche le sol pour envoyer ton chat à sa poursuite !"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ぜんまいねずみがひとりで走り回るよ。床をタップして、ねこを追いかけさせよう！"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "태엽 쥐가 혼자서 돌아다녀요. 바닥을 탭해서 고양이가 쫓아가게 해 주세요!"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kurmalı fare kendi kendine koşturuyor. Kedini peşinden göndermek için zemine dokun!"
+          }
+        }
+      }
+    },
+    "game.toyMouse.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spielzeugmaus"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toy Mouse"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ratón de juguete"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Souris jouet"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ねずみのおもちゃ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "쥐돌이 잡기"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oyuncak Fare"
+          }
+        }
+      }
+    },
+    "game.yarnBall.hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wische über das Wollknäuel, um es zu werfen. Wenn es langsamer wird, kann deine Katze es fangen. Dann wirf es wieder!"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Swipe the yarn ball to toss it. When it slows down, your cat can catch it. Then toss it again!"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desliza el ovillo para lanzarlo. Cuando vaya más despacio, tu gato podrá atraparlo. ¡Luego lánzalo otra vez!"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fais glisser la pelote pour la lancer. Quand elle ralentit, ton chat peut l'attraper. Puis relance-la !"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "毛糸玉をスワイプして転がそう。ゆっくりになったら、ねこがキャッチできるよ。そしたらまた転がしてね！"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "털실 뭉치를 쓸어서 던져요. 느려지면 고양이가 잡을 수 있어요. 그다음 다시 던져 주세요!"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fırlatmak için yün yumağını kaydır. Yavaşlayınca kedin yakalayabilir. Sonra yeniden fırlat!"
+          }
+        }
+      }
+    },
+    "game.yarnBall.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wollknäuel"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yarn Ball"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ovillo de lana"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pelote de laine"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "毛糸玉あそび"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "털실 놀이"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yün Yumağı"
+          }
+        }
+      }
+    },
     "garden.goHome": {
       "extractionState": "manual",
       "localizations": {

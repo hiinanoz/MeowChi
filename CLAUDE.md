@@ -37,7 +37,7 @@ Start with `docs/HANDOFF.md` (status, code map, ordered to-do list).
 xcodebuild test -project Meowchi.xcodeproj -scheme Meowchi -destination 'platform=iOS Simulator,name=iPhone 15' CODE_SIGNING_ALLOWED=NO
 ```
 
-DEBUG launch arguments for screenshots: `-screenshots` (store screenshots: sample progress in an in-memory save, no popups; used by `MeowchiUITests` and `screenshots.yml`); `-skipOnboarding` opens straight into the room; `-openScreen shop|tasks|decor|settings|laser|garden|play|food|clean|health` opens that screen; `-refillStats` fills all needs; `-debugLook coat,ears,tail`; `-decorTab cat`; `-debugDecor id,id` owns and equips decorations; `-debugWear bow,collar`. `-openScreen` also accepts nails|cozy|friend|tv|walks|login|collection|menu. `-NSDoubleLocalizedStrings YES` checks long translations.
+DEBUG launch arguments for screenshots: `-screenshots` (store screenshots: sample progress in an in-memory save, no popups; used by `MeowchiUITests` and `screenshots.yml`); `-skipOnboarding` opens straight into the room; `-openScreen shop|tasks|decor|settings|laser|garden|play|food|clean|health` opens that screen; `-refillStats` fills all needs; `-debugLook coat,ears,tail`; `-decorTab cat`; `-debugDecor id,id` owns and equips decorations; `-debugWear bow,collar`. `-openScreen` also accepts nails|cozy|friend|tv|walks|login|collection|menu|yarn|mouse. `-NSDoubleLocalizedStrings YES` checks long translations.
 
 ## Workflow
 

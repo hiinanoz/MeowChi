@@ -59,10 +59,10 @@ MeowchiTests/           XCTest: simulator, store, care, gameplay, decor, setting
 
 ### C. Content and polish (Mac verification needed)
 8. **Final pixel art** from the user (AI generation + cleanup). Swap the PNGs under the same names; respect the key colors and sizes in `docs/ASSETS.md`.
-9. **Yarn Ball and Toy Mouse mini-games** (`MiniGameKind` + a scene each, rewards via `Balance`).
+9. **Yarn Ball and Toy Mouse mini-games**: done (shared `MiniGameScene` base, configs in `Balance`). Needs a feel/tuning check on a device.
 10. **Extra animations** after final art: jump, groom, drink, turn, back-view "watching TV" pose.
-11. **Cat growth** per `docs/GROWTH_PLAN.md` (stage derived from care days; never decreases).
-12. **Personalities** (the enum exists; only one is used): behavior weights in `RoomScene.decideNextBehavior`.
+11. **Cat growth**: logic done (see `docs/GROWTH_PLAN.md`); stage art waits for final art.
+12. **Personalities**: done (random at adoption; walk/scratch weights in `Balance`, used by `RoomScene.decideNextBehavior`).
 13. Optional: Game Center achievements mirroring badges; iCloud save sync (needs a save-format plan).
 
 ### D. Known gaps and verification debt

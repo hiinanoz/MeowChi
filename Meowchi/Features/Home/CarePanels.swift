@@ -23,7 +23,7 @@ struct PlayPanel: View {
     let onCozy: @MainActor () -> Void
     let onTV: @MainActor () -> Void
     let onFriend: @MainActor () -> Void
-    let onLaser: @MainActor () -> Void
+    let onGame: @MainActor (MiniGameKind) -> Void
     let onGarden: @MainActor () -> Void
 
     var body: some View {
@@ -46,11 +46,13 @@ struct PlayPanel: View {
             .buttonStyle(.plain)
             .opacity(store.friendReadyAt == nil ? 1 : 0.55)
             sectionTitle("play.games")
-            Button { onLaser() } label: {
-                PanelRow(icon: "icon_play", title: MiniGameKind.laserChase.titleKey,
-                         detail: Text("game.energyCost \(Int(store.balance.laserChase.energyCost))"))
+            ForEach(MiniGameKind.allCases) { kind in
+                Button { onGame(kind) } label: {
+                    PanelRow(icon: "icon_play", title: kind.titleKey,
+                             detail: Text("game.energyCost \(Int(kind.config(store.balance).energyCost))"))
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
             Button { onGarden() } label: {
                 PanelRow(icon: "fx_sparkle", title: "walk.title",
                          detail: Text("game.energyCost \(Int(store.balance.walkEnergyCost))"))

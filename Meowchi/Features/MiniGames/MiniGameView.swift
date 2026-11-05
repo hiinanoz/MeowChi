@@ -9,12 +9,23 @@ struct MiniGameView: View {
     @Environment(GameStore.self) private var store
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
-    @State private var scene = LaserChaseScene(size: CGSize(width: 390, height: 600))
+    @State private var scene: MiniGameScene
     @State private var phase = Phase.intro
     @State private var score = 0
     @State private var remaining = 0
     @State private var notice: LocalizedStringKey?
     @State private var confirmLeave = false
+
+    init(kind: MiniGameKind) {
+        self.kind = kind
+        let size = CGSize(width: 390, height: 600)
+        let scene: MiniGameScene = switch kind {
+        case .laserChase: LaserChaseScene(size: size)
+        case .yarnBall: YarnBallScene(size: size)
+        case .toyMouse: ToyMouseScene(size: size)
+        }
+        _scene = State(initialValue: scene)
+    }
 
     private enum Phase: Equatable {
         case intro, playing, results(MiniGameReward)

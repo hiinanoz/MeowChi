@@ -4,7 +4,7 @@ import XCTest
 ///
 /// Every shot is a fresh launch with `-screenshots` (sample progress in memory, DEBUG only) and
 /// `-openScreen <screen>`, so no taps or back buttons are needed. Attachments are named
-/// `<lang>_<order>_<name>` for Tools/collect_screenshots.py.
+/// `<lang>_<order>_<name>` for Tools/collect_screenshots.py (7 shots per language).
 final class ScreenshotTests: XCTestCase {
     private let shots: [(name: String, screen: String?)] = [
         ("01_home", nil), ("02_food", "food"), ("03_decor", "decor"), ("04_laser", "laser"),

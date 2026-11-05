@@ -1,6 +1,7 @@
 import XCTest
 @testable import Meowchi
 
+@MainActor
 final class MiniGameKindTests: XCTestCase {
     func testEveryGameHasAPlayableConfig() {
         for kind in MiniGameKind.allCases {

@@ -1,6 +1,7 @@
 import XCTest
 @testable import Meowchi
 
+@MainActor
 final class GrowthTests: XCTestCase {
     private let balance = Balance.standard
     private let start = Date(timeIntervalSince1970: 1_800_000_000)

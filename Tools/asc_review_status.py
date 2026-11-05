@@ -73,6 +73,17 @@ def main():
         a = attrs(info)
         print(f"- durum: {a.get('appStoreState') or a.get('state')}  yaş sınırı: {a.get('appStoreAgeRating')}")
 
+    # Signing in release.yml needs a Team key with Admin role (certificates and profiles access).
+    print("\n== İmzalama yetkisi (sertifika/profil) ==")
+    for label, path in (("Bundle ID'ler", f"/bundleIds?filter[identifier]={BUNDLE_ID},{BUNDLE_ID}.widget"),
+                        ("Sertifikalar", "/certificates?limit=50"), ("Profiller", "/profiles?limit=50")):
+        result = call("GET", path, tolerant=True)
+        if "error" in result:
+            print(f"- {label}: ERİŞİM YOK (HTTP {result['error']}) → anahtar Team türünde ve Admin rolünde olmalı")
+        else:
+            names = [attrs(item).get("identifier") or attrs(item).get("name") for item in result.get("data", [])]
+            print(f"- {label}: {len(names)} → {', '.join(str(n) for n in names[:6])}")
+
 
 if __name__ == "__main__":
     main()

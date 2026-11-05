@@ -108,6 +108,11 @@ struct Balance {
     // MARK: Mini-games
     var laserChase = MiniGameConfig(durationSeconds: 45, energyCost: 10, minimumEnergy: 15, happiness: 12,
                                     coinsPerPoint: 2, xpPerPoint: 1, maxRewardedPoints: 30, minSecondsPerPoint: 0.5)
+    /// Each catch needs a toss and a roll, so points come slower and are worth more.
+    var yarnBall = MiniGameConfig(durationSeconds: 45, energyCost: 10, minimumEnergy: 15, happiness: 12,
+                                  coinsPerPoint: 3, xpPerPoint: 2, maxRewardedPoints: 20, minSecondsPerPoint: 1.0)
+    var toyMouse = MiniGameConfig(durationSeconds: 45, energyCost: 12, minimumEnergy: 15, happiness: 14,
+                                  coinsPerPoint: 3, xpPerPoint: 2, maxRewardedPoints: 20, minSecondsPerPoint: 1.0)
 
     // MARK: Garden walk
     var walkEnergyCost = 8.0
@@ -133,6 +138,23 @@ struct Balance {
     var allTasksBonusCoins = 40
     var happinessTaskThreshold = 80.0
 
+    // MARK: Growth (docs/GROWTH_PLAN.md)
+    var juniorCareDays = 7
+    var adultCareDays = 30
+    /// Kittens tire faster and learn faster; adults stay content longer.
+    var kittenEnergyDecayMultiplier = 1.2
+    var kittenXPMultiplier = 1.2
+    var adultHappinessDecayMultiplier = 0.8
+
+    // MARK: Personality (room behavior)
+    /// Multiplies the chance to wander and to use the scratching post in the room.
+    var personalityWalkMultiplier: [Personality: Double] = [
+        .playful: 1.1, .lazy: 0.6, .curious: 1.3, .affectionate: 0.9, .adventurous: 1.4, .calm: 0.8,
+    ]
+    var personalityScratchMultiplier: [Personality: Double] = [
+        .playful: 1.5, .lazy: 0.5, .curious: 1.0, .affectionate: 0.8, .adventurous: 1.2, .calm: 0.7,
+    ]
+
     // MARK: Progression & economy
     var baseXPPerLevel = 50
     var xpGrowthPerLevel = 25
@@ -142,6 +164,10 @@ struct Balance {
     var startingStats = CatStats(hunger: 70, energy: 80, happiness: 75, cleanliness: 80, health: 100)
 
     static let standard = Balance()
+
+    func energyDecayMultiplier(_ stage: CatStage) -> Double { stage == .kitten ? kittenEnergyDecayMultiplier : 1 }
+    func happinessDecayMultiplier(_ stage: CatStage) -> Double { stage == .adult ? adultHappinessDecayMultiplier : 1 }
+    func xpMultiplier(_ stage: CatStage) -> Double { stage == .kitten ? kittenXPMultiplier : 1 }
 
     func xpRequired(forLevel level: Int) -> Int {
         baseXPPerLevel + xpGrowthPerLevel * max(0, level - 1)

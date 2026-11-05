@@ -53,3 +53,42 @@ struct WidgetSnapshot: Codable, Equatable {
         points.last { $0.date <= date } ?? points.first
     }
 }
+
+/// Taps made on the widget's "Pet" button, waiting for the app to apply them through `GameStore`.
+/// The widget only records the tap (it has no game logic); the app turns it into a real, rewarded pet.
+struct WidgetActions: Codable, Equatable {
+    var pendingPets = 0
+    var lastPetAt: Date?
+
+    private static let file = "widget-actions.json"
+
+    static func load() -> WidgetActions {
+        guard let folder = WidgetSnapshot.folder,
+              let data = try? Data(contentsOf: folder.appendingPathComponent(file)),
+              let actions = try? JSONDecoder().decode(WidgetActions.self, from: data) else { return WidgetActions() }
+        return actions
+    }
+
+    func save() {
+        guard let folder = WidgetSnapshot.folder, let data = try? JSONEncoder().encode(self) else { return }
+        try? data.write(to: folder.appendingPathComponent(Self.file), options: .atomic)
+    }
+
+    /// Called by the widget's intent.
+    static func recordPet(at date: Date = .now) {
+        var actions = load()
+        actions.pendingPets += 1
+        actions.lastPetAt = date
+        actions.save()
+    }
+
+    /// Called by the app: returns the pending pets and clears them (keeps `lastPetAt` for the widget's heart).
+    static func takePendingPets() -> Int {
+        var actions = load()
+        let count = actions.pendingPets
+        guard count > 0 else { return 0 }
+        actions.pendingPets = 0
+        actions.save()
+        return count
+    }
+}

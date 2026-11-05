@@ -68,6 +68,7 @@ final class GameStoreTests: XCTestCase {
         balance.baseXPPerLevel = 2
         balance.xpGrowthPerLevel = 0
         balance.petXP = 5
+        balance.kittenXPMultiplier = 1
         let store = makeStore(balance: balance)
         store.pet()
         XCTAssertEqual(store.state.progression.level, 3)

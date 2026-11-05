@@ -2,8 +2,7 @@ import SwiftUI
 
 /// Mini-game catalogue. Each game is a SpriteKit scene that reports a score; rules and rewards live here.
 enum MiniGameKind: String, CaseIterable, Identifiable {
-    case laserChase
-    // Next: yarnBall, toyMouse (Phase 5).
+    case laserChase, yarnBall, toyMouse
 
     var id: String { rawValue }
     var titleKey: LocalizedStringKey { LocalizedStringKey("game." + rawValue + ".title") }
@@ -12,6 +11,8 @@ enum MiniGameKind: String, CaseIterable, Identifiable {
     func config(_ balance: Balance) -> MiniGameConfig {
         switch self {
         case .laserChase: balance.laserChase
+        case .yarnBall: balance.yarnBall
+        case .toyMouse: balance.toyMouse
         }
     }
 }

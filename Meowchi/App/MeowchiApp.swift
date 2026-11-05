@@ -45,7 +45,7 @@ struct RootView: View {
 
     private var startsAtHome: Bool {
         #if DEBUG
-        if CommandLine.arguments.contains("-skipOnboarding") { return true }
+        if CommandLine.arguments.contains("-skipOnboarding") || CommandLine.arguments.contains("-screenshots") { return true }
         #endif
         return store.state.settings.openHomeOnLaunch
     }

@@ -53,11 +53,26 @@ jobs:
           # Her yükleme benzersiz ve artan bir numara ister: bu iş akışının çalıştırma sayısı
           BUILD=$((100 + GITHUB_RUN_NUMBER))
           echo "BUILD_NUMBER=$BUILD" >> "$GITHUB_ENV"
-          echo "Sürüm: $(grep MARKETING_VERSION project.yml | head -1 | tr -d ' ') · Derleme: $BUILD"
+          echo "Sürüm: $(grep -E '^ +MARKETING_VERSION:' project.yml | head -1 | tr -d ' ') · Derleme: $BUILD"
 
       - name: Sırları kontrol et
         run: |
           if [ -n "$APPLE_TEAM_ID" ] && [ -n "$ASC_KEY_ID" ] && [ -n "$ASC_ISSUER_ID" ] && [ -n "$ASC_PRIVATE_KEY" ]; then
+            # Stray spaces or newlines in a pasted secret break signing; trim them.
+            for name in APPLE_TEAM_ID ASC_KEY_ID ASC_ISSUER_ID; do
+              value=$(printf '%s' "${!name}" | tr -d '[:space:]')
+              [ "$value" = "${!name}" ] || echo "::warning::$name boşluk/satır sonu içeriyordu (temizlendi)"
+              echo "::add-mask::$value"
+              echo "$name=$value" >> "$GITHUB_ENV"
+              printf -v "$name" '%s' "$value"
+            done
+            PROJECT_TEAM=$(grep -E '^ +DEVELOPMENT_TEAM:' project.yml | head -1 | awk '{print $2}')
+            if [ "$APPLE_TEAM_ID" != "$PROJECT_TEAM" ]; then
+              echo "::warning::APPLE_TEAM_ID sırrı project.yml'deki takım kimliğiyle aynı değil (uzunluk ${#APPLE_TEAM_ID})"
+            else
+              echo "Takım kimliği project.yml ile aynı"
+            fi
+            echo "ASC_KEY_ID uzunluk: ${#ASC_KEY_ID} (10 olmalı) · ASC_ISSUER_ID uzunluk: ${#ASC_ISSUER_ID} (36 olmalı)"
             echo "SIGNED=1" >> "$GITHUB_ENV"
             mkdir -p ~/private_keys
             printf '%s\n' "$ASC_PRIVATE_KEY" > ~/private_keys/AuthKey_$ASC_KEY_ID.p8
@@ -114,6 +129,22 @@ jobs:
             -authenticationKeyIssuerID "$ASC_ISSUER_ID" > export.log 2>&1 || { grep -E "error" export.log | head -40; tail -60 export.log; exit 1; }
           tail -15 export.log
           echo "::notice::Derleme $BUILD_NUMBER App Store Connect'e yüklendi. İşlenmesi 10-30 dakika sürer; sonra TestFlight'ta görünür."
+
+      - name: Hata ayrıntısı (dağıtım günlükleri)
+        if: failure()
+        run: |
+          ls -la ~/private_keys || true
+          # Key file shape only (no content): line count, header/footer present, CR characters
+          if [ -n "$ASC_KEY_PATH" ] && [ -f "$ASC_KEY_PATH" ]; then
+            echo "satır: $(wc -l < "$ASC_KEY_PATH")  CR: $(tr -cd '\r' < "$ASC_KEY_PATH" | wc -c)"
+            head -1 "$ASC_KEY_PATH" | grep -q "BEGIN PRIVATE KEY" && echo "başlık var" || echo "BAŞLIK YOK"
+            tail -1 "$ASC_KEY_PATH" | grep -q "END PRIVATE KEY" && echo "son satır var" || echo "SON SATIR YOK"
+          fi
+          for d in $(find /var/folders "$TMPDIR" -maxdepth 6 -name "*.xcdistributionlogs" 2>/dev/null | sort -u); do
+            ls "$d"
+            grep -h -n -B12 -A4 "Authentication failed" "$d"/IDEDistribution.verbose.log "$d"/IDEDistributionProvisioning.log 2>/dev/null \
+              | grep -v -i "privatekey\|BEGIN\|eyJ\|Bearer\|\"related\"\|\"self\"" | cut -c1-300 | head -120
+          done
 
       - name: Anahtarı sil
         if: always()

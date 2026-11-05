@@ -93,6 +93,8 @@ struct HomeView: View {
                 case "tv": DispatchQueue.main.asyncAfter(deadline: .now() + 1) { watch("fish") }
                 case "friend": DispatchQueue.main.asyncAfter(deadline: .now() + 1) { inviteFriend() }
                 case "laser": activeGame = .laserChase
+                case "yarn": activeGame = .yarnBall
+                case "mouse": activeGame = .toyMouse
                 case "garden": walkLocation = .garden
                 case "walks": showWalkPicker = true
                 case "beach": walkLocation = .beach
@@ -114,6 +116,8 @@ struct HomeView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 store.tick()
+                // A "Pet" tap on the home-screen widget becomes a real pet (normal cooldowns apply).
+                if WidgetActions.takePendingPets() > 0, store.pet() == .ok { WidgetBridge.update(from: store) }
                 AudioManager.shared.resumeMusic()
             } else if phase == .background {
                 store.save()
@@ -126,6 +130,10 @@ struct HomeView: View {
         .onChange(of: store.levelUpCount) { _, _ in
             AudioManager.shared.play(.levelUp)
             show("notice.levelUp", important: true)
+        }
+        .onChange(of: store.stageUpCount) { _, _ in
+            AudioManager.shared.play(.levelUp)
+            show("notice.grownUp \(store.state.cat.name)", important: true)
         }
         .task {
             // Foreground refresh. Offline time is handled by elapsed-time simulation, not timers.
@@ -173,7 +181,7 @@ struct HomeView: View {
             // Greet with the daily check-in once the room has settled (not during onboarding hints).
             try? await Task.sleep(for: .seconds(0.8))
             #if DEBUG
-            if CommandLine.arguments.contains("-openScreen") { return }
+            if CommandLine.arguments.contains("-openScreen") || CommandLine.arguments.contains("-screenshots") { return }
             #endif
             if store.showWelcomeBack {
                 store.showWelcomeBack = false
@@ -294,7 +302,7 @@ struct HomeView: View {
             PlayPanel(onCozy: { startActivity { presentImmersive { showCozy = true } } },
                       onTV: { chooseChannel = true },
                       onFriend: inviteFriend,
-                      onLaser: { startActivity { presentImmersive { activeGame = .laserChase } } },
+                      onGame: { kind in startActivity { presentImmersive { activeGame = kind } } },
                       onGarden: { startActivity { showWalkPicker = true } })
                 .transition(.panel)
         case .health:

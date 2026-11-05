@@ -23,7 +23,7 @@ struct PlayPanel: View {
     let onCozy: @MainActor () -> Void
     let onTV: @MainActor () -> Void
     let onFriend: @MainActor () -> Void
-    let onLaser: @MainActor () -> Void
+    let onGame: @MainActor (MiniGameKind) -> Void
     let onGarden: @MainActor () -> Void
 
     var body: some View {
@@ -46,11 +46,13 @@ struct PlayPanel: View {
             .buttonStyle(.plain)
             .opacity(store.friendReadyAt == nil ? 1 : 0.55)
             sectionTitle("play.games")
-            Button { onLaser() } label: {
-                PanelRow(icon: "icon_play", title: MiniGameKind.laserChase.titleKey,
-                         detail: Text("game.energyCost \(Int(store.balance.laserChase.energyCost))"))
+            ForEach(MiniGameKind.allCases) { kind in
+                Button { onGame(kind) } label: {
+                    PanelRow(icon: "icon_play", title: kind.titleKey,
+                             detail: Text("game.energyCost \(Int(kind.config(store.balance).energyCost))"))
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
             Button { onGarden() } label: {
                 PanelRow(icon: "fx_sparkle", title: "walk.title",
                          detail: Text("game.energyCost \(Int(store.balance.walkEnergyCost))"))
@@ -137,6 +139,13 @@ struct HealthPanel: View {
             Text(tipKey(for: stats))
                 .font(PixelFont.body(11))
                 .frame(maxWidth: .infinity, alignment: .leading)
+            HStack(spacing: 4) {
+                Text(LocalizedStringKey(store.stage.nameKey))
+                Text(verbatim: "·")
+                Text(LocalizedStringKey("personality." + store.state.cat.personality.rawValue))
+            }
+            .font(PixelFont.body(10)).foregroundStyle(PixelPalette.accentShade)
+            .frame(maxWidth: .infinity, alignment: .leading)
             Button { onVet() } label: {
                 HStack(spacing: 6) {
                     PixelIcon(name: "icon_health", size: 16)

@@ -30,6 +30,8 @@ final class GameStore {
     var loadIssue: SaveStoreError?
     /// Increments on every level up so views can react.
     private(set) var levelUpCount = 0
+    /// Bumped when the cat reaches a new life stage (the room shows a celebration banner).
+    private(set) var stageUpCount = 0
     var tutorialStep: TutorialStep?
     /// True once per launch when the player was away for a while (friendly greeting, never guilt).
     var showWelcomeBack = false
@@ -71,6 +73,14 @@ final class GameStore {
     }
 
     static func makeDefault() -> GameStore {
+        #if DEBUG
+        // App Store screenshots (`-screenshots`): sample progress in memory, the real save is never touched.
+        if CommandLine.arguments.contains("-screenshots") {
+            let store = GameStore(saveStore: InMemorySaveStore())
+            store.debugSampleProgress()
+            return store
+        }
+        #endif
         do {
             let container = try ModelContainer(for: SaveRecord.self)
             return GameStore(saveStore: SwiftDataSaveStore(container: container))
@@ -105,8 +115,10 @@ final class GameStore {
             state.daily = .generate(dayKey: today, count: balance.dailyTaskCount)
         }
         if today > state.login.dayKey {
+            let before = stage
             state.login.dayKey = today
             state.login.days += 1
+            if stage > before, state.onboardedAt != nil { stageUpCount += 1 }
         }
     }
 
@@ -358,9 +370,12 @@ final class GameStore {
 
     var needsOnboarding: Bool { state.onboardedAt == nil }
 
+    var stage: CatStage { CatStage(careDays: state.login.days, balance: balance) }
+
     func completeOnboarding(name: String, look: CatLook = CatLook()) {
         state.cat.name = CatState.sanitizedName(name, maxLength: balance.maxNameLength) ?? state.cat.name
         state.cat.look = CatLook(coat: look.coat, ears: look.ears, tail: look.tail).sanitized
+        state.cat.personality = Personality.allCases.randomElement() ?? .playful
         state.onboardedAt = clock()
         tutorialStep = .feed
         save()
@@ -640,7 +655,7 @@ final class GameStore {
 
     private func grantXP(_ amount: Int) {
         guard amount > 0 else { return }
-        state.progression.xp += amount
+        state.progression.xp += Int((Double(amount) * balance.xpMultiplier(stage)).rounded())
         while state.progression.xp >= balance.xpRequired(forLevel: state.progression.level) {
             state.progression.xp -= balance.xpRequired(forLevel: state.progression.level)
             state.progression.level += 1
@@ -666,6 +681,21 @@ final class GameStore {
             state.wardrobe.insert(item.rawValue)
             if item.slot == .head ? state.cat.look.head != item.rawValue : state.cat.look.neck != item.rawValue { wear(item) }
         }
+    }
+
+    /// Screenshot helper: an adopted, well-cared-for cat with some progress, decor and badges.
+    func debugSampleProgress() {
+        if needsOnboarding { completeOnboarding(name: String(localized: "cat.defaultName")) }
+        tutorialStep = nil
+        state.progression.level = 7
+        state.coins = 1250
+        for food in ["food.wet", "food.fish", "food.treat"] { state.inventory[food, default: 0] += 5 }
+        state.lifetime = [TaskEvent.fed.rawValue: 60, TaskEvent.petted.rawValue: 120, TaskEvent.played.rawValue: 12,
+                          TaskEvent.walked.rawValue: 8, TaskEvent.bathed.rawValue: 5, "photos": 6]
+        debugEquip(["bed_cloud", "rug_leaf", "plant_basic", "frame_sun", "view_sakura", "post_tower", "toy_yarn", "tv_retro"])
+        debugWear(["bow"])
+        state.seenTips = ["cozy", "walk", "collection", "nails", "decor", "tv"]
+        debugRefill()
     }
 
     func debugRefill() {

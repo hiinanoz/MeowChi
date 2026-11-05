@@ -93,3 +93,7 @@ Tail moods: happy = fast wag0/wag1, calm = slow wag, tired/sad = down, annoyed =
 ## Later phases
 
 Bath scene, garden (side-scrolling), shop item icons, decorations for each slot, mini-game props (laser dot, mouse toy), more cat looks (same 64×64 layout).
+
+## Widget copies
+
+The widget extension has its own small catalog (`MeowchiWidget/Assets.xcassets`): `icon_hunger`, `icon_energy`, `icon_happiness`, `icon_cleanliness`, `icon_health`, `fx_heart`, `fx_zzz`. When final art replaces these sprites in the app, copy the same PNGs there too.

@@ -47,7 +47,7 @@ MeowchiTests/           XCTest: simulator, store, care, gameplay, decor, setting
 ## 4. To-do list (in recommended order)
 
 ### A. Blocked on the user
-1. **Developer portal setup**: Team ID `24RD5ZN5HX` is set (`DEVELOPMENT_TEAM` in `project.yml`). Still to do in the portal: register `com.othinks.Meowchi`, `com.othinks.Meowchi.widget` and the App Group `group.com.othinks.Meowchi`, then create the App Store Connect record.
+1. **Developer portal**: done. `com.othinks.Meowchi`, `com.othinks.Meowchi.widget` and `group.com.othinks.Meowchi` are registered and linked (by hand: API-key signing cannot manage App Groups). First TestFlight build: 1.0 (106), uploaded by `release.yml` on 2026-10-30.
 
 ### B. Phase 6: release prep (cloud-friendly items marked ☁︎)
 2. ☁︎ **Translations** for tr, es, de, ja, ko, fr into both `.xcstrings` files: about 290 app keys + 3 widget keys, plurals for `hud.coins %lld`. Keep the tone cozy and non-guilt; review Japanese and Korean naturalness. Re-check long German and French text on the Mac.
@@ -59,11 +59,11 @@ MeowchiTests/           XCTest: simulator, store, care, gameplay, decor, setting
 
 ### C. Content and polish (Mac verification needed)
 8. **Final pixel art** from the user (AI generation + cleanup). Swap the PNGs under the same names; respect the key colors and sizes in `docs/ASSETS.md`.
-9. **Yarn Ball and Toy Mouse mini-games** (`MiniGameKind` + a scene each, rewards via `Balance`).
+9. **Yarn Ball and Toy Mouse mini-games**: done (shared `MiniGameScene` base, configs in `Balance`). Needs a feel/tuning check on a device.
 10. **Extra animations** after final art: jump, groom, drink, turn, back-view "watching TV" pose.
-11. **Cat growth** per `docs/GROWTH_PLAN.md` (stage derived from care days; never decreases).
-12. **Personalities** (the enum exists; only one is used): behavior weights in `RoomScene.decideNextBehavior`.
-13. Optional: Game Center achievements mirroring badges; iCloud save sync (needs a save-format plan).
+11. **Cat growth**: logic done (see `docs/GROWTH_PLAN.md`); stage art waits for final art.
+12. **Personalities**: done (random at adoption; walk/scratch weights in `Balance`, used by `RoomScene.decideNextBehavior`).
+13. Optional: Game Center achievements and iCloud save sync: plan in `docs/ONLINE_PLAN.md`, waiting for the user's go-ahead. Interactive widget (Pet button, heart/zzz) is done; needs a check on a real home screen.
 
 ### D. Known gaps and verification debt
 - iPad **landscape** layout and the door transition were never seen on screen. VoiceOver actions, haptics, the notification permission flow and the widget on a home screen were never tried by hand.

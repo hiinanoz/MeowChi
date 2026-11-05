@@ -5,8 +5,10 @@ iş akışında) hatırlatma olarak görünür. Biten madde `[x]` yapılır.
 
 ## Yapılacaklar
 
-- [ ] **Çeviriler (tr, es, de, ja, ko, fr).** İki .xcstrings dosyası; şu an yalnızca İngilizce.
+- [x] **Çeviriler (tr, es, de, ja, ko, fr).** İki .xcstrings dosyası; şu an yalnızca İngilizce.
 - [ ] **Son pixel art ve uygulama simgesi.** Yer tutucu PNG'ler aynı adlarla değişecek (docs/ASSETS.md).
-- [ ] **Yarn Ball ve Toy Mouse mini oyunları.**
-- [ ] **Kedi büyümesi** (docs/GROWTH_PLAN.md) ve **kişilikler**.
-- [ ] **Web sayfalarındaki ayar adları.** Uygulama çevrilince docs/_src altındaki menü adlarını (ör. "Gentle reminders") çevirilerle eşleştir, `python3 Tools/build_docs.py` çalıştır.
+- [x] **Yarn Ball ve Toy Mouse mini oyunları.**
+- [x] **Kedi büyümesi** (docs/GROWTH_PLAN.md) ve **kişilikler**. Aşama çizimleri son pixel art ile gelecek.
+- [x] **Web sayfalarındaki ayar adları.** Uygulama çevrilince docs/_src altındaki menü adlarını (ör. "Gentle reminders") çevirilerle eşleştir, `python3 Tools/build_docs.py` çalıştır.
+- [ ] **Game Center ve iCloud yedeği.** Plan: docs/ONLINE_PLAN.md (onay bekliyor).
+- [ ] **Widget'ı gerçek cihazda dene.** "Sev" düğmesi, kalp ve zzz.

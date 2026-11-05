@@ -63,7 +63,7 @@ MeowchiTests/           XCTest: simulator, store, care, gameplay, decor, setting
 10. **Extra animations** after final art: jump, groom, drink, turn, back-view "watching TV" pose.
 11. **Cat growth**: logic done (see `docs/GROWTH_PLAN.md`); stage art waits for final art.
 12. **Personalities**: done (random at adoption; walk/scratch weights in `Balance`, used by `RoomScene.decideNextBehavior`).
-13. Optional: Game Center achievements mirroring badges; iCloud save sync (needs a save-format plan).
+13. Optional: Game Center achievements and iCloud save sync: plan in `docs/ONLINE_PLAN.md`, waiting for the user's go-ahead. Interactive widget (Pet button, heart/zzz) is done; needs a check on a real home screen.
 
 ### D. Known gaps and verification debt
 - iPad **landscape** layout and the door transition were never seen on screen. VoiceOver actions, haptics, the notification permission flow and the widget on a home screen were never tried by hand.

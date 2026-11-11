@@ -111,6 +111,7 @@ final class RoomScene: SKScene {
         nightOverlay.zPosition = 2000
         world.addChild(nightOverlay)
 
+        addDustMotes()
         layoutWorld()
         if store?.state.cat.isSleeping == true { setSleeping(true, animated: false) }
         refreshLighting(animated: false)
@@ -554,6 +555,26 @@ final class RoomScene: SKScene {
     }
 
     // MARK: Effects
+
+    /// A few specks drifting in the window light: the room never looks frozen.
+    private func addDustMotes() {
+        guard !Motion.reduced else { return }
+        for i in 0..<6 {
+            let mote = SKSpriteNode(color: SKColor(red: 1, green: 0.96, blue: 0.85, alpha: 1), size: CGSize(width: 1, height: 1))
+            mote.alpha = 0
+            mote.zPosition = 1900
+            world.addChild(mote)
+            let drift = SKAction.run { [weak mote] in
+                mote?.position = CGPoint(x: CGFloat.random(in: 110...250).rounded(), y: CGFloat.random(in: 190...320).rounded())
+            }
+            let cycle = SKAction.sequence([
+                drift, .fadeAlpha(to: 0.7, duration: 1.5),
+                .moveBy(x: .random(in: -10...10), y: .random(in: -24...(-8)), duration: 5), .fadeOut(withDuration: 1.5),
+                .wait(forDuration: .random(in: 0.5...3)),
+            ])
+            mote.run(.sequence([.wait(forDuration: Double(i) * 1.3), .repeatForever(cycle)]))
+        }
+    }
 
     func spawnHearts() {
         for i in 0..<3 {

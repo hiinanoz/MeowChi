@@ -6,16 +6,21 @@ struct HUDView: View {
     var onShop: @MainActor () -> Void = {}
     var onTasks: @MainActor () -> Void = {}
     var onMenu: @MainActor () -> Void = {}
+    var onCat: @MainActor () -> Void = {}
 
     var body: some View {
         let state = store.state
         VStack(spacing: 8) {
             HStack(spacing: 10) {
-                CatPreview(look: state.cat.look, size: 64)
-                    .frame(width: 44, height: 40, alignment: .top)
-                    .clipped()
-                    .padding(2)
-                    .pixelPanel(PixelPalette.panelShade)
+                Button { onCat() } label: {
+                    CatPreview(look: state.cat.look, size: 64)
+                        .frame(width: 44, height: 40, alignment: .top)
+                        .clipped()
+                        .padding(2)
+                        .pixelPanel(PixelPalette.panelShade)
+                }
+                .buttonStyle(PixelPressStyle())
+                .accessibilityLabel(Text("card.title"))
                 VStack(alignment: .leading, spacing: 3) {
                     HStack {
                         Text(verbatim: state.cat.name).font(PixelFont.body(16)).lineLimit(1).minimumScaleFactor(0.6)

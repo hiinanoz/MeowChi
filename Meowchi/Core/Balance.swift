@@ -160,6 +160,15 @@ struct Balance {
     /// "Today's deal" in the shop: one decoration or accessory a day, this much cheaper.
     var dailyDealDiscount = 0.3
 
+    // MARK: Wishes and diary
+    /// A new wish can appear this long after the last one ended; it waits this long before fading.
+    var wishIntervalHours = 3.0
+    var wishLifetimeHours = 6.0
+    var wishCoins = 15
+    var wishHappiness = 8.0
+    var wishXP = 3
+    var diaryLimit = 40
+
     // MARK: Progression & economy
     var baseXPPerLevel = 50
     var xpGrowthPerLevel = 25

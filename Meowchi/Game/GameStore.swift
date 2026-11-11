@@ -32,6 +32,8 @@ final class GameStore {
     private(set) var levelUpCount = 0
     /// Bumped when the cat reaches a new life stage (the room shows a celebration banner).
     private(set) var stageUpCount = 0
+    /// Bumped when a wish is granted (the room shows a banner and hearts).
+    private(set) var wishGrantedCount = 0
     var tutorialStep: TutorialStep?
     /// True once per launch when the player was away for a while (friendly greeting, never guilt).
     var showWelcomeBack = false
@@ -118,8 +120,12 @@ final class GameStore {
             let before = stage
             state.login.dayKey = today
             state.login.days += 1
-            if stage > before, state.onboardedAt != nil { stageUpCount += 1 }
+            if stage > before, state.onboardedAt != nil {
+                stageUpCount += 1
+                addDiary("grownUp", detail: stage.nameKey)
+            }
         }
+        refreshWish(now)
     }
 
     func tick() {
@@ -145,6 +151,8 @@ final class GameStore {
         busyUntil = now.addingTimeInterval(balance.feedDurationSeconds)
         grantXP(item.xp)
         if tutorialStep == .feed { tutorialStep = .pet }
+        state.lifetime["food." + itemID, default: 0] += 1
+        if case .food(itemID)? = state.wish?.kind { grantWish(now) }
         record(.fed)
         save()
         return .ok
@@ -312,6 +320,7 @@ final class GameStore {
         state.care.lastFriendVisitAt = now
         state.cat.stats[.happiness] += balance.friendVisitHappiness
         grantXP(balance.friendVisitXP)
+        addDiary("friend")
         record(.friendVisited)
         busyUntil = now.addingTimeInterval(14)
         save()
@@ -384,6 +393,8 @@ final class GameStore {
         state.cat.look = CatLook(coat: look.coat, ears: look.ears, tail: look.tail).sanitized
         state.cat.personality = Personality.allCases.randomElement() ?? .playful
         state.onboardedAt = clock()
+        state.lastWishAt = clock()
+        addDiary("adopted")
         tutorialStep = .feed
         save()
     }
@@ -549,7 +560,11 @@ final class GameStore {
         let rewarded = max(0, min(points, config.maxRewardedPoints, plausible))
         let previousBest = state.bestScores[game.kind.rawValue] ?? 0
         let isNewBest = points > previousBest
-        if isNewBest { state.bestScores[game.kind.rawValue] = points }
+        if isNewBest {
+            state.bestScores[game.kind.rawValue] = points
+            if points > 0 { addDiary("newBest", detail: "game." + game.kind.rawValue + ".title", number: points) }
+        }
+        if case .game(game.kind.rawValue)? = state.wish?.kind { grantWish(now) }
         let reward = MiniGameReward(points: max(0, points), coins: rewarded * config.coinsPerPoint, xp: rewarded * config.xpPerPoint,
                                     stars: config.stars(for: points), best: max(points, previousBest), isNewBest: isNewBest)
         state.cat.stats[.happiness] += config.happiness
@@ -608,6 +623,7 @@ final class GameStore {
         simulate(clock())
         state.cat.stats[.happiness] += balance.walkHappiness
         grantXP(balance.walkXP)
+        addDiary("walk", detail: "walk." + walk.location.rawValue)
         record(.walked)
         save()
         return walk
@@ -661,11 +677,51 @@ final class GameStore {
 
     private func record(_ event: TaskEvent) {
         state.lifetime[event.rawValue, default: 0] += 1
+        if case .event(event)? = state.wish?.kind { grantWish(clock()) }
         for i in state.daily.tasks.indices {
             guard let definition = DailyTasks.definition(state.daily.tasks[i].id),
                   definition.event == event, !state.daily.tasks[i].claimed else { continue }
             state.daily.tasks[i].progress = min(definition.target, state.daily.tasks[i].progress + 1)
         }
+    }
+
+    // MARK: Wishes and diary
+
+    /// Ends an expired wish and, now and then, makes a new one (never while asleep or before adoption).
+    private func refreshWish(_ now: Date) {
+        if let wish = state.wish, now >= wish.expiresAt {
+            state.wish = nil
+            state.lastWishAt = now
+        }
+        guard state.wish == nil, state.onboardedAt != nil, !state.cat.isSleeping, tutorialStep == nil else { return }
+        if let last = state.lastWishAt, now.timeIntervalSince(last) < balance.wishIntervalHours * 3600 { return }
+        var choices = CatWish.eventChoices.map { CatWish.Kind.event($0) }
+        choices += MiniGameKind.allCases.map { CatWish.Kind.game($0.rawValue) }
+        // Only foods the player has, so a wish never forces a purchase.
+        choices += ItemCatalog.foods.filter { quantity(of: $0.id) > 0 }.map { CatWish.Kind.food($0.id) }
+        guard let kind = choices.randomElement() else { return }
+        state.wish = CatWish(kind: kind, expiresAt: now.addingTimeInterval(balance.wishLifetimeHours * 3600))
+    }
+
+    private func grantWish(_ now: Date) {
+        state.wish = nil
+        state.lastWishAt = now
+        state.coins += balance.wishCoins
+        state.cat.stats[.happiness] += balance.wishHappiness
+        grantXP(balance.wishXP)
+        wishGrantedCount += 1
+        addDiary("wish")
+    }
+
+    private func addDiary(_ kind: String, detail: String? = nil, number: Int? = nil) {
+        state.diary.insert(DiaryEntry(date: clock(), kind: kind, detail: detail, number: number), at: 0)
+        if state.diary.count > balance.diaryLimit { state.diary.removeLast(state.diary.count - balance.diaryLimit) }
+    }
+
+    /// The food the cat has eaten most, if any.
+    var favoriteFood: FoodItem? {
+        ItemCatalog.foods.max { (state.lifetime["food." + $0.id] ?? 0) < (state.lifetime["food." + $1.id] ?? 0) }
+            .flatMap { (state.lifetime["food." + $0.id] ?? 0) > 0 ? $0 : nil }
     }
 
     // MARK: Tips
@@ -701,6 +757,7 @@ final class GameStore {
             state.badges[badge.id] = clock()
             state.coins += badge.coins
             lastUnlockedBadge = badge
+            addDiary("badge", detail: "badge." + badge.id)
         }
     }
 
@@ -719,6 +776,7 @@ final class GameStore {
             state.progression.level += 1
             state.coins += balance.levelUpCoins
             levelUpCount += 1
+            addDiary("levelUp", number: state.progression.level)
         }
     }
 

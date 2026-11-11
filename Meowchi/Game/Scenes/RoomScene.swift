@@ -555,7 +555,7 @@ final class RoomScene: SKScene {
 
     // MARK: Effects
 
-    private func spawnHearts() {
+    func spawnHearts() {
         for i in 0..<3 {
             run(.wait(forDuration: Double(i) * 0.18)) { [weak self] in
                 self?.spawnEffect("fx_heart", offsetY: 56, dx: CGFloat([-12, 4, 16][i]))

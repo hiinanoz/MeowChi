@@ -30,6 +30,11 @@ struct GameState: Codable, Equatable {
     var seenTips: Set<String> = []
     /// Best score per mini-game (`MiniGameKind.rawValue`).
     var bestScores: [String: Int] = [:]
+    /// The cat's current wish (thought bubble) and when the last one ended.
+    var wish: CatWish?
+    var lastWishAt: Date?
+    /// Newest first, capped at `Balance.diaryLimit`.
+    var diary: [DiaryEntry] = []
 
     static func newGame(now: Date, balance: Balance) -> GameState {
         GameState(
@@ -128,6 +133,9 @@ extension GameState {
         badges = try c.decodeIfPresent([String: Date].self, forKey: .badges) ?? [:]
         seenTips = try c.decodeIfPresent(Set<String>.self, forKey: .seenTips) ?? []
         bestScores = try c.decodeIfPresent([String: Int].self, forKey: .bestScores) ?? [:]
+        wish = try c.decodeIfPresent(CatWish.self, forKey: .wish)
+        lastWishAt = try c.decodeIfPresent(Date.self, forKey: .lastWishAt)
+        diary = try c.decodeIfPresent([DiaryEntry].self, forKey: .diary) ?? []
     }
 }
 

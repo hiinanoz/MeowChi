@@ -20,6 +20,7 @@ struct HomeView: View {
     @State private var failCount = 0
     /// The level being celebrated by the level-up card, if it is showing.
     @State private var celebratedLevel: Int?
+    @State private var showCard = false
 
     @State private var panel: CarePanel?
     @State private var isBrushing = false
@@ -150,6 +151,11 @@ struct HomeView: View {
             AccessibilityNotification.Announcement(String(localized: "notice.levelUp")).post()
             withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) { celebratedLevel = store.state.progression.level }
         }
+        .onChange(of: store.wishGrantedCount) { _, _ in
+            AudioManager.shared.play(.purr)
+            scene.spawnHearts()
+            show("wish.granted \(store.state.cat.name)", important: true)
+        }
         .onChange(of: store.stageUpCount) { _, _ in
             AudioManager.shared.play(.levelUp)
             show("notice.grownUp \(store.state.cat.name)", important: true)
@@ -167,6 +173,7 @@ struct HomeView: View {
     private func presentations<V: View>(_ content: V) -> some View {
         content
         .sheet(isPresented: $showShop) { ShopView().environment(store) }
+        .sheet(isPresented: $showCard) { CatCardView().environment(store) }
         .sheet(isPresented: $showTasks) { TasksView().environment(store) }
         .sheet(isPresented: $showDecor) { DecorView().environment(store) }
         .sheet(isPresented: $showSettings) { SettingsView().environment(store) }
@@ -249,7 +256,7 @@ struct HomeView: View {
 
     private var hud: some View {
         HUDView(onShop: { panel = nil; showShop = true }, onTasks: { panel = nil; showTasks = true },
-                    onMenu: { panel = nil; showMenu = true })
+                    onMenu: { panel = nil; showMenu = true }, onCat: { panel = nil; showCard = true })
     }
 
     private var roomView: some View {
@@ -258,6 +265,7 @@ struct HomeView: View {
                 .clipShape(PixelBorder(step: 4))
                 .overlay(PixelBorder(step: 4).stroke(PixelPalette.ink, lineWidth: 2))
                 .overlay(alignment: .top) { noticeBanner }
+                .overlay(alignment: .topTrailing) { wishBubble }
                 .accessibilityElement()
                 .accessibilityLabel(Text(verbatim: store.state.cat.name) + Text(verbatim: ", ") + Text(store.mood.titleKey))
                 .accessibilityHint(Text("a11y.room.hint"))
@@ -288,6 +296,26 @@ struct HomeView: View {
                     .accessibilityLabel(Text("common.close"))
                 }
             }
+    }
+
+    /// The cat's current wish as a little thought bubble; tapping it says it out loud.
+    @ViewBuilder private var wishBubble: some View {
+        if let wish = store.state.wish, notice == nil {
+            Button { show("wish.title \(store.state.cat.name)") } label: {
+                HStack(spacing: 4) {
+                    PixelIcon(name: wish.icon, size: 18)
+                    Text(wish.textKey).font(PixelFont.body(10)).lineLimit(1)
+                }
+                .foregroundStyle(PixelPalette.ink)
+                .padding(.horizontal, 8).padding(.vertical, 5)
+                .pixelPanel()
+            }
+            .buttonStyle(PixelPressStyle())
+            .padding(8)
+            .phaseAnimator(Motion.reduced ? [0] : [0, -3]) { content, y in content.offset(y: y) } animation: { _ in .easeInOut(duration: 1.2) }
+            .transition(.scale.combined(with: .opacity))
+            .accessibilityLabel(Text("wish.title \(store.state.cat.name)") + Text(verbatim: " ") + Text(wish.textKey))
+        }
     }
 
     @ViewBuilder private var noticeBanner: some View {

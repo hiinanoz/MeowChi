@@ -433,7 +433,7 @@ final class GameStore {
     private func buyDecor(_ id: String, price: Int?) -> ActionResult {
         guard let item = DecorCatalog.item(id) else { return .unknownItem }
         guard !state.decor.isOwned(item) else { return .alreadyOwned }
-        guard state.progression.level >= item.unlockLevel else { return .locked }
+        guard state.progression.level >= item.unlockLevel, item.isAvailable(at: clock()) else { return .locked }
         let cost = price ?? item.price
         guard state.coins >= cost else { return .insufficientCoins }
         state.coins -= cost
@@ -488,7 +488,7 @@ final class GameStore {
     /// The same item all day (picked from the day key), among things the player's level allows.
     var dailyDeal: DailyDeal? {
         let level = state.progression.level
-        let decor = DecorCatalog.items.filter { !$0.isFree && !$0.isEmpty && $0.unlockLevel <= level }.map { DailyDeal.Item.decor($0) }
+        let decor = DecorCatalog.items.filter { !$0.isFree && !$0.isEmpty && $0.unlockLevel <= level && $0.season == nil }.map { DailyDeal.Item.decor($0) }
         let accessories = Accessory.allCases.filter { $0.unlockLevel <= level }.map { DailyDeal.Item.accessory($0) }
         let candidates = decor + accessories
         guard !candidates.isEmpty, !state.daily.dayKey.isEmpty else { return nil }
@@ -609,6 +609,13 @@ final class GameStore {
         case .item(let id):
             state.inventory[id, default: 0] += 1
             walk.itemsFound += 1
+        case .collectible(let id):
+            if state.collectibles.insert(id).inserted {
+                addDiary("found", detail: "find." + id.replacingOccurrences(of: "find_", with: ""))
+            } else {
+                state.coins += balance.duplicateCollectibleCoins
+                walk.coinsFound += balance.duplicateCollectibleCoins
+            }
         }
         activeWalk = walk
         save()

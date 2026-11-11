@@ -62,6 +62,7 @@ final class RoomScene: SKScene {
     private var nextLightingCheck: TimeInterval = 0
     /// While a care panel covers the lower room, the cat stays near the back wall so it remains visible.
     private var keepNearBack = false
+    private var lastDecor: DecorState?
     /// Touch tracking for tap vs. stroke petting.
     private var touchStartedOnCat = false
     private var strokeTravel: CGFloat = 0
@@ -181,6 +182,9 @@ final class RoomScene: SKScene {
             goScratch()
         } else if Double.random(in: 0...1) < walkChance * walkFactor {
             cat.walk(to: randomFloorPoint())
+        } else if mood == .sleepy, Double.random(in: 0...1) < 0.4 {
+            cat.react(.yawn, duration: 1.4)
+            AudioManager.shared.play(.meowSleepy)
         } else {
             cat.play([.sad, .hungry, .sick].contains(mood) ? .sad : .idle)
         }
@@ -327,6 +331,11 @@ final class RoomScene: SKScene {
     func applyDecor() {
         guard let store else { return }
         let decor = store.state.decor
+        // Something new in the room: the cat has a curious sniff.
+        if isBuilt, lastDecor != nil, lastDecor != decor, !cat.isScripted, !store.state.cat.isSleeping {
+            cat.react(.sniff, duration: 1.6)
+        }
+        lastDecor = decor
         backdrop.apply(decor)
         for (slot, node) in furniture {
             let item = decor.equipped(slot)

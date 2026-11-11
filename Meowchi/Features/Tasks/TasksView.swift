@@ -8,7 +8,7 @@ struct TasksView: View {
     var body: some View {
         let daily = store.state.daily
         let claimed = daily.tasks.filter(\.claimed).count
-        SheetScaffold(title: "tasks.title", onClose: { dismiss() }) {
+        SheetScaffold(title: "tasks.title", onClose: { dismiss() }, accent: Color(red: 0.45, green: 0.62, blue: 0.95)) {
             ForEach(daily.tasks) { task in
                 if let definition = store.definition(for: task) { row(task, definition) }
             }

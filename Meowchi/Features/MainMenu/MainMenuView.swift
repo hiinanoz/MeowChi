@@ -14,11 +14,10 @@ struct MainMenuView: View {
         VStack(spacing: 18) {
             Spacer(minLength: 20)
             VStack(spacing: 6) {
-                Text(verbatim: "Meowchi")
-                    .font(.system(size: 44, weight: .black, design: .monospaced))
-                    .foregroundStyle(PixelPalette.accent)
-                    .shadow(color: PixelPalette.ink, radius: 0, x: 3, y: 3)
+                Image("ui_logo").interpolation(.none).resizable().scaledToFit()
+                    .frame(width: 306)
                     .offset(y: logoUp ? -3 : 0)
+                    .accessibilityLabel(Text(verbatim: "Meowchi"))
                 Text("menu.subtitle").font(PixelFont.body(13)).foregroundStyle(PixelPalette.panel)
             }
             CatPreview(look: store.state.cat.look, size: 192, animation: .happy)

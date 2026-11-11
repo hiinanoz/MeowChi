@@ -99,6 +99,7 @@ final class GardenScene: SKScene {
         switch reward {
         case .coins: icon = "icon_coin"
         case .item(let id): icon = ItemCatalog.food(id)?.iconName ?? "icon_coin"
+        case .collectible(let id): icon = id
         }
         let pop = SKSpriteNode(texture: SpriteLibrary.texture(icon))
         pop.setScale(2)

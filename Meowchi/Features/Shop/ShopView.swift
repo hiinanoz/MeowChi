@@ -23,7 +23,7 @@ struct ShopView: View {
     private let columns = [GridItem(.adaptive(minimum: 96), spacing: 8)]
 
     var body: some View {
-        SheetScaffold(title: "shop.title", onClose: { dismiss() }) {
+        SheetScaffold(title: "shop.title", onClose: { dismiss() }, accent: Color(red: 0.95, green: 0.60, blue: 0.29)) {
             HStack {
                 PixelIcon(name: "icon_coin", size: 18)
                 Text(store.state.coins, format: .number).font(PixelFont.body(16)).monospacedDigit()
@@ -39,7 +39,9 @@ struct ShopView: View {
                 ForEach(ItemCatalog.foods) { foodRow($0) }
             case .toys:
                 LazyVGrid(columns: columns, spacing: 8) {
-                    ForEach(DecorCatalog.items(in: .toy).filter { !$0.isEmpty }) { decorCell($0) }
+                    ForEach(DecorCatalog.items(in: .toy).filter { !$0.isEmpty && ($0.isAvailable() || store.state.decor.isOwned($0)) }) {
+                        decorCell($0)
+                    }
                 }
             case .accessories:
                 LazyVGrid(columns: columns, spacing: 8) {
@@ -47,7 +49,8 @@ struct ShopView: View {
                 }
             case .decor:
                 ForEach(DecorSlot.allCases.filter { $0 != .toy }) { slot in
-                    let items = DecorCatalog.items(in: slot).filter { !$0.isFree && !$0.isEmpty }
+                    let items = DecorCatalog.items(in: slot)
+                        .filter { !$0.isFree && !$0.isEmpty && ($0.isAvailable() || store.state.decor.isOwned($0)) }
                     if !items.isEmpty {
                         Text(slot.titleKey).font(PixelFont.body(12)).foregroundStyle(PixelPalette.accentShade)
                             .frame(maxWidth: .infinity, alignment: .leading).padding(.top, 4)
@@ -153,6 +156,12 @@ struct ShopView: View {
         let locked = store.state.progression.level < item.unlockLevel
         return VStack(spacing: 6) {
             DecorPreview(item: item)
+                .overlay(alignment: .topTrailing) {
+                    if let season = item.season {
+                        Text(season.nameKey).font(PixelFont.body(8)).padding(.horizontal, 4).padding(.vertical, 1)
+                            .background(Capsule().fill(PixelPalette.warn))
+                    }
+                }
             Text(item.nameKey).font(PixelFont.body(10)).lineLimit(2).multilineTextAlignment(.center)
             status(owned: owned, locked: locked, unlockLevel: item.unlockLevel, price: item.price) { buyDecor(item) }
         }

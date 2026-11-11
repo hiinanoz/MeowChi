@@ -84,3 +84,32 @@ struct Confetti: View {
         }
     }
 }
+
+/// Celebration when the cat reaches a new life stage: the cat on a cushion, with confetti.
+struct GrowthCard: View {
+    let onClose: () -> Void
+    @Environment(GameStore.self) private var store
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.45).ignoresSafeArea().onTapGesture(perform: onClose)
+            if !Motion.reduced { Confetti().ignoresSafeArea().allowsHitTesting(false) }
+            VStack(spacing: 10) {
+                Text("notice.grownUp \(store.state.cat.name)").font(PixelFont.body(17)).multilineTextAlignment(.center)
+                ZStack(alignment: .bottom) {
+                    Image("ui_cushion").interpolation(.none).resizable().frame(width: 160, height: 56)
+                    CatPreview(look: store.state.cat.look, size: 128, animation: .happy).padding(.bottom, 18)
+                }
+                Text(LocalizedStringKey(store.stage.nameKey)).font(PixelFont.body(20)).foregroundStyle(PixelPalette.accentShade)
+                Text("growth.photoSaved").font(PixelFont.body(10)).foregroundStyle(PixelPalette.accentShade)
+                Button("levelUp.ok", action: onClose).buttonStyle(PixelButtonStyle(fill: PixelPalette.good))
+            }
+            .foregroundStyle(PixelPalette.ink)
+            .padding(18)
+            .pixelPanel()
+            .padding(28)
+            .transition(Motion.reduced ? .opacity : .scale(scale: 0.6).combined(with: .opacity))
+        }
+        .accessibilityAddTraits(.isModal)
+    }
+}

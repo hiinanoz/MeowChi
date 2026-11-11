@@ -42,6 +42,7 @@ struct RootView: View {
     @Environment(\.openURL) private var openURL
     /// Launch shows the main menu; "Go home" enters the room. Onboarding drops straight into the room.
     @State private var atHome: Bool?
+    @State private var splash = true
 
     private var startsAtHome: Bool {
         #if DEBUG
@@ -64,6 +65,12 @@ struct RootView: View {
         .animation(.easeInOut(duration: 0.3), value: atHome)
         .onChange(of: store.needsOnboarding) { _, needs in if !needs { atHome = true } }
         .background(ShaderPrewarm())
+        .overlay { if splash { LaunchPaws().transition(.opacity) } }
+        .task {
+            // Short pawprint splash while the first shaders warm up.
+            try? await Task.sleep(for: .seconds(0.9))
+            withAnimation(.easeOut(duration: 0.3)) { splash = false }
+        }
         .preferredColorScheme(.dark)
         // The pixel layout stays readable up to the first accessibility size.
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
@@ -74,5 +81,30 @@ struct RootView: View {
             } message: {
                 Text("save.error.message")
             }
+    }
+}
+
+/// Three pawprints that light up one after another on launch.
+private struct LaunchPaws: View {
+    @State private var step = 0
+
+    var body: some View {
+        ZStack {
+            PixelPalette.frame.ignoresSafeArea()
+            HStack(spacing: 18) {
+                ForEach(0..<3, id: \.self) { index in
+                    PixelIcon(name: "icon_paw", size: 32)
+                        .opacity(index <= step ? 1 : 0.25)
+                        .offset(y: index % 2 == 0 ? 0 : -10)
+                }
+            }
+        }
+        .accessibilityHidden(true)
+        .task {
+            for next in 1...2 {
+                try? await Task.sleep(for: .seconds(0.25))
+                withAnimation(.easeOut(duration: 0.15)) { step = next }
+            }
+        }
     }
 }

@@ -35,6 +35,8 @@ struct GameState: Codable, Equatable {
     var lastWishAt: Date?
     /// Newest first, capped at `Balance.diaryLimit`.
     var diary: [DiaryEntry] = []
+    /// Album keepsakes found on walks (`find_*` ids).
+    var collectibles: Set<String> = []
 
     static func newGame(now: Date, balance: Balance) -> GameState {
         GameState(
@@ -136,6 +138,7 @@ extension GameState {
         wish = try c.decodeIfPresent(CatWish.self, forKey: .wish)
         lastWishAt = try c.decodeIfPresent(Date.self, forKey: .lastWishAt)
         diary = try c.decodeIfPresent([DiaryEntry].self, forKey: .diary) ?? []
+        collectibles = try c.decodeIfPresent(Set<String>.self, forKey: .collectibles) ?? []
     }
 }
 

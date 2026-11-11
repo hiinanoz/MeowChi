@@ -97,3 +97,11 @@ Bath scene, garden (side-scrolling), shop item icons, decorations for each slot,
 ## Widget copies
 
 The widget extension has its own small catalog (`MeowchiWidget/Assets.xcassets`): `icon_hunger`, `icon_energy`, `icon_happiness`, `icon_cleanliness`, `icon_health`, `fx_heart`, `fx_zzz`. When final art replaces these sprites in the app, copy the same PNGs there too.
+
+## UX update placeholders (Tools/gen_extra_sprites.py)
+
+Made by `Tools/gen_extra_sprites.py`, which only adds these files. Replace them with final art under the same names:
+- Cat poses: `cat_yawn_0/1`, `cat_sniff_0/1` plus the matching `cat_ears_<style>_…` and `cat_acc_<id>_…` layers.
+- Seasonal decor: `plant_xmas`, `plant_sakura`, `toy_beachball`.
+- Album keepsakes (Icons): `find_leaf`, `find_flower`, `find_acorn`, `find_button`, `find_shell`, `find_starfish`, `find_feather`, `find_pebble`.
+- UI: `ui_logo` (title screen), `ui_cushion` (growth celebration), `ui_empty_cat` (empty screens), `icon_paw` (launch).

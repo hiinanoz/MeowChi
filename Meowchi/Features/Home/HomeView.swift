@@ -21,6 +21,7 @@ struct HomeView: View {
     /// The level being celebrated by the level-up card, if it is showing.
     @State private var celebratedLevel: Int?
     @State private var showCard = false
+    @State private var showGrowth = false
 
     @State private var panel: CarePanel?
     @State private var isBrushing = false
@@ -161,7 +162,9 @@ struct HomeView: View {
         }
         .onChange(of: store.stageUpCount) { _, _ in
             AudioManager.shared.play(.levelUp)
-            show("notice.grownUp \(store.state.cat.name)", important: true)
+            AccessibilityNotification.Announcement(String(localized: "notice.grownUp \(store.state.cat.name)")).post()
+            takePhoto() // a keepsake of the moment, saved to the album
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) { showGrowth = true }
         }
         .task {
             // Foreground refresh. Offline time is handled by elapsed-time simulation, not timers.
@@ -183,6 +186,9 @@ struct HomeView: View {
         .sheet(isPresented: $showNails) { NailTrimView().environment(store) }
         .fullScreenCover(isPresented: $showCozy, onDismiss: liftCurtain) { CozyView().environment(store) }
         .overlay { if iris > 0 { IrisCurtain(closed: iris) } }
+        .overlay {
+            if showGrowth { GrowthCard { withAnimation(.easeOut(duration: 0.2)) { showGrowth = false } } }
+        }
         .overlay {
             if let level = celebratedLevel {
                 LevelUpCard(level: level) { withAnimation(.easeOut(duration: 0.2)) { celebratedLevel = nil } }

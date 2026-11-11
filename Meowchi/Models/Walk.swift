@@ -15,11 +15,26 @@ struct WalkLocationConfig {
     var coinRange: ClosedRange<Int>
     var itemChance: Double
     var itemPool: [String]
+    /// Album keepsakes found only here (asset names in Icons, e.g. "find_shell").
+    var collectibles: [String] = []
 }
 
 enum FindReward: Equatable {
     case coins(Int)
     case item(String)
+    /// A keepsake for the Collection album (`find_*`). Already owned ones turn into a few coins.
+    case collectible(String)
+}
+
+/// Every keepsake in album order, with where it can be found.
+enum Collectibles {
+    static func all(_ balance: Balance = .standard) -> [(id: String, location: WalkLocation)] {
+        WalkLocation.allCases.flatMap { location in
+            (balance.walkLocations[location]?.collectibles ?? []).map { (id: $0, location: location) }
+        }
+    }
+
+    static func nameKey(_ id: String) -> LocalizedStringKey { LocalizedStringKey("find." + id.replacingOccurrences(of: "find_", with: "")) }
 }
 
 struct WalkFind: Equatable {
@@ -45,9 +60,12 @@ struct WalkSession: Equatable {
         let finds = (0..<count).map { i -> WalkFind in
             // Spread finds evenly with some jitter so the whole garden is worth exploring.
             let slot = (Double(i) + 0.2 + rng.unit() * 0.6) / Double(count)
-            let reward: FindReward = rng.unit() < config.itemChance
+            var reward: FindReward = rng.unit() < config.itemChance
                 ? .item(config.itemPool[Int(rng.next() % UInt64(config.itemPool.count))])
                 : .coins(config.coinRange.lowerBound + Int(rng.next() % UInt64(config.coinRange.count)))
+            if !config.collectibles.isEmpty, rng.unit() < balance.collectibleChance {
+                reward = .collectible(config.collectibles[Int(rng.next() % UInt64(config.collectibles.count))])
+            }
             return WalkFind(x: 0.06 + slot * 0.88, y: 0.15 + rng.unit() * 0.7, reward: reward)
         }
         return WalkSession(finds: finds, location: location)

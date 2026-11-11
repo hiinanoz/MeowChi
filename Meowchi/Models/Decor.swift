@@ -16,6 +16,8 @@ struct DecorItem: Identifiable, Equatable {
     let unlockLevel: Int
     /// Color items (wall/floor color) tint the grayscale pattern instead of having a sprite. 0xRRGGBB.
     var tint: UInt32? = nil
+    /// Seasonal items are sold only in their season; once bought they stay forever.
+    var season: Season? = nil
 
     var nameKey: LocalizedStringKey { LocalizedStringKey("decor." + id) }
     var isFree: Bool { price == 0 }
@@ -67,6 +69,9 @@ enum DecorCatalog {
         DecorItem(id: "frame_clock", slot: .wallArt, price: 90, unlockLevel: 2),
         DecorItem(id: "toy_yarn", slot: .toy, price: 0, unlockLevel: 1),
         DecorItem(id: "toy_mouse", slot: .toy, price: 50, unlockLevel: 1),
+        DecorItem(id: "toy_beachball", slot: .toy, price: 80, unlockLevel: 1, season: .summer),
+        DecorItem(id: "plant_xmas", slot: .plant, price: 150, unlockLevel: 1, season: .winter),
+        DecorItem(id: "plant_sakura", slot: .plant, price: 150, unlockLevel: 1, season: .spring),
         DecorItem(id: "tv_none", slot: .tv, price: 0, unlockLevel: 1),
         DecorItem(id: "tv_retro", slot: .tv, price: 250, unlockLevel: 2),
         DecorItem(id: "tv_modern", slot: .tv, price: 400, unlockLevel: 3),

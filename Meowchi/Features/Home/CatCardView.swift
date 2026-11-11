@@ -8,7 +8,7 @@ struct CatCardView: View {
 
     var body: some View {
         let state = store.state
-        SheetScaffold(title: "card.title", onClose: { dismiss() }) {
+        SheetScaffold(title: "card.title", onClose: { dismiss() }, accent: Color(red: 0.92, green: 0.45, blue: 0.55)) {
             VStack(spacing: 6) {
                 CatPreview(look: state.cat.look, size: 128, animation: .happy)
                 Text(verbatim: state.cat.name).font(PixelFont.body(20))
@@ -43,6 +43,7 @@ struct CatCardView: View {
 
             Text("card.diary").font(PixelFont.body(13)).frame(maxWidth: .infinity, alignment: .leading).padding(.top, 4)
             if state.diary.isEmpty {
+                Image("ui_empty_cat").interpolation(.none).resizable().scaledToFit().frame(width: 96).accessibilityHidden(true)
                 Text("card.diaryEmpty").font(PixelFont.body(11)).foregroundStyle(PixelPalette.accentShade)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }

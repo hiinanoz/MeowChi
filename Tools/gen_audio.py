@@ -272,6 +272,31 @@ def music_upbeat():
     return track(120, melody, chords, lead, stabs, bass, drums, [(0.25, 0.22)])
 
 
+def music_night():
+    """Night: 64 BPM music box over a soft pad, D major pentatonic, lots of space."""
+    melody = ("A5:2 F#5:1 E5:1 | D5:3 r:1 | E5:1 F#5:1 A5:2 | B5:3 r:1 | "
+              "A5:2 F#5:2 | E5:1 D5:1 E5:2 | F#5:1 E5:1 D5:1 B4:1 | D5:4 | "
+              "D6:2 B5:1 A5:1 | F#5:3 r:1 | E5:1 F#5:1 A5:1 B5:1 | A5:4 | "
+              "F#5:2 E5:1 D5:1 | E5:2 B4:2 | D5:1 E5:1 F#5:2 | D5:4")
+    chords = [(38, [62, 66, 69]), (43, [55, 59, 62]), (35, [59, 62, 66]), (45, [57, 61, 64])]
+
+    def lead(out, t, d, n):
+        mix(out, pluck(midi(n + 12), d + 1.6, decay=0.997, bright=0.9), t, 0.22)
+
+    def pad(out, t, beat, tones):
+        for n in tones:
+            mix(out, tone(midi(n), beat * 4, "sine", attack=1.0, release=1.4), t, 0.04)
+
+    def bass(out, t, beat, root):
+        mix(out, lowpass(tone(midi(root), beat * 3.5, "triangle", attack=0.05, release=0.8), 0.3), t, 0.14)
+
+    def drums(out, t, beat, bar):
+        if bar % 2 == 1:
+            mix(out, noise_burst(0.06, 90, tone_hz=1600), t + 2 * beat, 0.025)
+
+    return track(64, melody, chords, lead, pad, bass, drums, [(0.42, 0.35), (0.63, 0.2)], tail=3.0)
+
+
 def music_retro8():
     """8-bit: NES-style pulse lead, pulse arpeggios, triangle bass, raw noise drums. 140 BPM, C major."""
     melody = ("E5:.5 G5:.5 C6:.5 G5:.5 E5:.5 G5:.5 C6:1 | A5:.5 C6:.5 E6:.5 C6:.5 A5:1 G5:1 | "
@@ -374,6 +399,35 @@ def sfx():
             out[i] = rnd.uniform(-1, 1) * (0.5 + 0.5 * math.sin(2 * math.pi * 24 * t)) * math.sin(math.pi * i / len(out))
         return lowpass(lowpass(out, 0.05), 0.08)
 
+    def meow_variant(seconds, base, rise, fall):
+        out = buffer(seconds)
+        phase = 0.0
+        for i in range(len(out)):
+            t = i / len(out)
+            f = base + rise * math.sin(math.pi * min(1, t * 1.4)) + fall * t
+            phase = (phase + f / SR) % 1
+            v = math.sin(2 * math.pi * phase) + 0.5 * math.sin(4 * math.pi * phase) + 0.25 * math.sin(6 * math.pi * phase)
+            out[i] = v * math.sin(math.pi * t) ** 0.7 * 0.5
+        return lowpass(out, 0.35)
+
+    def scrub():
+        out = buffer(0.5)
+        for k in range(4):
+            mix(out, lowpass(noise_burst(0.1, 25), 0.25), k * 0.11, 0.6)
+        return out
+
+    def snip():
+        out = buffer(0.12)
+        mix(out, noise_burst(0.03, 200, tone_hz=3200), 0, 0.7)
+        mix(out, noise_burst(0.03, 200, tone_hz=2400), 0.05, 0.5)
+        return out
+
+    def tv_jingle():
+        out = buffer(0.7)
+        mix(out, lowpass(noise_burst(0.15, 12), 0.7), 0, 0.25)
+        mix(out, seq([72, 76, 79, 84], 0.08, wave="square", length=0.12), 0.12, 0.8)
+        return out
+
     def crunch():
         out = buffer(0.45)
         for k in range(3):
@@ -391,6 +445,21 @@ def sfx():
         "sfx_splash": lowpass(noise_burst(0.6, 6), 0.3),
         "sfx_catch": sweep(1200, 400, 0.08),
         "sfx_find": seq([86, 91, 95], 0.05, wave="triangle", length=0.15),
+        # UI
+        "sfx_open": sweep(500, 900, 0.07),
+        "sfx_close": sweep(900, 500, 0.07),
+        "sfx_tab": seq([91], 0.03, wave="triangle", length=0.035),
+        "sfx_badge": seq([79, 83, 86, 91, 95], 0.06, wave="triangle", length=0.25),
+        "sfx_reward": seq([88, 91, 96], 0.08, wave="triangle", length=0.3),
+        "sfx_wish": seq([95, 91, 98], 0.07, wave="sine", length=0.25),
+        # Care and room
+        "sfx_scrub": scrub(),
+        "sfx_snip": snip(),
+        "sfx_tv": tv_jingle(),
+        # Meows by mood: happy (short, high), hungry (long, insistent), sleepy (soft, falling)
+        "sfx_meow_happy": meow_variant(0.32, 680, 320, 0.0),
+        "sfx_meow_hungry": meow_variant(0.7, 470, 300, -60),
+        "sfx_meow_sleepy": meow_variant(0.6, 420, 140, -180),
     }
 
 
@@ -415,6 +484,7 @@ def main():
     write("music_upbeat", music_upbeat(), "alac")
     write("music_retro8", music_retro8(), "alac")
     write("music_retro16", music_retro16(), "alac")
+    write("music_night", music_night(), "alac")
     for name, samples in sfx().items():
         write(name, samples, "LEI16")
 

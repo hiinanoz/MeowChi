@@ -236,7 +236,7 @@ struct GameSettings: Codable, Equatable {
 }
 
 enum MusicTrack: String, CaseIterable, Identifiable {
-    case calm, upbeat, retro8, retro16
+    case calm, upbeat, retro8, retro16, night
 
     var id: String { rawValue }
     var fileName: String { "music_" + rawValue }

@@ -23,7 +23,7 @@ struct TasksView: View {
                 if daily.bonusClaimed {
                     Text("tasks.claimed").font(PixelFont.body(11)).foregroundStyle(PixelPalette.accentShade)
                 } else {
-                    Button("tasks.claim") { if store.claimDailyBonus() == .ok { AudioManager.shared.play(.levelUp) } }
+                    Button("tasks.claim") { if store.claimDailyBonus() == .ok { AudioManager.shared.play(.reward) } }
                         .buttonStyle(PixelButtonStyle(fill: PixelPalette.warn))
                         .disabled(!daily.allClaimed)
                 }

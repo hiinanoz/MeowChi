@@ -251,7 +251,7 @@ final class RoomScene: SKScene {
         switch result {
         case .ok:
             if stroke { haptics.impactOccurred(intensity: 0.6) }
-            AudioManager.shared.play(stroke ? .purr : .meow)
+            AudioManager.shared.play(stroke ? .purr : AudioManager.meow(for: store?.mood ?? .happy))
             guard !cat.isScripted else { spawnHearts(); return }
             cat.stopMoving()
             cat.react(.happy, duration: stroke ? 2 : 1)
@@ -271,6 +271,7 @@ final class RoomScene: SKScene {
         switch result {
         case .ok:
             haptics.impactOccurred(intensity: 0.4)
+            AudioManager.shared.play(.scrub)
             AudioManager.shared.play(.purr)
             cat.stopMoving()
             cat.react(.happy, duration: 1.2)
@@ -413,11 +414,12 @@ final class RoomScene: SKScene {
         cat.isScripted = true
         let frames = SpriteLibrary.textures((0..<4).map { "tv_\(channel)_\($0)" })
         tvScreen.run(.repeatForever(.animate(with: frames, timePerFrame: 0.25)), withKey: "channel")
+        AudioManager.shared.play(.tv)
         cat.walk(to: Spot.watchTV) { [weak self] in
             guard let self else { return }
             self.cat.play(.idle)
             self.cat.setTailMood(.happy)
-            let cheer = SKAction.run { [weak self] in self?.cat.react(.happy, duration: 1.2); AudioManager.shared.play(.meow) }
+            let cheer = SKAction.run { [weak self] in self?.cat.react(.happy, duration: 1.2); AudioManager.shared.play(.meowHappy) }
             self.run(.sequence([.wait(forDuration: 3), cheer, .wait(forDuration: 4), cheer, .wait(forDuration: 4), .run { [weak self] in
                 guard let self else { return }
                 self.tvScreen.removeAction(forKey: "channel")

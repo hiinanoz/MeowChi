@@ -151,6 +151,9 @@ struct HomeView: View {
             AccessibilityNotification.Announcement(String(localized: "notice.levelUp")).post()
             withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) { celebratedLevel = store.state.progression.level }
         }
+        .onChange(of: store.state.wish) { old, new in
+            if old == nil, new != nil { AudioManager.shared.play(.wish) }
+        }
         .onChange(of: store.wishGrantedCount) { _, _ in
             AudioManager.shared.play(.purr)
             scene.spawnHearts()
@@ -206,7 +209,7 @@ struct HomeView: View {
         }
         .onChange(of: store.lastUnlockedBadge) { _, badge in
             guard badge != nil else { return }
-            AudioManager.shared.play(.levelUp)
+            AudioManager.shared.play(.badge)
             show("notice.badge", important: true)
         }
         .task {
@@ -507,6 +510,7 @@ private struct ActionBar: View {
     }
 
     private func toggle(_ target: CarePanel) {
+        AudioManager.shared.play(panel == target ? .close : .open)
         withAnimation(.easeOut(duration: 0.2)) { panel = panel == target ? nil : target }
     }
 }

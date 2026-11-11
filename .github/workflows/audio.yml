@@ -1,0 +1,33 @@
+name: Sesleri üret
+
+# Synthesizes music and sound effects with Tools/gen_audio.py on a Mac (it needs `afconvert`)
+# and commits the .caf files back to the same branch. Runs when the generator changes, or by hand.
+on:
+  push:
+    branches: [phase-5f-ux-7j2o0i]
+    paths:
+      - Tools/gen_audio.py
+      - .github/workflows/audio.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audio:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sesleri üret
+        run: |
+          python3 Tools/gen_audio.py
+          ls -la Meowchi/Resources/Audio
+      - name: Değişiklikleri kaydet
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add Meowchi/Resources/Audio
+          if git diff --cached --quiet; then echo "Değişiklik yok"; exit 0; fi
+          git commit -m "Audio: regenerate music and sound effects (Tools/gen_audio.py)"
+          git push origin HEAD:${GITHUB_REF_NAME}

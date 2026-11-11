@@ -77,7 +77,7 @@ struct ShopView: View {
             ForEach(Tab.allCases) { item in
                 let selected = item == tab
                 Button {
-                    AudioManager.shared.play(.tap)
+                    AudioManager.shared.play(.tab)
                     withAnimation(.easeOut(duration: 0.15)) { tab = item }
                 } label: {
                     Text(item.titleKey).font(PixelFont.body(11)).lineLimit(1).minimumScaleFactor(0.6)

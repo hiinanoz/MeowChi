@@ -39,7 +39,7 @@ struct LoginRewardView: View {
             }
             if claimable {
                 Button("tasks.claim") {
-                    if store.claimLogin() != nil { AudioManager.shared.play(.coin) }
+                    if store.claimLogin() != nil { AudioManager.shared.play(.reward) }
                 }
                 .buttonStyle(PixelButtonStyle(fill: PixelPalette.good))
             } else if !store.state.settings.remindersAsked {

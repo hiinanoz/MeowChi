@@ -48,7 +48,7 @@ struct GameMenuView: View {
                 }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PixelPressStyle())
     }
 
     private func select(_ destination: Destination) {

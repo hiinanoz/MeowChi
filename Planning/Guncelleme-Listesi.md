@@ -12,3 +12,16 @@ iş akışında) hatırlatma olarak görünür. Biten madde `[x]` yapılır.
 - [x] **Web sayfalarındaki ayar adları.** Uygulama çevrilince docs/_src altındaki menü adlarını (ör. "Gentle reminders") çevirilerle eşleştir, `python3 Tools/build_docs.py` çalıştır.
 - [ ] **Game Center ve iCloud yedeği.** Plan: docs/ONLINE_PLAN.md (onay bekliyor).
 - [ ] **Widget'ı gerçek cihazda dene.** "Sev" düğmesi, kalp ve zzz.
+
+## UX geliştirme planı (sırayla; kullanıcı kararları: geçici çizim üret, mevsimler kış/bahar/yaz, dekor ve aksesuar yalnızca mağazada, ad ve görünüm ayarlardan ücretsiz)
+
+- [ ] **A. Dokunuş ve hareket:** basılan düğme çöksün, başarısız dokunuşta sallanma ve titreşim, HUD sayaçları yuvarlanarak artsın, altın ve XP uçuşu, pixel iris geçişi.
+- [ ] **B. Kutlamalar:** seviye atlama kartı (açılan eşyalarla), mini oyun rekorları ve yıldızlar.
+- [ ] **C. Menüler:** canlı menü kutuları, bölümlü ayarlar (ad ve görünüm değiştirme, hakkında, gizlilik, destek), hareketli ana menü.
+- [ ] **D. Mağaza:** sekmeler (Mama/Oyuncak/Aksesuar/Dekor), günün fırsatı, satın alma yalnızca mağazada; Dekor yalnızca yerleştirir.
+- [ ] **E. Kediyle bağ:** kedi kartı (paylaşılabilir), kedi istekleri, kedi günlüğü.
+- [ ] **F. Oda:** gün saati ve hava, ortam hareketi (kuş, toz, bitki, saat).
+- [ ] **G. Ses:** yeni efektler, ruh haline göre miyavlar, gece müziği; sesler GitHub'daki Mac'te üretilir.
+- [ ] **H. Toplama:** yürüyüş buluntuları albümü, mevsimlik içerik.
+- [ ] **I. Geçici çizimler:** büyüme sahnesi, yeni kedi pozları, ekran temaları, boş durum çizimleri, açılış animasyonu, pixel logo.
+- [ ] **J. TestFlight'a yükle.**

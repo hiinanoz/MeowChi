@@ -11,7 +11,13 @@ struct HomeView: View {
     @State private var notice: LocalizedStringResource?
     @State private var noticeID = 0
     /// Black "door" shown while switching between the room and an immersive screen.
-    @State private var curtain = false
+    /// Pixel iris between the room and immersive screens: 0 open, 1 closed.
+    @State private var iris: CGFloat = 0
+    @State private var coinBursts: [CoinBurstLayer.Burst] = []
+    @State private var coinOrigin = CGRect.zero
+    @State private var coinTarget = CGRect.zero
+    /// Bumped on a "can't do that" notice: the banner shakes and the phone gives a warning tap.
+    @State private var failCount = 0
 
     @State private var panel: CarePanel?
     @State private var isBrushing = false
@@ -73,6 +79,16 @@ struct HomeView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
+        .coordinateSpace(name: "home")
+        .onPreferenceChange(CoinOriginKey.self) { coinOrigin = $0 }
+        .onPreferenceChange(CoinTargetKey.self) { coinTarget = $0 }
+        .overlay { CoinBurstLayer(bursts: coinBursts, origin: coinOrigin, target: coinTarget) }
+        .onChange(of: store.state.coins) { old, new in
+            guard new > old, !Motion.reduced else { return }
+            let burst = CoinBurstLayer.Burst(count: min(6, max(2, (new - old) / 5)))
+            coinBursts.append(burst)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) { coinBursts.removeAll { $0.id == burst.id } }
+        }
         .background(PixelPalette.frame.ignoresSafeArea())
         .onAppear {
             AudioManager.shared.context = .home
@@ -153,7 +169,8 @@ struct HomeView: View {
         .sheet(isPresented: $showSettings) { SettingsView().environment(store) }
         .sheet(isPresented: $showNails) { NailTrimView().environment(store) }
         .fullScreenCover(isPresented: $showCozy, onDismiss: liftCurtain) { CozyView().environment(store) }
-        .overlay { if curtain { Color.black.ignoresSafeArea().allowsHitTesting(false).transition(.opacity) } }
+        .overlay { if iris > 0 { IrisCurtain(closed: iris) } }
+        .sensoryFeedback(.warning, trigger: failCount)
         .sensoryFeedback(.success, trigger: store.levelUpCount)
         .sensoryFeedback(.success, trigger: store.state.badges.count)
         .sheet(isPresented: $showLogin) { LoginRewardView().environment(store) }
@@ -229,6 +246,7 @@ struct HomeView: View {
 
     private var roomView: some View {
         SpriteView(scene: scene, preferredFramesPerSecond: 60, options: [.ignoresSiblingOrder])
+                .reportFrame(CoinOriginKey.self)
                 .clipShape(PixelBorder(step: 4))
                 .overlay(PixelBorder(step: 4).stroke(PixelPalette.ink, lineWidth: 2))
                 .overlay(alignment: .top) { noticeBanner }
@@ -271,6 +289,8 @@ struct HomeView: View {
                 .foregroundStyle(PixelPalette.ink)
                 .padding(.horizontal, 10).padding(.vertical, 6)
                 .pixelPanel()
+                .modifier(ShakeEffect(shakes: CGFloat(failCount)))
+                .animation(.linear(duration: 0.4), value: failCount)
                 .padding(.top, 8)
                 .transition(.banner)
         }
@@ -398,6 +418,7 @@ struct HomeView: View {
     private func show(_ text: LocalizedStringResource, important: Bool = false) {
         noticeID += 1
         let id = noticeID
+        if Self.failureNotices.contains(text.key) { failCount += 1 }
         withAnimation { notice = text }
         AccessibilityNotification.Announcement(String(localized: text)).post()
         Task {
@@ -406,11 +427,16 @@ struct HomeView: View {
         }
     }
 
-    /// Fades the room to black, then presents the immersive screen without its slide (a "door" transition).
+    /// Notices that mean "that didn't work": they shake the banner and give a warning haptic.
+    private static let failureNotices: Set<String> = [
+        "notice.noCoins", "notice.noFood", "notice.tooTired", "notice.tooSoon", "notice.busy", "notice.sleeping", "notice.locked",
+    ]
+
+    /// Closes a pixel iris over the room, then presents the immersive screen without its slide.
     private func presentImmersive(_ present: @escaping () -> Void) {
         guard !Motion.reduced else { return present() }
-        withAnimation(.easeIn(duration: 0.25)) { curtain = true }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+        withAnimation(.easeIn(duration: 0.3)) { iris = 1 }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             var transaction = Transaction()
             transaction.disablesAnimations = true
             withTransaction(transaction) { present() }
@@ -419,7 +445,7 @@ struct HomeView: View {
 
     private func liftCurtain() {
         AudioManager.shared.context = .home
-        withAnimation(.easeOut(duration: 0.35)) { curtain = false }
+        withAnimation(.easeOut(duration: 0.45)) { iris = 0 }
     }
 }
 

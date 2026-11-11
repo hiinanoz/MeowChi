@@ -63,7 +63,13 @@ jobs:
           if ! python3 Tools/asc_review_detail_exists.py "${{ inputs.version }}"; then
             echo "::warning::App Review iletişim bilgileri (ad, soyad, telefon) App Store Connect'te boş: inceleme notu bu kez atlanıyor."
             rm -rf fastlane/metadata/review_information
+            # fastlane stops on the first version's missing review detail; texts go up via the API below.
+            echo "SKIP_TEXT=true" >> "$GITHUB_ENV"
           fi
+
+      - name: Metinleri API ile yükle (inceleme bilgileri yokken)
+        if: env.SKIP_TEXT == 'true'
+        run: python3 Tools/asc_upload_texts.py "${{ inputs.version }}"
 
       - name: fastlane deliver
         run: |
@@ -80,6 +86,7 @@ jobs:
             --metadata_path fastlane/metadata \
             --screenshots_path fastlane/screenshots \
             --skip_binary_upload true \
+            --skip_metadata "${SKIP_TEXT:-false}" \
             --skip_screenshots $SHOTS \
             --overwrite_screenshots true \
             --run_precheck_before_submit false \

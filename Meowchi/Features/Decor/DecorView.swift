@@ -17,7 +17,12 @@ struct DecorView: View {
 
     @Environment(GameStore.self) private var store
     @Environment(\.dismiss) private var dismiss
-    @State private var path: [Tab] = Self.initialPath
+    @State private var path: [Tab]
+
+    /// `startAtCat` opens straight on the cat's look and accessories (from Settings).
+    init(startAtCat: Bool = false) {
+        _path = State(initialValue: startAtCat ? [.cat] : Self.initialPath)
+    }
 
     private static var initialPath: [Tab] {
         #if DEBUG

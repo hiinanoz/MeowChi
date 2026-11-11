@@ -372,6 +372,13 @@ final class GameStore {
 
     var stage: CatStage { CatStage(careDays: state.login.days, balance: balance) }
 
+    /// Renaming is free and allowed any time (Settings). Invalid or empty names keep the old one.
+    func rename(_ name: String) {
+        guard let clean = CatState.sanitizedName(name, maxLength: balance.maxNameLength), clean != state.cat.name else { return }
+        state.cat.name = clean
+        save()
+    }
+
     func completeOnboarding(name: String, look: CatLook = CatLook()) {
         state.cat.name = CatState.sanitizedName(name, maxLength: balance.maxNameLength) ?? state.cat.name
         state.cat.look = CatLook(coat: look.coat, ears: look.ears, tail: look.tail).sanitized

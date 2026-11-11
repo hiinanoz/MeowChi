@@ -77,3 +77,15 @@ final class GrowthTests: XCTestCase {
         }
     }
 }
+
+@MainActor
+final class RenameTests: XCTestCase {
+    func testRenameKeepsOldNameWhenInvalid() {
+        let store = GameStore(saveStore: InMemorySaveStore())
+        store.completeOnboarding(name: "Mochi")
+        store.rename("  Pudding ")
+        XCTAssertEqual(store.state.cat.name, "Pudding")
+        store.rename("   ")
+        XCTAssertEqual(store.state.cat.name, "Pudding")
+    }
+}

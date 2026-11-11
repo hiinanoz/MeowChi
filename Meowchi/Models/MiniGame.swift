@@ -28,10 +28,17 @@ struct MiniGameConfig {
     var maxRewardedPoints: Int
     /// Plausibility limit: at most one point per this many seconds of play.
     var minSecondsPerPoint: Double
+    /// Points needed for 1, 2 and 3 stars.
+    var starPoints = [5, 12, 20]
+
+    func stars(for points: Int) -> Int { starPoints.filter { points >= $0 }.count }
 }
 
 struct MiniGameReward: Equatable {
     var points: Int
     var coins: Int
     var xp: Int
+    var stars = 0
+    var best = 0
+    var isNewBest = false
 }

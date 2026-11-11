@@ -18,6 +18,8 @@ struct HomeView: View {
     @State private var coinTarget = CGRect.zero
     /// Bumped on a "can't do that" notice: the banner shakes and the phone gives a warning tap.
     @State private var failCount = 0
+    /// The level being celebrated by the level-up card, if it is showing.
+    @State private var celebratedLevel: Int?
 
     @State private var panel: CarePanel?
     @State private var isBrushing = false
@@ -145,7 +147,8 @@ struct HomeView: View {
         .onChange(of: panel) { _, open in scene.setPanelOpen(open != nil) }
         .onChange(of: store.levelUpCount) { _, _ in
             AudioManager.shared.play(.levelUp)
-            show("notice.levelUp", important: true)
+            AccessibilityNotification.Announcement(String(localized: "notice.levelUp")).post()
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) { celebratedLevel = store.state.progression.level }
         }
         .onChange(of: store.stageUpCount) { _, _ in
             AudioManager.shared.play(.levelUp)
@@ -170,6 +173,11 @@ struct HomeView: View {
         .sheet(isPresented: $showNails) { NailTrimView().environment(store) }
         .fullScreenCover(isPresented: $showCozy, onDismiss: liftCurtain) { CozyView().environment(store) }
         .overlay { if iris > 0 { IrisCurtain(closed: iris) } }
+        .overlay {
+            if let level = celebratedLevel {
+                LevelUpCard(level: level) { withAnimation(.easeOut(duration: 0.2)) { celebratedLevel = nil } }
+            }
+        }
         .sensoryFeedback(.warning, trigger: failCount)
         .sensoryFeedback(.success, trigger: store.levelUpCount)
         .sensoryFeedback(.success, trigger: store.state.badges.count)

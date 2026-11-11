@@ -88,6 +88,9 @@ struct MiniGameView: View {
         case .intro:
             card {
                 Text(kind.hintKey).font(PixelFont.body(13)).multilineTextAlignment(.center)
+                if let best = store.state.bestScores[kind.rawValue], best > 0 {
+                    Text("game.best \(best)").font(PixelFont.body(11)).foregroundStyle(PixelPalette.accentShade)
+                }
                 Text("game.energyCost \(Int(kind.config(store.balance).energyCost))").font(PixelFont.body(11))
                 if let notice { Text(notice).font(PixelFont.body(11)).foregroundStyle(PixelPalette.badText) }
                 Button("game.start") { start() }.buttonStyle(PixelButtonStyle(fill: PixelPalette.good))
@@ -97,7 +100,13 @@ struct MiniGameView: View {
         case .results(let reward):
             card {
                 Text("game.results").font(PixelFont.body(18))
+                StarRow(stars: reward.stars)
                 Text("game.points \(reward.points)").font(PixelFont.body(14))
+                if reward.isNewBest {
+                    Text("game.newBest").font(PixelFont.body(13)).foregroundStyle(PixelPalette.goodText)
+                } else {
+                    Text("game.best \(reward.best)").font(PixelFont.body(11)).foregroundStyle(PixelPalette.accentShade)
+                }
                 HStack(spacing: 16) {
                     Label { Text(verbatim: "+\(reward.coins)") } icon: { PixelIcon(name: "icon_coin", size: 16) }
                     Label { Text(verbatim: "+\(reward.xp) XP") } icon: { PixelIcon(name: "icon_xp", size: 16) }
@@ -154,5 +163,32 @@ struct MiniGameView: View {
             store.cancelMiniGame()
         }
         dismiss()
+    }
+}
+
+/// 1-3 stars that pop in one after another.
+private struct StarRow: View {
+    let stars: Int
+    @State private var shown = 0
+
+    var body: some View {
+        HStack(spacing: 6) {
+            ForEach(0..<3, id: \.self) { index in
+                Text(verbatim: "★")
+                    .font(.system(size: 30, weight: .black))
+                    .foregroundStyle(index < shown ? PixelPalette.warn : PixelPalette.barTrack)
+                    .shadow(color: PixelPalette.ink, radius: 0, x: 2, y: 2)
+                    .scaleEffect(index < shown ? 1 : 0.8)
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(verbatim: "\(stars)/3 ★"))
+        .sensoryFeedback(.impact(weight: .light), trigger: shown)
+        .task {
+            for step in 0..<stars {
+                try? await Task.sleep(for: .seconds(Motion.reduced ? 0 : 0.25))
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) { shown = step + 1 }
+            }
+        }
     }
 }

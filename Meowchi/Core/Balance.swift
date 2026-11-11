@@ -110,9 +110,11 @@ struct Balance {
                                     coinsPerPoint: 2, xpPerPoint: 1, maxRewardedPoints: 30, minSecondsPerPoint: 0.5)
     /// Each catch needs a toss and a roll, so points come slower and are worth more.
     var yarnBall = MiniGameConfig(durationSeconds: 45, energyCost: 10, minimumEnergy: 15, happiness: 12,
-                                  coinsPerPoint: 3, xpPerPoint: 2, maxRewardedPoints: 20, minSecondsPerPoint: 1.0)
+                                  coinsPerPoint: 3, xpPerPoint: 2, maxRewardedPoints: 20, minSecondsPerPoint: 1.0,
+                                  starPoints: [3, 7, 12])
     var toyMouse = MiniGameConfig(durationSeconds: 45, energyCost: 12, minimumEnergy: 15, happiness: 14,
-                                  coinsPerPoint: 3, xpPerPoint: 2, maxRewardedPoints: 20, minSecondsPerPoint: 1.0)
+                                  coinsPerPoint: 3, xpPerPoint: 2, maxRewardedPoints: 20, minSecondsPerPoint: 1.0,
+                                  starPoints: [3, 7, 12])
 
     // MARK: Garden walk
     var walkEnergyCost = 8.0

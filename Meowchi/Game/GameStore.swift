@@ -493,7 +493,11 @@ final class GameStore {
         let elapsed = max(0, now.timeIntervalSince(game.startedAt))
         let plausible = Int(elapsed / config.minSecondsPerPoint)
         let rewarded = max(0, min(points, config.maxRewardedPoints, plausible))
-        let reward = MiniGameReward(points: max(0, points), coins: rewarded * config.coinsPerPoint, xp: rewarded * config.xpPerPoint)
+        let previousBest = state.bestScores[game.kind.rawValue] ?? 0
+        let isNewBest = points > previousBest
+        if isNewBest { state.bestScores[game.kind.rawValue] = points }
+        let reward = MiniGameReward(points: max(0, points), coins: rewarded * config.coinsPerPoint, xp: rewarded * config.xpPerPoint,
+                                    stars: config.stars(for: points), best: max(points, previousBest), isNewBest: isNewBest)
         state.cat.stats[.happiness] += config.happiness
         state.coins += reward.coins
         grantXP(reward.xp)

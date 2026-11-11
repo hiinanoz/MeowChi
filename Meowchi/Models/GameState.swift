@@ -28,6 +28,8 @@ struct GameState: Codable, Equatable {
     var badges: [String: Date] = [:]
     /// First-time feature tips the player has dismissed.
     var seenTips: Set<String> = []
+    /// Best score per mini-game (`MiniGameKind.rawValue`).
+    var bestScores: [String: Int] = [:]
 
     static func newGame(now: Date, balance: Balance) -> GameState {
         GameState(
@@ -125,6 +127,7 @@ extension GameState {
         lifetime = try c.decodeIfPresent([String: Int].self, forKey: .lifetime) ?? [:]
         badges = try c.decodeIfPresent([String: Date].self, forKey: .badges) ?? [:]
         seenTips = try c.decodeIfPresent(Set<String>.self, forKey: .seenTips) ?? []
+        bestScores = try c.decodeIfPresent([String: Int].self, forKey: .bestScores) ?? [:]
     }
 }
 

@@ -110,9 +110,11 @@ struct Balance {
                                     coinsPerPoint: 2, xpPerPoint: 1, maxRewardedPoints: 30, minSecondsPerPoint: 0.5)
     /// Each catch needs a toss and a roll, so points come slower and are worth more.
     var yarnBall = MiniGameConfig(durationSeconds: 45, energyCost: 10, minimumEnergy: 15, happiness: 12,
-                                  coinsPerPoint: 3, xpPerPoint: 2, maxRewardedPoints: 20, minSecondsPerPoint: 1.0)
+                                  coinsPerPoint: 3, xpPerPoint: 2, maxRewardedPoints: 20, minSecondsPerPoint: 1.0,
+                                  starPoints: [3, 7, 12])
     var toyMouse = MiniGameConfig(durationSeconds: 45, energyCost: 12, minimumEnergy: 15, happiness: 14,
-                                  coinsPerPoint: 3, xpPerPoint: 2, maxRewardedPoints: 20, minSecondsPerPoint: 1.0)
+                                  coinsPerPoint: 3, xpPerPoint: 2, maxRewardedPoints: 20, minSecondsPerPoint: 1.0,
+                                  starPoints: [3, 7, 12])
 
     // MARK: Garden walk
     var walkEnergyCost = 8.0
@@ -121,11 +123,20 @@ struct Balance {
     var walkXP = 3
     var walkFindCount = 5
     var walkLocations: [WalkLocation: WalkLocationConfig] = [
-        .garden: WalkLocationConfig(unlockLevel: 1, coinRange: 3...8, itemChance: 0.2, itemPool: ["food.treat", "food.fish"]),
-        .park: WalkLocationConfig(unlockLevel: 2, coinRange: 4...10, itemChance: 0.2, itemPool: ["food.treat", "food.chicken"]),
-        .beach: WalkLocationConfig(unlockLevel: 3, coinRange: 5...12, itemChance: 0.3, itemPool: ["food.fish"]),
-        .forest: WalkLocationConfig(unlockLevel: 4, coinRange: 6...14, itemChance: 0.25, itemPool: ["food.treat", "food.chicken", "food.fish"]),
+        .garden: WalkLocationConfig(unlockLevel: 1, coinRange: 3...8, itemChance: 0.2, itemPool: ["food.treat", "food.fish"],
+                                     collectibles: ["find_leaf", "find_flower"]),
+        .park: WalkLocationConfig(unlockLevel: 2, coinRange: 4...10, itemChance: 0.2, itemPool: ["food.treat", "food.chicken"],
+                                   collectibles: ["find_acorn", "find_button"]),
+        .beach: WalkLocationConfig(unlockLevel: 3, coinRange: 5...12, itemChance: 0.3, itemPool: ["food.fish"],
+                                    collectibles: ["find_shell", "find_starfish"]),
+        .forest: WalkLocationConfig(unlockLevel: 4, coinRange: 6...14, itemChance: 0.25, itemPool: ["food.treat", "food.chicken", "food.fish"],
+                                     collectibles: ["find_feather", "find_pebble"]),
     ]
+
+    /// Chance that a find on a walk is an album keepsake instead of coins or food.
+    var collectibleChance = 0.12
+    /// Coins for digging up a keepsake the player already has.
+    var duplicateCollectibleCoins = 5
 
     // MARK: Daily check-in (7-day cycle)
     var loginRewards: [LoginReward] = [
@@ -154,6 +165,18 @@ struct Balance {
     var personalityScratchMultiplier: [Personality: Double] = [
         .playful: 1.5, .lazy: 0.5, .curious: 1.0, .affectionate: 0.8, .adventurous: 1.2, .calm: 0.7,
     ]
+
+    /// "Today's deal" in the shop: one decoration or accessory a day, this much cheaper.
+    var dailyDealDiscount = 0.3
+
+    // MARK: Wishes and diary
+    /// A new wish can appear this long after the last one ended; it waits this long before fading.
+    var wishIntervalHours = 3.0
+    var wishLifetimeHours = 6.0
+    var wishCoins = 15
+    var wishHappiness = 8.0
+    var wishXP = 3
+    var diaryLimit = 40
 
     // MARK: Progression & economy
     var baseXPPerLevel = 50

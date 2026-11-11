@@ -46,7 +46,7 @@ struct NailTrimView: View {
 
     private func snip(_ index: Int) {
         trimmed.insert(index)
-        AudioManager.shared.play(.tap)
+        AudioManager.shared.play(.snip)
         guard trimmed.count == claws.count else { return }
         if store.trimNails() == .ok { AudioManager.shared.play(.find) }
         finished = true

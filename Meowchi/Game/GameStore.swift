@@ -32,6 +32,8 @@ final class GameStore {
     private(set) var levelUpCount = 0
     /// Bumped when the cat reaches a new life stage (the room shows a celebration banner).
     private(set) var stageUpCount = 0
+    /// Bumped when a wish is granted (the room shows a banner and hearts).
+    private(set) var wishGrantedCount = 0
     var tutorialStep: TutorialStep?
     /// True once per launch when the player was away for a while (friendly greeting, never guilt).
     var showWelcomeBack = false
@@ -118,8 +120,12 @@ final class GameStore {
             let before = stage
             state.login.dayKey = today
             state.login.days += 1
-            if stage > before, state.onboardedAt != nil { stageUpCount += 1 }
+            if stage > before, state.onboardedAt != nil {
+                stageUpCount += 1
+                addDiary("grownUp", detail: stage.nameKey)
+            }
         }
+        refreshWish(now)
     }
 
     func tick() {
@@ -145,6 +151,8 @@ final class GameStore {
         busyUntil = now.addingTimeInterval(balance.feedDurationSeconds)
         grantXP(item.xp)
         if tutorialStep == .feed { tutorialStep = .pet }
+        state.lifetime["food." + itemID, default: 0] += 1
+        if case .food(itemID)? = state.wish?.kind { grantWish(now) }
         record(.fed)
         save()
         return .ok
@@ -312,6 +320,7 @@ final class GameStore {
         state.care.lastFriendVisitAt = now
         state.cat.stats[.happiness] += balance.friendVisitHappiness
         grantXP(balance.friendVisitXP)
+        addDiary("friend")
         record(.friendVisited)
         busyUntil = now.addingTimeInterval(14)
         save()
@@ -372,11 +381,20 @@ final class GameStore {
 
     var stage: CatStage { CatStage(careDays: state.login.days, balance: balance) }
 
+    /// Renaming is free and allowed any time (Settings). Invalid or empty names keep the old one.
+    func rename(_ name: String) {
+        guard let clean = CatState.sanitizedName(name, maxLength: balance.maxNameLength), clean != state.cat.name else { return }
+        state.cat.name = clean
+        save()
+    }
+
     func completeOnboarding(name: String, look: CatLook = CatLook()) {
         state.cat.name = CatState.sanitizedName(name, maxLength: balance.maxNameLength) ?? state.cat.name
         state.cat.look = CatLook(coat: look.coat, ears: look.ears, tail: look.tail).sanitized
         state.cat.personality = Personality.allCases.randomElement() ?? .playful
         state.onboardedAt = clock()
+        state.lastWishAt = clock()
+        addDiary("adopted")
         tutorialStep = .feed
         save()
     }
@@ -410,12 +428,15 @@ final class GameStore {
 
     /// Buys a decoration and puts it in its slot. Unique items can't be bought twice.
     @discardableResult
-    func buyDecor(_ id: String) -> ActionResult {
+    func buyDecor(_ id: String) -> ActionResult { buyDecor(id, price: nil) }
+
+    private func buyDecor(_ id: String, price: Int?) -> ActionResult {
         guard let item = DecorCatalog.item(id) else { return .unknownItem }
         guard !state.decor.isOwned(item) else { return .alreadyOwned }
-        guard state.progression.level >= item.unlockLevel else { return .locked }
-        guard state.coins >= item.price else { return .insufficientCoins }
-        state.coins -= item.price
+        guard state.progression.level >= item.unlockLevel, item.isAvailable(at: clock()) else { return .locked }
+        let cost = price ?? item.price
+        guard state.coins >= cost else { return .insufficientCoins }
+        state.coins -= cost
         state.decor.owned.insert(id)
         state.decor.equipped[item.slot.rawValue] = id
         save()
@@ -442,14 +463,58 @@ final class GameStore {
 
     /// Buys an accessory and puts it on. Each accessory is bought once.
     @discardableResult
-    func buyAccessory(_ item: Accessory) -> ActionResult {
+    func buyAccessory(_ item: Accessory) -> ActionResult { buyAccessory(item, price: nil) }
+
+    private func buyAccessory(_ item: Accessory, price: Int?) -> ActionResult {
         guard !state.wardrobe.contains(item.rawValue) else { return .alreadyOwned }
         guard state.progression.level >= item.unlockLevel else { return .locked }
-        guard state.coins >= item.price else { return .insufficientCoins }
-        state.coins -= item.price
+        let cost = price ?? item.price
+        guard state.coins >= cost else { return .insufficientCoins }
+        state.coins -= cost
         state.wardrobe.insert(item.rawValue)
         wear(item)
         return .ok
+    }
+
+    // MARK: Today's deal
+
+    struct DailyDeal: Equatable {
+        enum Item: Equatable { case decor(DecorItem), accessory(Accessory) }
+        let item: Item
+        let price: Int
+        let fullPrice: Int
+    }
+
+    /// The same item all day (picked from the day key), among things the player's level allows.
+    var dailyDeal: DailyDeal? {
+        let level = state.progression.level
+        let decor = DecorCatalog.items.filter { !$0.isFree && !$0.isEmpty && $0.unlockLevel <= level && $0.season == nil }.map { DailyDeal.Item.decor($0) }
+        let accessories = Accessory.allCases.filter { $0.unlockLevel <= level }.map { DailyDeal.Item.accessory($0) }
+        let candidates = decor + accessories
+        guard !candidates.isEmpty, !state.daily.dayKey.isEmpty else { return nil }
+        let index = state.daily.dayKey.unicodeScalars.reduce(0) { ($0 * 31 + Int($1.value)) % 100_003 } % candidates.count
+        let item = candidates[index]
+        let full: Int = switch item {
+        case .decor(let d): d.price
+        case .accessory(let a): a.price
+        }
+        return DailyDeal(item: item, price: Int((Double(full) * (1 - balance.dailyDealDiscount)).rounded()), fullPrice: full)
+    }
+
+    func isOwned(_ item: DailyDeal.Item) -> Bool {
+        switch item {
+        case .decor(let d): state.decor.isOwned(d)
+        case .accessory(let a): state.wardrobe.contains(a.rawValue)
+        }
+    }
+
+    @discardableResult
+    func buyDailyDeal() -> ActionResult {
+        guard let deal = dailyDeal else { return .unknownItem }
+        switch deal.item {
+        case .decor(let d): return buyDecor(d.id, price: deal.price)
+        case .accessory(let a): return buyAccessory(a, price: deal.price)
+        }
     }
 
     /// Puts an owned accessory on, or takes it off if it is already worn.
@@ -493,7 +558,15 @@ final class GameStore {
         let elapsed = max(0, now.timeIntervalSince(game.startedAt))
         let plausible = Int(elapsed / config.minSecondsPerPoint)
         let rewarded = max(0, min(points, config.maxRewardedPoints, plausible))
-        let reward = MiniGameReward(points: max(0, points), coins: rewarded * config.coinsPerPoint, xp: rewarded * config.xpPerPoint)
+        let previousBest = state.bestScores[game.kind.rawValue] ?? 0
+        let isNewBest = points > previousBest
+        if isNewBest {
+            state.bestScores[game.kind.rawValue] = points
+            if points > 0 { addDiary("newBest", detail: "game." + game.kind.rawValue + ".title", number: points) }
+        }
+        if case .game(game.kind.rawValue)? = state.wish?.kind { grantWish(now) }
+        let reward = MiniGameReward(points: max(0, points), coins: rewarded * config.coinsPerPoint, xp: rewarded * config.xpPerPoint,
+                                    stars: config.stars(for: points), best: max(points, previousBest), isNewBest: isNewBest)
         state.cat.stats[.happiness] += config.happiness
         state.coins += reward.coins
         grantXP(reward.xp)
@@ -536,6 +609,13 @@ final class GameStore {
         case .item(let id):
             state.inventory[id, default: 0] += 1
             walk.itemsFound += 1
+        case .collectible(let id):
+            if state.collectibles.insert(id).inserted {
+                addDiary("found", detail: "find." + id.replacingOccurrences(of: "find_", with: ""))
+            } else {
+                state.coins += balance.duplicateCollectibleCoins
+                walk.coinsFound += balance.duplicateCollectibleCoins
+            }
         }
         activeWalk = walk
         save()
@@ -550,6 +630,7 @@ final class GameStore {
         simulate(clock())
         state.cat.stats[.happiness] += balance.walkHappiness
         grantXP(balance.walkXP)
+        addDiary("walk", detail: "walk." + walk.location.rawValue)
         record(.walked)
         save()
         return walk
@@ -603,11 +684,51 @@ final class GameStore {
 
     private func record(_ event: TaskEvent) {
         state.lifetime[event.rawValue, default: 0] += 1
+        if case .event(event)? = state.wish?.kind { grantWish(clock()) }
         for i in state.daily.tasks.indices {
             guard let definition = DailyTasks.definition(state.daily.tasks[i].id),
                   definition.event == event, !state.daily.tasks[i].claimed else { continue }
             state.daily.tasks[i].progress = min(definition.target, state.daily.tasks[i].progress + 1)
         }
+    }
+
+    // MARK: Wishes and diary
+
+    /// Ends an expired wish and, now and then, makes a new one (never while asleep or before adoption).
+    private func refreshWish(_ now: Date) {
+        if let wish = state.wish, now >= wish.expiresAt {
+            state.wish = nil
+            state.lastWishAt = now
+        }
+        guard state.wish == nil, state.onboardedAt != nil, !state.cat.isSleeping, tutorialStep == nil else { return }
+        if let last = state.lastWishAt, now.timeIntervalSince(last) < balance.wishIntervalHours * 3600 { return }
+        var choices = CatWish.eventChoices.map { CatWish.Kind.event($0) }
+        choices += MiniGameKind.allCases.map { CatWish.Kind.game($0.rawValue) }
+        // Only foods the player has, so a wish never forces a purchase.
+        choices += ItemCatalog.foods.filter { quantity(of: $0.id) > 0 }.map { CatWish.Kind.food($0.id) }
+        guard let kind = choices.randomElement() else { return }
+        state.wish = CatWish(kind: kind, expiresAt: now.addingTimeInterval(balance.wishLifetimeHours * 3600))
+    }
+
+    private func grantWish(_ now: Date) {
+        state.wish = nil
+        state.lastWishAt = now
+        state.coins += balance.wishCoins
+        state.cat.stats[.happiness] += balance.wishHappiness
+        grantXP(balance.wishXP)
+        wishGrantedCount += 1
+        addDiary("wish")
+    }
+
+    private func addDiary(_ kind: String, detail: String? = nil, number: Int? = nil) {
+        state.diary.insert(DiaryEntry(date: clock(), kind: kind, detail: detail, number: number), at: 0)
+        if state.diary.count > balance.diaryLimit { state.diary.removeLast(state.diary.count - balance.diaryLimit) }
+    }
+
+    /// The food the cat has eaten most, if any.
+    var favoriteFood: FoodItem? {
+        ItemCatalog.foods.max { (state.lifetime["food." + $0.id] ?? 0) < (state.lifetime["food." + $1.id] ?? 0) }
+            .flatMap { (state.lifetime["food." + $0.id] ?? 0) > 0 ? $0 : nil }
     }
 
     // MARK: Tips
@@ -643,6 +764,7 @@ final class GameStore {
             state.badges[badge.id] = clock()
             state.coins += badge.coins
             lastUnlockedBadge = badge
+            addDiary("badge", detail: "badge." + badge.id)
         }
     }
 
@@ -661,6 +783,7 @@ final class GameStore {
             state.progression.level += 1
             state.coins += balance.levelUpCoins
             levelUpCount += 1
+            addDiary("levelUp", number: state.progression.level)
         }
     }
 

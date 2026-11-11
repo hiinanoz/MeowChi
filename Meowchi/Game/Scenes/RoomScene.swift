@@ -62,6 +62,7 @@ final class RoomScene: SKScene {
     private var nextLightingCheck: TimeInterval = 0
     /// While a care panel covers the lower room, the cat stays near the back wall so it remains visible.
     private var keepNearBack = false
+    private var lastDecor: DecorState?
     /// Touch tracking for tap vs. stroke petting.
     private var touchStartedOnCat = false
     private var strokeTravel: CGFloat = 0
@@ -111,6 +112,7 @@ final class RoomScene: SKScene {
         nightOverlay.zPosition = 2000
         world.addChild(nightOverlay)
 
+        addDustMotes()
         layoutWorld()
         if store?.state.cat.isSleeping == true { setSleeping(true, animated: false) }
         refreshLighting(animated: false)
@@ -180,6 +182,9 @@ final class RoomScene: SKScene {
             goScratch()
         } else if Double.random(in: 0...1) < walkChance * walkFactor {
             cat.walk(to: randomFloorPoint())
+        } else if mood == .sleepy, Double.random(in: 0...1) < 0.4 {
+            cat.react(.yawn, duration: 1.4)
+            AudioManager.shared.play(.meowSleepy)
         } else {
             cat.play([.sad, .hungry, .sick].contains(mood) ? .sad : .idle)
         }
@@ -250,7 +255,7 @@ final class RoomScene: SKScene {
         switch result {
         case .ok:
             if stroke { haptics.impactOccurred(intensity: 0.6) }
-            AudioManager.shared.play(stroke ? .purr : .meow)
+            AudioManager.shared.play(stroke ? .purr : AudioManager.meow(for: store?.mood ?? .happy))
             guard !cat.isScripted else { spawnHearts(); return }
             cat.stopMoving()
             cat.react(.happy, duration: stroke ? 2 : 1)
@@ -270,6 +275,7 @@ final class RoomScene: SKScene {
         switch result {
         case .ok:
             haptics.impactOccurred(intensity: 0.4)
+            AudioManager.shared.play(.scrub)
             AudioManager.shared.play(.purr)
             cat.stopMoving()
             cat.react(.happy, duration: 1.2)
@@ -325,6 +331,11 @@ final class RoomScene: SKScene {
     func applyDecor() {
         guard let store else { return }
         let decor = store.state.decor
+        // Something new in the room: the cat has a curious sniff.
+        if isBuilt, lastDecor != nil, lastDecor != decor, !cat.isScripted, !store.state.cat.isSleeping {
+            cat.react(.sniff, duration: 1.6)
+        }
+        lastDecor = decor
         backdrop.apply(decor)
         for (slot, node) in furniture {
             let item = decor.equipped(slot)
@@ -412,11 +423,12 @@ final class RoomScene: SKScene {
         cat.isScripted = true
         let frames = SpriteLibrary.textures((0..<4).map { "tv_\(channel)_\($0)" })
         tvScreen.run(.repeatForever(.animate(with: frames, timePerFrame: 0.25)), withKey: "channel")
+        AudioManager.shared.play(.tv)
         cat.walk(to: Spot.watchTV) { [weak self] in
             guard let self else { return }
             self.cat.play(.idle)
             self.cat.setTailMood(.happy)
-            let cheer = SKAction.run { [weak self] in self?.cat.react(.happy, duration: 1.2); AudioManager.shared.play(.meow) }
+            let cheer = SKAction.run { [weak self] in self?.cat.react(.happy, duration: 1.2); AudioManager.shared.play(.meowHappy) }
             self.run(.sequence([.wait(forDuration: 3), cheer, .wait(forDuration: 4), cheer, .wait(forDuration: 4), .run { [weak self] in
                 guard let self else { return }
                 self.tvScreen.removeAction(forKey: "channel")
@@ -555,7 +567,27 @@ final class RoomScene: SKScene {
 
     // MARK: Effects
 
-    private func spawnHearts() {
+    /// A few specks drifting in the window light: the room never looks frozen.
+    private func addDustMotes() {
+        guard !Motion.reduced else { return }
+        for i in 0..<6 {
+            let mote = SKSpriteNode(color: SKColor(red: 1, green: 0.96, blue: 0.85, alpha: 1), size: CGSize(width: 1, height: 1))
+            mote.alpha = 0
+            mote.zPosition = 1900
+            world.addChild(mote)
+            let drift = SKAction.run { [weak mote] in
+                mote?.position = CGPoint(x: CGFloat.random(in: 110...250).rounded(), y: CGFloat.random(in: 190...320).rounded())
+            }
+            let cycle = SKAction.sequence([
+                drift, .fadeAlpha(to: 0.7, duration: 1.5),
+                .moveBy(x: .random(in: -10...10), y: .random(in: -24...(-8)), duration: 5), .fadeOut(withDuration: 1.5),
+                .wait(forDuration: .random(in: 0.5...3)),
+            ])
+            mote.run(.sequence([.wait(forDuration: Double(i) * 1.3), .repeatForever(cycle)]))
+        }
+    }
+
+    func spawnHearts() {
         for i in 0..<3 {
             run(.wait(forDuration: Double(i) * 0.18)) { [weak self] in
                 self?.spawnEffect("fx_heart", offsetY: 56, dx: CGFloat([-12, 4, 16][i]))

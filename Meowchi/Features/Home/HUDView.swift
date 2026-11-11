@@ -6,16 +6,21 @@ struct HUDView: View {
     var onShop: @MainActor () -> Void = {}
     var onTasks: @MainActor () -> Void = {}
     var onMenu: @MainActor () -> Void = {}
+    var onCat: @MainActor () -> Void = {}
 
     var body: some View {
         let state = store.state
         VStack(spacing: 8) {
             HStack(spacing: 10) {
-                CatPreview(look: state.cat.look, size: 64)
-                    .frame(width: 44, height: 40, alignment: .top)
-                    .clipped()
-                    .padding(2)
-                    .pixelPanel(PixelPalette.panelShade)
+                Button { onCat() } label: {
+                    CatPreview(look: state.cat.look, size: 64)
+                        .frame(width: 44, height: 40, alignment: .top)
+                        .clipped()
+                        .padding(2)
+                        .pixelPanel(PixelPalette.panelShade)
+                }
+                .buttonStyle(PixelPressStyle())
+                .accessibilityLabel(Text("card.title"))
                 VStack(alignment: .leading, spacing: 3) {
                     HStack {
                         Text(verbatim: state.cat.name).font(PixelFont.body(16)).lineLimit(1).minimumScaleFactor(0.6)
@@ -25,10 +30,12 @@ struct HUDView: View {
                     }
                     HStack(spacing: 6) {
                         Text("hud.level \(state.progression.level)").font(PixelFont.body(11))
+                            .contentTransition(.numericText(value: Double(state.progression.level)))
                             .lineLimit(1).minimumScaleFactor(0.6).fixedSize(horizontal: false, vertical: true)
                         PixelBar(value: Double(state.progression.xp) / Double(store.balance.xpRequired(forLevel: state.progression.level)) * 100,
                                  color: PixelPalette.xp, segments: 12)
                             .frame(maxWidth: 110)
+                            .animation(.easeOut(duration: 0.4), value: state.progression.xp)
                     }
                     .accessibilityElement(children: .combine)
                 }
@@ -40,11 +47,13 @@ struct HUDView: View {
                                 PixelIcon(name: "icon_coin", size: 16)
                                 Text(state.coins, format: .number).font(PixelFont.body(14)).monospacedDigit()
                                     .lineLimit(1).minimumScaleFactor(0.6)
+                                    .contentTransition(.numericText(value: Double(state.coins)))
                             }
                             .padding(.horizontal, 8).padding(.vertical, 5)
                             .pixelPanel(PixelPalette.panelShade)
+                            .reportFrame(CoinTargetKey.self)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(PixelPressStyle())
                         .hitTarget()
                         .accessibilityLabel(Text("hud.coins \(state.coins)"))
                         .accessibilityHint(Text("shop.title"))
@@ -53,7 +62,7 @@ struct HUDView: View {
                                 .padding(7)
                                 .pixelPanel(PixelPalette.warn)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(PixelPressStyle())
                         .hitTarget(32)
                         .accessibilityLabel(Text("menu.title"))
                     }
@@ -66,7 +75,7 @@ struct HUDView: View {
                         .padding(.horizontal, 8).padding(.vertical, 4)
                         .pixelPanel(PixelPalette.panelShade)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(PixelPressStyle())
                     .hitTarget()
                     .accessibilityLabel(Text("tasks.title"))
                 }
@@ -80,6 +89,9 @@ struct HUDView: View {
         .foregroundStyle(PixelPalette.ink)
         .padding(10)
         .pixelPanel()
+        // Counters roll to their new value instead of jumping (the coin burst lands on the counter).
+        .animation(Motion.reduced ? nil : .snappy(duration: 0.5).delay(0.5), value: state.coins)
+        .animation(Motion.reduced ? nil : .snappy, value: state.progression.level)
     }
 }
 

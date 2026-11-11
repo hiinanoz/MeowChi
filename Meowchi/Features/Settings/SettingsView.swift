@@ -5,10 +5,34 @@ struct SettingsView: View {
     @Environment(GameStore.self) private var store
     @Environment(\.dismiss) private var dismiss
     @State private var previousContext = AudioManager.MusicContext.home
+    @State private var name = ""
+    @State private var showLook = false
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         let settings = store.state.settings
         SheetScaffold(title: "settings.title", onClose: { dismiss() }) {
+            sectionTitle("settings.cat")
+            section {
+                HStack(spacing: 10) {
+                    CatPreview(look: store.state.cat.look, size: 64).frame(width: 52, height: 48, alignment: .top).clipped()
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("settings.name").font(PixelFont.body(10)).foregroundStyle(PixelPalette.accentShade)
+                        TextField("onboarding.name.placeholder", text: $name)
+                            .font(PixelFont.body(14))
+                            .textInputAutocapitalization(.words)
+                            .submitLabel(.done)
+                            .onSubmit { store.rename(name); name = store.state.cat.name }
+                            .padding(6)
+                            .background(PixelBorder().fill(PixelPalette.panel))
+                    }
+                }
+                Button { showLook = true } label: {
+                    HStack(spacing: 6) { PixelIcon(name: "icon_decor", size: 16); Text("settings.changeLook") }
+                }
+                .buttonStyle(PixelButtonStyle(fill: PixelPalette.xp))
+            }
+            sectionTitle("settings.audio")
             section {
                 Toggle(isOn: binding(\.musicEnabled)) { Text("settings.music").font(PixelFont.body(13)) }
                 volume(binding(\.musicVolume), enabled: settings.musicEnabled)
@@ -32,6 +56,7 @@ struct SettingsView: View {
                 Toggle(isOn: binding(\.soundEnabled)) { Text("settings.sound").font(PixelFont.body(13)) }
                 volume(binding(\.sfxVolume), enabled: settings.soundEnabled)
             }
+            sectionTitle("settings.game")
             section {
                 Toggle(isOn: binding(\.openHomeOnLaunch)) { Text("settings.openHome").font(PixelFont.body(13)) }
                 Toggle(isOn: Binding(get: { store.state.settings.remindersEnabled }, set: { setReminders($0) })) {
@@ -42,9 +67,20 @@ struct SettingsView: View {
             }
             Text("settings.silentHint").font(PixelFont.body(10)).foregroundStyle(PixelPalette.accentShade)
                 .frame(maxWidth: .infinity, alignment: .leading)
+            sectionTitle("settings.about")
+            section {
+                linkRow("settings.support", "https://hii.othinks.com/meowchi/support")
+                linkRow("settings.privacy", "https://hii.othinks.com/meowchi/privacy")
+                linkRow("settings.contact", "mailto:mobile@othinks.com")
+                Text("settings.version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "")")
+                    .font(PixelFont.body(10)).foregroundStyle(PixelPalette.accentShade)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
+        .sheet(isPresented: $showLook) { DecorView(startAtCat: true).environment(store) }
         .tint(PixelPalette.accentShade)
         .onAppear {
+            name = store.state.cat.name
             // Let the player hear their pick while choosing, then restore the screen's music.
             previousContext = AudioManager.shared.context
             AudioManager.shared.context = .home
@@ -78,6 +114,23 @@ struct SettingsView: View {
         }
         .disabled(!enabled)
         .opacity(enabled ? 1 : 0.5)
+    }
+
+    private func sectionTitle(_ title: LocalizedStringKey) -> some View {
+        Text(title).font(PixelFont.body(12)).foregroundStyle(PixelPalette.accentShade)
+            .frame(maxWidth: .infinity, alignment: .leading).padding(.top, 4)
+    }
+
+    private func linkRow(_ title: LocalizedStringKey, _ url: String) -> some View {
+        Button { if let link = URL(string: url) { openURL(link) } } label: {
+            HStack {
+                Text(title).font(PixelFont.body(13))
+                Spacer()
+                PixelIcon(name: "icon_back", size: 12).rotationEffect(.degrees(180))
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(PixelPressStyle())
     }
 
     private func section<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {

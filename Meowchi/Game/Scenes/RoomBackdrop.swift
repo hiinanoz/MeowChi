@@ -10,6 +10,7 @@ final class RoomBackdrop: SKNode {
     private let baseboard = SKSpriteNode(texture: SpriteLibrary.texture("baseboard"))
     private let rug = SKSpriteNode()
     private let wallArt = SKSpriteNode()
+    private let ambience = WindowAmbience()
 
     override init() {
         super.init()
@@ -35,7 +36,8 @@ final class RoomBackdrop: SKNode {
         wallArt.zPosition = -990
         rug.position = CGPoint(x: 180, y: 70)
         rug.zPosition = -900
-        [baseboard, view, window, wallArt, rug].forEach(addChild)
+        ambience.zPosition = -994 // above the view, below the window frame
+        [baseboard, view, ambience, window, wallArt, rug].forEach(addChild)
         apply(DecorState())
     }
 
@@ -47,6 +49,8 @@ final class RoomBackdrop: SKNode {
         wall.color = Self.color(decor.equipped(.wallColor))
         floorLayer.color = Self.color(decor.equipped(.floorColor))
         set(view, decor.equipped(.view).id)
+        ambience.layout(glass: CGRect(x: view.position.x, y: view.position.y - view.size.height,
+                                      width: view.size.width, height: view.size.height))
         set(rug, decor.equipped(.rug).id)
         set(wallArt, decor.equipped(.wallArt).id)
     }

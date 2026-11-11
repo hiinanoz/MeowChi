@@ -2,7 +2,7 @@ import SpriteKit
 
 /// Visual states of the cat. Each maps to one looping (or one-shot) sprite animation.
 enum CatAnimation: Equatable {
-    case idle, walk, happy, sad, eat, sleep, scratch
+    case idle, walk, happy, sad, eat, sleep, scratch, yawn, sniff
 }
 
 /// Tail body language, independent of the body animation.
@@ -175,6 +175,8 @@ final class CatNode: SKNode {
         case .eat: (["eat_0", "eat_1"], 0.22)
         case .sleep: (["sleep_0", "sleep_1"], 0.9)
         case .scratch: (["scratch_0", "scratch_1"], 0.16)
+        case .yawn: (["yawn_0", "yawn_1", "yawn_1", "idle_0"], 0.35)
+        case .sniff: (["sniff_0", "sniff_1"], 0.2)
         }
     }
 }

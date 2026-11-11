@@ -11,7 +11,17 @@ struct HomeView: View {
     @State private var notice: LocalizedStringResource?
     @State private var noticeID = 0
     /// Black "door" shown while switching between the room and an immersive screen.
-    @State private var curtain = false
+    /// Pixel iris between the room and immersive screens: 0 open, 1 closed.
+    @State private var iris: CGFloat = 0
+    @State private var coinBursts: [CoinBurstLayer.Burst] = []
+    @State private var coinOrigin = CGRect.zero
+    @State private var coinTarget = CGRect.zero
+    /// Bumped on a "can't do that" notice: the banner shakes and the phone gives a warning tap.
+    @State private var failCount = 0
+    /// The level being celebrated by the level-up card, if it is showing.
+    @State private var celebratedLevel: Int?
+    @State private var showCard = false
+    @State private var showGrowth = false
 
     @State private var panel: CarePanel?
     @State private var isBrushing = false
@@ -73,6 +83,16 @@ struct HomeView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
+        .coordinateSpace(name: "home")
+        .onPreferenceChange(CoinOriginKey.self) { coinOrigin = $0 }
+        .onPreferenceChange(CoinTargetKey.self) { coinTarget = $0 }
+        .overlay { CoinBurstLayer(bursts: coinBursts, origin: coinOrigin, target: coinTarget) }
+        .onChange(of: store.state.coins) { old, new in
+            guard new > old, !Motion.reduced else { return }
+            let burst = CoinBurstLayer.Burst(count: min(6, max(2, (new - old) / 5)))
+            coinBursts.append(burst)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) { coinBursts.removeAll { $0.id == burst.id } }
+        }
         .background(PixelPalette.frame.ignoresSafeArea())
         .onAppear {
             AudioManager.shared.context = .home
@@ -129,11 +149,22 @@ struct HomeView: View {
         .onChange(of: panel) { _, open in scene.setPanelOpen(open != nil) }
         .onChange(of: store.levelUpCount) { _, _ in
             AudioManager.shared.play(.levelUp)
-            show("notice.levelUp", important: true)
+            AccessibilityNotification.Announcement(String(localized: "notice.levelUp")).post()
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) { celebratedLevel = store.state.progression.level }
+        }
+        .onChange(of: store.state.wish) { old, new in
+            if old == nil, new != nil { AudioManager.shared.play(.wish) }
+        }
+        .onChange(of: store.wishGrantedCount) { _, _ in
+            AudioManager.shared.play(.purr)
+            scene.spawnHearts()
+            show("wish.granted \(store.state.cat.name)", important: true)
         }
         .onChange(of: store.stageUpCount) { _, _ in
             AudioManager.shared.play(.levelUp)
-            show("notice.grownUp \(store.state.cat.name)", important: true)
+            AccessibilityNotification.Announcement(String(localized: "notice.grownUp \(store.state.cat.name)")).post()
+            takePhoto() // a keepsake of the moment, saved to the album
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) { showGrowth = true }
         }
         .task {
             // Foreground refresh. Offline time is handled by elapsed-time simulation, not timers.
@@ -148,12 +179,22 @@ struct HomeView: View {
     private func presentations<V: View>(_ content: V) -> some View {
         content
         .sheet(isPresented: $showShop) { ShopView().environment(store) }
+        .sheet(isPresented: $showCard) { CatCardView().environment(store) }
         .sheet(isPresented: $showTasks) { TasksView().environment(store) }
         .sheet(isPresented: $showDecor) { DecorView().environment(store) }
         .sheet(isPresented: $showSettings) { SettingsView().environment(store) }
         .sheet(isPresented: $showNails) { NailTrimView().environment(store) }
         .fullScreenCover(isPresented: $showCozy, onDismiss: liftCurtain) { CozyView().environment(store) }
-        .overlay { if curtain { Color.black.ignoresSafeArea().allowsHitTesting(false).transition(.opacity) } }
+        .overlay { if iris > 0 { IrisCurtain(closed: iris) } }
+        .overlay {
+            if showGrowth { GrowthCard { withAnimation(.easeOut(duration: 0.2)) { showGrowth = false } } }
+        }
+        .overlay {
+            if let level = celebratedLevel {
+                LevelUpCard(level: level) { withAnimation(.easeOut(duration: 0.2)) { celebratedLevel = nil } }
+            }
+        }
+        .sensoryFeedback(.warning, trigger: failCount)
         .sensoryFeedback(.success, trigger: store.levelUpCount)
         .sensoryFeedback(.success, trigger: store.state.badges.count)
         .sheet(isPresented: $showLogin) { LoginRewardView().environment(store) }
@@ -174,7 +215,7 @@ struct HomeView: View {
         }
         .onChange(of: store.lastUnlockedBadge) { _, badge in
             guard badge != nil else { return }
-            AudioManager.shared.play(.levelUp)
+            AudioManager.shared.play(.badge)
             show("notice.badge", important: true)
         }
         .task {
@@ -224,14 +265,16 @@ struct HomeView: View {
 
     private var hud: some View {
         HUDView(onShop: { panel = nil; showShop = true }, onTasks: { panel = nil; showTasks = true },
-                    onMenu: { panel = nil; showMenu = true })
+                    onMenu: { panel = nil; showMenu = true }, onCat: { panel = nil; showCard = true })
     }
 
     private var roomView: some View {
         SpriteView(scene: scene, preferredFramesPerSecond: 60, options: [.ignoresSiblingOrder])
+                .reportFrame(CoinOriginKey.self)
                 .clipShape(PixelBorder(step: 4))
                 .overlay(PixelBorder(step: 4).stroke(PixelPalette.ink, lineWidth: 2))
                 .overlay(alignment: .top) { noticeBanner }
+                .overlay(alignment: .topTrailing) { wishBubble }
                 .accessibilityElement()
                 .accessibilityLabel(Text(verbatim: store.state.cat.name) + Text(verbatim: ", ") + Text(store.mood.titleKey))
                 .accessibilityHint(Text("a11y.room.hint"))
@@ -264,6 +307,26 @@ struct HomeView: View {
             }
     }
 
+    /// The cat's current wish as a little thought bubble; tapping it says it out loud.
+    @ViewBuilder private var wishBubble: some View {
+        if let wish = store.state.wish, notice == nil {
+            Button { show("wish.title \(store.state.cat.name)") } label: {
+                HStack(spacing: 4) {
+                    PixelIcon(name: wish.icon, size: 18)
+                    Text(wish.textKey).font(PixelFont.body(10)).lineLimit(1)
+                }
+                .foregroundStyle(PixelPalette.ink)
+                .padding(.horizontal, 8).padding(.vertical, 5)
+                .pixelPanel()
+            }
+            .buttonStyle(PixelPressStyle())
+            .padding(8)
+            .phaseAnimator(Motion.reduced ? [0] : [0, -3]) { content, y in content.offset(y: y) } animation: { _ in .easeInOut(duration: 1.2) }
+            .transition(.scale.combined(with: .opacity))
+            .accessibilityLabel(Text("wish.title \(store.state.cat.name)") + Text(verbatim: " ") + Text(wish.textKey))
+        }
+    }
+
     @ViewBuilder private var noticeBanner: some View {
         if let notice {
             Text(notice)
@@ -271,6 +334,8 @@ struct HomeView: View {
                 .foregroundStyle(PixelPalette.ink)
                 .padding(.horizontal, 10).padding(.vertical, 6)
                 .pixelPanel()
+                .modifier(ShakeEffect(shakes: CGFloat(failCount)))
+                .animation(.linear(duration: 0.4), value: failCount)
                 .padding(.top, 8)
                 .transition(.banner)
         }
@@ -398,6 +463,7 @@ struct HomeView: View {
     private func show(_ text: LocalizedStringResource, important: Bool = false) {
         noticeID += 1
         let id = noticeID
+        if Self.failureNotices.contains(text.key) { failCount += 1 }
         withAnimation { notice = text }
         AccessibilityNotification.Announcement(String(localized: text)).post()
         Task {
@@ -406,11 +472,16 @@ struct HomeView: View {
         }
     }
 
-    /// Fades the room to black, then presents the immersive screen without its slide (a "door" transition).
+    /// Notices that mean "that didn't work": they shake the banner and give a warning haptic.
+    private static let failureNotices: Set<String> = [
+        "notice.noCoins", "notice.noFood", "notice.tooTired", "notice.tooSoon", "notice.busy", "notice.sleeping", "notice.locked",
+    ]
+
+    /// Closes a pixel iris over the room, then presents the immersive screen without its slide.
     private func presentImmersive(_ present: @escaping () -> Void) {
         guard !Motion.reduced else { return present() }
-        withAnimation(.easeIn(duration: 0.25)) { curtain = true }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+        withAnimation(.easeIn(duration: 0.3)) { iris = 1 }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             var transaction = Transaction()
             transaction.disablesAnimations = true
             withTransaction(transaction) { present() }
@@ -419,7 +490,7 @@ struct HomeView: View {
 
     private func liftCurtain() {
         AudioManager.shared.context = .home
-        withAnimation(.easeOut(duration: 0.35)) { curtain = false }
+        withAnimation(.easeOut(duration: 0.45)) { iris = 0 }
     }
 }
 
@@ -445,6 +516,7 @@ private struct ActionBar: View {
     }
 
     private func toggle(_ target: CarePanel) {
+        AudioManager.shared.play(panel == target ? .close : .open)
         withAnimation(.easeOut(duration: 0.2)) { panel = panel == target ? nil : target }
     }
 }

@@ -77,3 +77,34 @@ final class GrowthTests: XCTestCase {
         }
     }
 }
+
+@MainActor
+final class RenameTests: XCTestCase {
+    func testRenameKeepsOldNameWhenInvalid() {
+        let store = GameStore(saveStore: InMemorySaveStore())
+        store.completeOnboarding(name: "Mochi")
+        store.rename("  Pudding ")
+        XCTAssertEqual(store.state.cat.name, "Pudding")
+        store.rename("   ")
+        XCTAssertEqual(store.state.cat.name, "Pudding")
+    }
+}
+
+final class WeatherTests: XCTestCase {
+    func testWeatherIsStableWithinABlockAndSnowOnlyInWinter() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+        let summer = calendar.date(from: DateComponents(year: 2026, month: 7, day: 10, hour: 9))!
+        XCTAssertEqual(DayCycle.weather(at: summer, calendar: calendar),
+                       DayCycle.weather(at: summer.addingTimeInterval(1800), calendar: calendar))
+        var wet = 0
+        for day in 1...60 {
+            let date = calendar.date(from: DateComponents(year: 2026, month: 7, day: 1, hour: 10))!.addingTimeInterval(Double(day) * 86_400)
+            let weather = DayCycle.weather(at: date, calendar: calendar)
+            XCTAssertNotEqual(weather, .snow)
+            if weather != .clear { wet += 1 }
+        }
+        XCTAssertGreaterThan(wet, 5)
+        XCTAssertLessThan(wet, 40)
+    }
+}

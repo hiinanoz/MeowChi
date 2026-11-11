@@ -22,3 +22,26 @@ final class MiniGameKindTests: XCTestCase {
         }
     }
 }
+
+@MainActor
+final class MiniGameRecordTests: XCTestCase {
+    func testStarsAndBestScore() {
+        let config = Balance.standard.laserChase
+        XCTAssertEqual(config.stars(for: 0), 0)
+        XCTAssertEqual(config.stars(for: config.starPoints[0]), 1)
+        XCTAssertEqual(config.stars(for: config.starPoints[2] + 5), 3)
+
+        let store = GameStore(saveStore: InMemorySaveStore())
+        store.debugRefill()
+        store.startMiniGame(.laserChase)
+        let first = store.finishMiniGame(points: 3)
+        XCTAssertEqual(first?.isNewBest, true)
+        XCTAssertEqual(store.state.bestScores["laserChase"], 3)
+        store.debugRefill()
+        store.startMiniGame(.laserChase)
+        let second = store.finishMiniGame(points: 1)
+        XCTAssertEqual(second?.isNewBest, false)
+        XCTAssertEqual(second?.best, 3)
+        XCTAssertEqual(store.state.bestScores["laserChase"], 3)
+    }
+}

@@ -9,14 +9,15 @@ struct CollectionView: View {
     @State private var photos: [URL] = []
     @State private var selected: URL?
 
-    enum Tab { case badges, photos }
+    enum Tab { case badges, album, photos }
 
     private let columns = [GridItem(.adaptive(minimum: 96), spacing: 8)]
 
     var body: some View {
-        SheetScaffold(title: "collection.title", onClose: { dismiss() }) {
+        SheetScaffold(title: "collection.title", onClose: { dismiss() }, accent: Color(red: 0.62, green: 0.52, blue: 0.90)) {
             HStack(spacing: 6) {
                 chip(.badges, "collection.badges \(store.state.badges.count) \(Badge.all.count)")
+                chip(.album, "collection.album \(store.state.collectibles.count) \(Collectibles.all().count)")
                 chip(.photos, "collection.photos \(photos.count)")
                 Spacer()
             }
@@ -25,9 +26,31 @@ struct CollectionView: View {
                 LazyVGrid(columns: columns, spacing: 8) {
                     ForEach(Badge.all) { badgeCell($0) }
                 }
+            case .album:
+                LazyVGrid(columns: columns, spacing: 8) {
+                    ForEach(Collectibles.all(), id: \.id) { entry in
+                        let owned = store.state.collectibles.contains(entry.id)
+                        VStack(spacing: 4) {
+                            PixelIcon(name: entry.id, size: 36)
+                                .saturation(owned ? 1 : 0).opacity(owned ? 1 : 0.35)
+                            Text(owned ? Collectibles.nameKey(entry.id) : "collection.unknown").font(PixelFont.body(10))
+                                .lineLimit(2).multilineTextAlignment(.center)
+                            Text(entry.location.titleKey).font(PixelFont.body(9)).foregroundStyle(PixelPalette.accentShade)
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 96)
+                        .background(PixelBorder().fill(owned ? PixelPalette.warn.opacity(0.3) : PixelPalette.panelShade))
+                    }
+                }
+                Text("collection.albumHint").font(PixelFont.body(10)).foregroundStyle(PixelPalette.accentShade)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             case .photos:
                 if photos.isEmpty {
-                    Text("collection.noPhotos").font(PixelFont.body(12)).multilineTextAlignment(.center).padding(20)
+                    VStack(spacing: 8) {
+                        Image("ui_empty_cat").interpolation(.none).resizable().scaledToFit().frame(width: 128)
+                            .accessibilityHidden(true)
+                        Text("collection.noPhotos").font(PixelFont.body(12)).multilineTextAlignment(.center)
+                    }
+                    .padding(20)
                 } else {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 6)], spacing: 6) {
                         ForEach(photos, id: \.self) { url in

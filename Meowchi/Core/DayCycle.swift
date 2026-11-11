@@ -25,4 +25,18 @@ enum DayCycle {
     }
 
     static let sleepingDarkness = 0.4
+
+    enum Weather: Equatable { case clear, rain, snow }
+
+    /// Offline "weather" for the window: the same for a 4-hour block, wet about a third of the time,
+    /// snow in December to February. Pure so it is testable and identical everywhere in the app.
+    static func weather(at date: Date, calendar: Calendar = .current) -> Weather {
+        let day = calendar.ordinality(of: .day, in: .year, for: date) ?? 1
+        let block = calendar.component(.hour, from: date) / 4
+        let year = calendar.component(.year, from: date)
+        var seed = UInt64(year * 1000 + day * 6 + block) &* 0x9E37_79B9_7F4A_7C15
+        seed ^= seed >> 29
+        guard seed % 100 < 33 else { return .clear }
+        return [12, 1, 2].contains(calendar.component(.month, from: date)) ? .snow : .rain
+    }
 }

@@ -16,6 +16,9 @@ struct GardenView: View {
         case starting, walking, blocked(LocalizedStringKey), summary(coins: Int, items: Int)
     }
 
+    /// A keepsake just found for the album (shown for a moment).
+    @State private var keepsake: String?
+
     var body: some View {
         VStack(spacing: 8) {
             PixelHeader(title: location.titleKey, onBack: { goHome() }) {
@@ -28,6 +31,20 @@ struct GardenView: View {
             .padding(10)
             .pixelPanel()
             SpriteView(scene: scene, preferredFramesPerSecond: 60, options: [.ignoresSiblingOrder])
+                .overlay(alignment: .top) {
+                    if let keepsake {
+                        HStack(spacing: 6) {
+                            PixelIcon(name: keepsake, size: 22)
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text("garden.keepsake").font(PixelFont.body(10)).foregroundStyle(PixelPalette.accentShade)
+                                Text(Collectibles.nameKey(keepsake)).font(PixelFont.body(12))
+                            }
+                        }
+                        .foregroundStyle(PixelPalette.ink)
+                        .padding(8).pixelPanel().padding(.top, 8)
+                        .transition(.banner)
+                    }
+                }
                 .clipShape(PixelBorder(step: 4))
                 .overlay(PixelBorder(step: 4).stroke(PixelPalette.ink, lineWidth: 2))
                 .overlay(alignment: .bottom) { overlay }
@@ -81,6 +98,11 @@ struct GardenView: View {
         scene.store = store
         scene.location = location
         scene.look = store.state.cat.look
+        scene.onFind = { reward in
+            guard case .collectible(let id) = reward, store.state.diary.first?.kind == "found" else { return }
+            withAnimation { keepsake = id }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { withAnimation { if keepsake == id { keepsake = nil } } }
+        }
         switch store.startWalk(location) {
         case .ok:
             if let walk = store.activeWalk { scene.showFinds(walk) }

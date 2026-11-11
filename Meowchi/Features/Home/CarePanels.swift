@@ -32,18 +32,18 @@ struct PlayPanel: View {
             Button { onCozy() } label: {
                 PanelRow(icon: "icon_happiness", title: "cozy.title", detail: Text("cozy.detail"))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PixelPressStyle())
             if store.hasTV {
                 Button { onTV() } label: {
                     PanelRow(icon: "icon_play", title: "tv.watch", detail: readiness(store.tvReadyAt))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PixelPressStyle())
                 .opacity(store.tvReadyAt == nil ? 1 : 0.55)
             }
             Button { onFriend() } label: {
                 PanelRow(icon: "icon_play", title: "friend.invite", detail: readiness(store.friendReadyAt))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PixelPressStyle())
             .opacity(store.friendReadyAt == nil ? 1 : 0.55)
             sectionTitle("play.games")
             ForEach(MiniGameKind.allCases) { kind in
@@ -51,13 +51,13 @@ struct PlayPanel: View {
                     PanelRow(icon: "icon_play", title: kind.titleKey,
                              detail: Text("game.energyCost \(Int(kind.config(store.balance).energyCost))"))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PixelPressStyle())
             }
             Button { onGarden() } label: {
                 PanelRow(icon: "fx_sparkle", title: "walk.title",
                          detail: Text("game.energyCost \(Int(store.balance.walkEnergyCost))"))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PixelPressStyle())
         }
     }
 }
@@ -76,7 +76,7 @@ struct FoodPanel: View {
                          detail: Text(store.state.care.water / 100, format: .percent.precision(.fractionLength(0)))
                             .foregroundColor(store.isWaterLow ? PixelPalette.badText : PixelPalette.ink))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PixelPressStyle())
             if owned.isEmpty {
                 Text("notice.noFood").font(PixelFont.body(12))
             } else {
@@ -85,7 +85,7 @@ struct FoodPanel: View {
                         PanelRow(icon: food.iconName, title: food.nameKey,
                                  detail: Text(verbatim: "×\(store.quantity(of: food.id))"))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(PixelPressStyle())
                 }
             }
         }
@@ -103,21 +103,21 @@ struct CleanPanel: View {
     var body: some View {
         PanelContainer(title: "action.clean") {
             Button { onBath() } label: { PanelRow(icon: "icon_clean", title: "clean.bath", detail: readiness(store.bathReadyAt)) }
-                .buttonStyle(.plain)
+                .buttonStyle(PixelPressStyle())
             Button { onBrush() } label: { PanelRow(icon: "icon_brush", title: "clean.brush", detail: Text("clean.brush.detail")) }
-                .buttonStyle(.plain)
+                .buttonStyle(PixelPressStyle())
             Button { onNails() } label: {
                 PanelRow(icon: "icon_brush", title: "nails.title",
                          detail: Text(store.canTrimNails ? "nails.long" : "nails.neat")
                             .foregroundColor(store.canTrimNails ? PixelPalette.badText : PixelPalette.goodText))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PixelPressStyle())
             Button { onLitter() } label: {
                 PanelRow(icon: "icon_cleanliness", title: "clean.litter",
                          detail: Text(store.state.care.litter / 100, format: .percent.precision(.fractionLength(0)))
                             .foregroundStyle(store.isLitterDirty ? PixelPalette.badText : PixelPalette.ink))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PixelPressStyle())
         }
     }
 }

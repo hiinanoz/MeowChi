@@ -9,12 +9,14 @@ final class AudioManager {
 
     enum Sound: String, CaseIterable {
         case tap, meow, purr, eat, coin, buy, levelUp = "levelup", splash, laserCatch = "catch", find
+        case open, close, tab, badge, reward, wish, scrub, snip, tv
+        case meowHappy = "meow_happy", meowHungry = "meow_hungry", meowSleepy = "meow_sleepy"
 
         var fileName: String { "sfx_" + rawValue }
         /// Minimum time between two plays of the same sound, to avoid machine-gun repeats.
         var minInterval: TimeInterval {
             switch self {
-            case .purr, .meow, .splash: 0.9
+            case .purr, .meow, .splash, .meowHappy, .meowHungry, .meowSleepy, .tv: 0.9
             case .eat: 0.5
             default: 0.06
             }
@@ -36,12 +38,25 @@ final class AudioManager {
 
     private var currentTrack: MusicTrack {
         switch context {
-        case .menu: .retro16
-        case .game: .upbeat
-        case .home: MusicTrack(rawValue: settings.musicTrack) ?? .calm
+        case .menu: return .retro16
+        case .game: return .upbeat
+        case .home:
+            // The calm pick turns into the quieter night tune late in the evening.
+            let pick = MusicTrack(rawValue: settings.musicTrack) ?? .calm
+            return pick == .calm && DayCycle.phase(at: .now) == .night ? .night : pick
         }
     }
     private let log = Logger(subsystem: "Meowchi", category: "Audio")
+
+    /// A meow that matches how the cat feels.
+    static func meow(for mood: Mood) -> Sound {
+        switch mood {
+        case .happy, .excited: .meowHappy
+        case .hungry, .sad, .sick: .meowHungry
+        case .sleepy: .meowSleepy
+        case .neutral, .bored: .meow
+        }
+    }
 
     private init() {
         do {

@@ -57,6 +57,14 @@ jobs:
           rm -rf fastlane/screenshots/_preview fastlane/screenshots/_diagnostics
           find fastlane/screenshots -name "*.png" | sort | head -60
 
+      - name: İnceleme iletişim bilgileri var mı?
+        run: |
+          python3 -m pip install --quiet --break-system-packages pyjwt cryptography
+          if ! python3 Tools/asc_review_detail_exists.py "${{ inputs.version }}"; then
+            echo "::warning::App Review iletişim bilgileri (ad, soyad, telefon) App Store Connect'te boş: inceleme notu bu kez atlanıyor."
+            rm -rf fastlane/metadata/review_information
+          fi
+
       - name: fastlane deliver
         run: |
           # The first version has no "What's New" field in App Store Connect.
@@ -82,7 +90,6 @@ jobs:
       - name: Son derlemeyi sürüme bağla
         if: inputs.attach_build
         run: |
-          python3 -m pip install --quiet --break-system-packages pyjwt cryptography
           python3 Tools/asc_attach_build.py "${{ inputs.version }}"
 
       - name: Anahtarı sil

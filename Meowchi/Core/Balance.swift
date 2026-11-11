@@ -157,6 +157,9 @@ struct Balance {
         .playful: 1.5, .lazy: 0.5, .curious: 1.0, .affectionate: 0.8, .adventurous: 1.2, .calm: 0.7,
     ]
 
+    /// "Today's deal" in the shop: one decoration or accessory a day, this much cheaper.
+    var dailyDealDiscount = 0.3
+
     // MARK: Progression & economy
     var baseXPPerLevel = 50
     var xpGrowthPerLevel = 25

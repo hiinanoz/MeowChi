@@ -417,12 +417,15 @@ final class GameStore {
 
     /// Buys a decoration and puts it in its slot. Unique items can't be bought twice.
     @discardableResult
-    func buyDecor(_ id: String) -> ActionResult {
+    func buyDecor(_ id: String) -> ActionResult { buyDecor(id, price: nil) }
+
+    private func buyDecor(_ id: String, price: Int?) -> ActionResult {
         guard let item = DecorCatalog.item(id) else { return .unknownItem }
         guard !state.decor.isOwned(item) else { return .alreadyOwned }
         guard state.progression.level >= item.unlockLevel else { return .locked }
-        guard state.coins >= item.price else { return .insufficientCoins }
-        state.coins -= item.price
+        let cost = price ?? item.price
+        guard state.coins >= cost else { return .insufficientCoins }
+        state.coins -= cost
         state.decor.owned.insert(id)
         state.decor.equipped[item.slot.rawValue] = id
         save()
@@ -449,14 +452,58 @@ final class GameStore {
 
     /// Buys an accessory and puts it on. Each accessory is bought once.
     @discardableResult
-    func buyAccessory(_ item: Accessory) -> ActionResult {
+    func buyAccessory(_ item: Accessory) -> ActionResult { buyAccessory(item, price: nil) }
+
+    private func buyAccessory(_ item: Accessory, price: Int?) -> ActionResult {
         guard !state.wardrobe.contains(item.rawValue) else { return .alreadyOwned }
         guard state.progression.level >= item.unlockLevel else { return .locked }
-        guard state.coins >= item.price else { return .insufficientCoins }
-        state.coins -= item.price
+        let cost = price ?? item.price
+        guard state.coins >= cost else { return .insufficientCoins }
+        state.coins -= cost
         state.wardrobe.insert(item.rawValue)
         wear(item)
         return .ok
+    }
+
+    // MARK: Today's deal
+
+    struct DailyDeal: Equatable {
+        enum Item: Equatable { case decor(DecorItem), accessory(Accessory) }
+        let item: Item
+        let price: Int
+        let fullPrice: Int
+    }
+
+    /// The same item all day (picked from the day key), among things the player's level allows.
+    var dailyDeal: DailyDeal? {
+        let level = state.progression.level
+        let decor = DecorCatalog.items.filter { !$0.isFree && !$0.isEmpty && $0.unlockLevel <= level }.map { DailyDeal.Item.decor($0) }
+        let accessories = Accessory.allCases.filter { $0.unlockLevel <= level }.map { DailyDeal.Item.accessory($0) }
+        let candidates = decor + accessories
+        guard !candidates.isEmpty, !state.daily.dayKey.isEmpty else { return nil }
+        let index = state.daily.dayKey.unicodeScalars.reduce(0) { ($0 * 31 + Int($1.value)) % 100_003 } % candidates.count
+        let item = candidates[index]
+        let full: Int = switch item {
+        case .decor(let d): d.price
+        case .accessory(let a): a.price
+        }
+        return DailyDeal(item: item, price: Int((Double(full) * (1 - balance.dailyDealDiscount)).rounded()), fullPrice: full)
+    }
+
+    func isOwned(_ item: DailyDeal.Item) -> Bool {
+        switch item {
+        case .decor(let d): state.decor.isOwned(d)
+        case .accessory(let a): state.wardrobe.contains(a.rawValue)
+        }
+    }
+
+    @discardableResult
+    func buyDailyDeal() -> ActionResult {
+        guard let deal = dailyDeal else { return .unknownItem }
+        switch deal.item {
+        case .decor(let d): return buyDecor(d.id, price: deal.price)
+        case .accessory(let a): return buyAccessory(a, price: deal.price)
+        }
     }
 
     /// Puts an owned accessory on, or takes it off if it is already worn.

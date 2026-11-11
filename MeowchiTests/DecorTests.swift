@@ -105,3 +105,22 @@ final class DecorTests: XCTestCase {
         XCTAssertEqual(try SaveCodec.decode(JSONSerialization.data(withJSONObject: json)).decor, DecorState())
     }
 }
+
+@MainActor
+final class DailyDealTests: XCTestCase {
+    func testDealIsStableAndDiscounted() {
+        let store = GameStore(saveStore: InMemorySaveStore())
+        guard let deal = store.dailyDeal else { return XCTFail("No deal") }
+        XCTAssertEqual(store.dailyDeal, deal)
+        XCTAssertLessThan(deal.price, deal.fullPrice)
+        store.debugRefill()
+        let coinsBefore = 10_000
+        var state = store.state
+        state.coins = coinsBefore
+        let rich = GameStore(saveStore: InMemorySaveStore(state: state))
+        XCTAssertEqual(rich.buyDailyDeal(), .ok)
+        XCTAssertEqual(rich.state.coins, coinsBefore - deal.price)
+        XCTAssertTrue(rich.isOwned(deal.item))
+        XCTAssertEqual(rich.buyDailyDeal(), .alreadyOwned)
+    }
+}
